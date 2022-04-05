@@ -40,4 +40,24 @@ impl StackOverFlow {
 
         links_map
     }
+
+    pub async fn get_question_content(question_url: &str) -> Vec<String> {
+        let question_sep = "<div class=\"s-prose js-post-body\" itemprop=\"text\">"; // we use this to split the response since it's unique and the start of the answear in the html.
+
+        let body = reqwest::get(question_url).await.unwrap().text().await.unwrap();
+
+        let mut body_split: Vec<&str> = body.split(question_sep).collect();
+        body_split.reverse();
+        body_split.pop();
+        body_split.reverse();
+        
+        let mut question_contents = vec![];
+
+        for question in body_split {
+            let question_content = question.split("</div>").collect::<Vec<&str>>()[0];
+            question_contents.push(Util::beautify_text_in_html(question_content));
+        }
+
+        question_contents
+    }
 }
