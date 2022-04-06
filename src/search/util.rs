@@ -10,7 +10,14 @@ impl Util {
     }
 
     pub fn beautify_text_in_html(text: &str) -> String {
-        let mut text = urlencoding::decode(text).unwrap().to_string();
+        let mut text = match urlencoding::decode(text) {
+            Ok(text) => text.to_string(),
+            Err(error) => {
+                eprintln!("There was an error decoding the given html text, skipping this step, the given error is: {}", error);
+                text.to_string()
+            }
+        };
+
         text = text
             .replace("<blockquote>", "")
             .replace("</blockquote>", "")

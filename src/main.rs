@@ -1,7 +1,7 @@
 mod search;
 use search::stackoverflow::StackOverFlow;
-use std::{future, borrow::BorrowMut};
-use std::env;
+use std::{borrow::BorrowMut, future};
+use std::{env, process};
 
 #[tokio::main]
 async fn main() {
@@ -12,25 +12,48 @@ async fn main() {
     let body = StackOverFlow::get_questions(search_text.as_str()).await;
 
     let mut i = 1;
-    let mut contents  = vec![];
+    let mut contents = vec![];
     for (key, value) in body {
-        contents.push(tokio::task::spawn(StackOverFlow::get_question_content(value)));
+        contents.push(tokio::task::spawn(StackOverFlow::get_question_content(
+            value,
+        )));
         println!("{}. {}", i, key);
         i += 1;
     }
 
     let mut input = String::from("");
     std::io::stdin().read_line(&mut input);
-    let input: usize = input.trim().parse().unwrap();
+    let input: usize = match input.trim().parse() {
+        Ok(input) => input,
+        Err(error) => {
+            eprintln!(
+                "There was an error parsing user input, the given error is: {}",
+                error
+            );
+            process::exit(109);
+        }
+    };
 
     let index = input - 1;
     // let x = contents.remove(index);
     // let x = x.await;
     let start = std::time::Instant::now();
-    let x = contents.get_mut(index).unwrap().await.unwrap();
+    let x = match contents.get_mut(index) {
+        Some(x) => match x.await {
+            Ok(x) => x,
+            Err(error) => {
+                eprintln!("There was an error awaiting for the response for the chosen question, the given error is: {}", error);
+                process::exit(111);
+            }
+        },
+        None => {
+            eprintln!("There was an error getting the question content for the chosen question.");
+            process::exit(110);
+        }
+    };
+
     let dur = std::time::Instant::now() - start;
     println!("The duration to await ms: {}", dur.as_millis());
-
 
     for content in x {
         println!("\n\nQuestion/Answer:\n {}", &content);

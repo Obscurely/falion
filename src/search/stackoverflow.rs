@@ -1,8 +1,8 @@
-use reqwest;
-use regex::Regex;
-use std::collections::HashMap;
-use crate::search::util::Util;
 use crate::search::duckduckgo::DuckDuckGo;
+use crate::search::util::Util;
+use regex::Regex;
+use reqwest;
+use std::collections::HashMap;
 use std::process;
 
 pub struct StackOverFlow {}
@@ -15,25 +15,28 @@ impl StackOverFlow {
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
         let re = Regex::new("\"http[s].?://[a-z]*?stackoverflow.com/.*?\"").unwrap();
         let mut links = vec![];
-       
+
         let vqd = match vqd.await {
             Ok(vqd) => vqd,
             Err(error) => {
-                eprintln!("There was an error retrieving the vqd, the given error is: {}", error);
+                eprintln!(
+                    "There was an error retrieving the vqd, the given error is: {}",
+                    error
+                );
                 process::exit(101);
-            } 
+            }
         };
 
-        let body = match reqwest::get(base_addr.replace("{querry}", querry).replace("{vqd}", &vqd)).await {
-            Ok(res) => {
-                match res.text().await {
-                    Ok(body) => body,
-                    Err(error) => {
-                        eprintln!("There was an error reading the response of the stackoverflow search, the given error is: {}", error);
-                        process::exit(102);
-                    }
+        let body = match reqwest::get(base_addr.replace("{querry}", querry).replace("{vqd}", &vqd))
+            .await
+        {
+            Ok(res) => match res.text().await {
+                Ok(body) => body,
+                Err(error) => {
+                    eprintln!("There was an error reading the response of the stackoverflow search, the given error is: {}", error);
+                    process::exit(102);
                 }
-            }
+            },
             Err(error) => {
                 eprintln!("There was an error requesting stackoverflow to give available threads on the given search, the given error is: {}", error);
                 process::exit(103);
@@ -48,8 +51,8 @@ impl StackOverFlow {
 
         // let dur = std::time::Instant::now() - start;
         // println!("The duration in ms for get links: {}", dur.as_millis());
-        
-        links        
+
+        links
     }
 
     pub async fn get_questions(search: &str) -> HashMap<String, String> {
@@ -73,7 +76,8 @@ impl StackOverFlow {
         // let dur = std::time::Instant::now() - start;
         // println!("The duration in ms for get questions: {}", dur.as_millis());
 
-        links_map }
+        links_map
+    }
 
     pub async fn get_question_content(question_url: String) -> Vec<String> {
         // let start = std::time::Instant::now();
@@ -82,33 +86,33 @@ impl StackOverFlow {
         let mut question_contents = vec![];
 
         let body = body.await;
-        if body.is_ok() {
-            let body = match body.unwrap() {
-                    Ok(body) => {
-                        match body.text().await {
-                            Ok(body_text) => body_text,
-                            Err(error) => {
-                                eprintln!("There was an error reading the body of the just got \"good\" request, the given error is: {}", error);
-                                return vec![String::from("Nothing in here, there was an error retrieving content!")];
-                            }
-                        }
-                    },
+        if body.is_err() {
+            eprintln!("There was an error reading the content of a question (debug: first part).");
+            return vec![String::from(
+                "Nothing in here, there was an error retireving content!",
+            )];
+        }
+
+        let body = match body.expect("Even tho checking the content of the question resulted in being ok there was still an error, this is really weird, stopping the program for safety!") {
+            Ok(body) => {
+                match body.text().await {
+                    Ok(body_text) => body_text,
                     Err(error) => {
-                        eprintln!("There was an error reading the content of a question (debug: second part), the given error is: {}", error);
+                        eprintln!("There was an error reading the body of the just got \"good\" request, the given error is: {}", error);
                         return vec![String::from("Nothing in here, there was an error retrieving content!")];
-                    } 
-                };
-        }
-        else if body.is_err() {
-            eprintln!("There was an error reading the content of a question (debug: first part)."); 
-            return vec![String::from("Nothing in here, there was an error retireving content!")];
-        }
+                    }
+                }
+            },
+            Err(error) => {
+                eprintln!("There was an error reading the content of a question (debug: second part), the given error is: {}", error);
+                return vec![String::from("Nothing in here, there was an error retrieving content!")];
+            },
+        };
 
         let mut body_split: Vec<&str> = body.split(question_sep).collect();
         body_split.reverse();
         body_split.pop();
         body_split.reverse();
-        
 
         for question in body_split {
             let question_content = question.split("</div>").collect::<Vec<&str>>()[0];
@@ -117,7 +121,7 @@ impl StackOverFlow {
 
         // let dur = std::time::Instant::now() - start;
         // println!("The duration in ms for get questions: {}", dur.as_millis());
-        
+
         question_contents
     }
 }
