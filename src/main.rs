@@ -1,18 +1,17 @@
 mod search;
 use search::stackoverflow::StackOverFlow;
+use std::{future, borrow::BorrowMut};
 use std::env;
 
 #[tokio::main]
 async fn main() {
     let search_text = env::args().collect::<Vec<String>>().join(" ");
-    println!("{}", &search_text);
-
-    let body = StackOverFlow::get_questions(&search_text).await;
+    let body = StackOverFlow::get_questions(search_text.as_str()).await;
 
     let mut i = 1;
-    let values = body.values().collect::<Vec<&String>>();
-    let keys = body.keys().collect::<Vec<&String>>();
-    for key in keys {
+    let mut contents  = vec![];
+    for (key, value) in body {
+        contents.push(tokio::task::spawn(StackOverFlow::get_question_content(value)));
         println!("{}. {}", i, key);
         i += 1;
     }
@@ -22,9 +21,15 @@ async fn main() {
     let input: usize = input.trim().parse().unwrap();
 
     let index = input - 1;
-    let contents = StackOverFlow::get_question_content(values.get(index).unwrap()).await;
+    // let x = contents.remove(index);
+    // let x = x.await;
+    let start = std::time::Instant::now();
+    let x = contents.get_mut(index).unwrap().await.unwrap();
+    let dur = std::time::Instant::now() - start;
+    println!("The duration to await ms: {}", dur.as_millis());
 
-    for content in contents {
+
+    for content in x {
         println!("\n\nQuestion/Answer:\n {}", &content);
     }
 }
