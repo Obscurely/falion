@@ -5,7 +5,10 @@ use std::env;
 
 #[tokio::main]
 async fn main() {
-    let search_text = env::args().collect::<Vec<String>>().join(" ");
+    let args = env::args().collect::<Vec<String>>();
+    let mut search_text = args.join(" ");
+    search_text = search_text.replace((args[0].to_string() + " ").as_str(), "");
+    println!("{}", search_text);
     let body = StackOverFlow::get_questions(search_text.as_str()).await;
 
     let mut i = 1;

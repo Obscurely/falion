@@ -3,6 +3,7 @@ use regex::Regex;
 use std::collections::HashMap;
 use crate::search::util::Util;
 use crate::search::duckduckgo::DuckDuckGo;
+use std::process;
 
 pub struct StackOverFlow {}
 
@@ -11,11 +12,34 @@ impl StackOverFlow {
         // let start = std::time::Instant::now();
         let vqd = tokio::task::spawn(DuckDuckGo::get_vqd(querry.to_owned()));
         let base_addr = "https://links.duckduckgo.com/d.js?q={querry}%20site%3Astackoverflow.com&l=us-en&dl=en&ss_mkt=us&vqd={vqd}";
+        // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
         let re = Regex::new("\"http[s].?://[a-z]*?stackoverflow.com/.*?\"").unwrap();
         let mut links = vec![];
        
-        let vqd = vqd.await.unwrap();
-        let body = reqwest::get(base_addr.replace("{querry}", querry).replace("{vqd}", &vqd)).await.unwrap().text().await.unwrap();
+        let vqd = match vqd.await {
+            Ok(vqd) => vqd,
+            Err(error) => {
+                eprintln!("There was an error retrieving the vqd, the given error is: {}", error);
+                process::exit(101);
+            } 
+        };
+
+        let body = match reqwest::get(base_addr.replace("{querry}", querry).replace("{vqd}", &vqd)).await {
+            Ok(res) => {
+                match res.text().await {
+                    Ok(body) => body,
+                    Err(error) => {
+                        eprintln!("There was an error reading the response of the stackoverflow search, the given error is: {}", error);
+                        process::exit(102);
+                    }
+                }
+            }
+            Err(error) => {
+                eprintln!("There was an error requesting stackoverflow to give available threads on the given search, the given error is: {}", error);
+                process::exit(103);
+            }
+        };
+
         let links_match = re.captures_iter(body.as_str());
 
         for link in links_match {
@@ -36,8 +60,14 @@ impl StackOverFlow {
         let mut links_map = HashMap::new();
         for link in links {
             let title: Vec<&str> = link.split("/").collect();
-            let title = title.last().unwrap().replace("-", " ");
-            
+            let title = match title.last() {
+                Some(title) => title.replace("-", " "),
+                None => {
+                    eprintln!("There was an error retrieving a title from a found thread, skipping since it may be invalid.");
+                    continue;
+                }
+            };
+
             links_map.insert(title, link);
         }
         // let dur = std::time::Instant::now() - start;
@@ -51,7 +81,28 @@ impl StackOverFlow {
         let question_sep = "<div class=\"s-prose js-post-body\" itemprop=\"text\">"; // we use this to split the response since it's unique and the start of the answear in the html.
         let mut question_contents = vec![];
 
-        let body = body.await.unwrap().unwrap().text().await.unwrap();
+        let body = body.await;
+        if body.is_ok() {
+            let body = match body.unwrap() {
+                    Ok(body) => {
+                        match body.text().await {
+                            Ok(body_text) => body_text,
+                            Err(error) => {
+                                eprintln!("There was an error reading the body of the just got \"good\" request, the given error is: {}", error);
+                                return vec![String::from("Nothing in here, there was an error retrieving content!")];
+                            }
+                        }
+                    },
+                    Err(error) => {
+                        eprintln!("There was an error reading the content of a question (debug: second part), the given error is: {}", error);
+                        return vec![String::from("Nothing in here, there was an error retrieving content!")];
+                    } 
+                };
+        }
+        else if body.is_err() {
+            eprintln!("There was an error reading the content of a question (debug: first part)."); 
+            return vec![String::from("Nothing in here, there was an error retireving content!")];
+        }
 
         let mut body_split: Vec<&str> = body.split(question_sep).collect();
         body_split.reverse();
