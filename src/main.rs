@@ -3,11 +3,15 @@ use colored::Colorize;
 use search::stackoverflow::StackOverFlow;
 use std::{borrow::BorrowMut, future};
 use std::{env, process};
+use crossterm::terminal;
+use crossterm::event;
 
 use crate::search::util::Util;
 
 #[tokio::main]
 async fn main() {
+    let mut stdout = std::io::stdout();
+    terminal::disable_raw_mode().unwrap();
     let args = env::args().collect::<Vec<String>>();
     let mut search_text = args.join(" ");
     search_text = search_text.replace((args[0].to_string() + " ").as_str(), "");
@@ -77,8 +81,56 @@ async fn main() {
     println!("The duration to await ms: {}", dur.as_millis());
 
     Util::clear_terminal();
-    println!("{}", selected_question_content[0]);
+
+    let mut r = 0;
+    println!("{}", format!("Question/Answer:\n").green());
+    println!("{}", selected_question_content[r]);
     Util::move_cursor_beginning();
-    std::io::stdin().read_line(&mut input);
+
+    terminal::enable_raw_mode();
+    loop {
+        Util::move_cursor_beginning();
+        //matching the key
+        match event::read().unwrap() {
+            //i think this speaks for itself
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('n'),
+                modifiers: event::KeyModifiers::CONTROL,
+                //clearing the screen and printing our message
+            }) => {
+                    terminal::disable_raw_mode();
+                    if r < selected_question_content.len() -1 {
+                        r += 1;
+                        Util::clear_terminal();
+                        println!("{}", format!("Question/Answer:\n").green());
+                        println!("{}", selected_question_content[r]);
+                        Util::move_cursor_beginning();
+                    }
+                    terminal::enable_raw_mode();
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('b'),
+                modifiers: event::KeyModifiers::CONTROL,
+            }) => {
+                    terminal::disable_raw_mode();
+                    if r > 0 {
+                        r -= 1;
+                        Util::clear_terminal();
+                        println!("{}", format!("Question/Answer:\n").green());
+                        println!("{}", selected_question_content[r]);
+                        Util::move_cursor_beginning();
+                    }
+                    terminal::enable_raw_mode();
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('q'),
+                modifiers: event::KeyModifiers::CONTROL,
+            }) => {
+                    terminal::disable_raw_mode();
+                    std::process::exit(0);
+                }
+            _ => (),
+        }
+    }
 }
 
