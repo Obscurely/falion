@@ -1,4 +1,5 @@
 use colored::Colorize;
+use crossterm::terminal;
 use urlencoding;
 
 pub struct Util {}
@@ -45,5 +46,14 @@ impl Util {
             .replace("<hr />", "\n");
 
         text
+    }
+
+    pub fn clear_terminal() {
+        crossterm::execute!(std::io::stdout(), terminal::Clear(terminal::ClearType::All));
+        crossterm::execute!(std::io::stdout(), crossterm::cursor::MoveTo(0, 0));
+    }
+
+    pub fn move_cursor_beginning() {
+        crossterm::execute!(std::io::stdout(), crossterm::cursor::MoveTo(0, 0));
     }
 }

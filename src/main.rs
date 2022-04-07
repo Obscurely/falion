@@ -4,6 +4,8 @@ use search::stackoverflow::StackOverFlow;
 use std::{borrow::BorrowMut, future};
 use std::{env, process};
 
+use crate::search::util::Util;
+
 #[tokio::main]
 async fn main() {
     let args = env::args().collect::<Vec<String>>();
@@ -24,22 +26,40 @@ async fn main() {
 
     let mut input = String::from("");
     std::io::stdin().read_line(&mut input);
-    let input: usize = match input.trim().parse() {
-        Ok(input) => input,
-        Err(error) => {
-            eprintln!(
-                "There was an error parsing user input, the given error is: {}",
-                format!("{}", error).red()
-            );
-            process::exit(109);
-        }
-    };
+    let mut selected_question: usize = 1; 
 
-    let index = input - 1;
+    let mut valid_input = false;
+    while !valid_input {
+        selected_question = match input.trim().parse() {
+            Ok(input_int) => {
+                if input_int > contents.len() {
+                    println!("Input number was too high, please try again: ");
+                    input.clear();
+                    continue;
+                }
+
+                valid_input = true;
+                input_int
+            },
+            Err(error) => {
+                eprintln!(
+                    "There was an error parsing user input, the given error is: {}",
+                    format!("{}", error).red()
+                );
+                println!("Please try again:");
+                
+                input.clear();
+                std::io::stdin().read_line(&mut input);
+                continue;
+            }
+        };
+    }
+
+    let index = selected_question - 1;
     // let x = contents.remove(index);
     // let x = x.await;
     let start = std::time::Instant::now();
-    let x = match contents.get_mut(index) {
+    let selected_question_content = match contents.get_mut(index) {
         Some(x) => match x.await {
             Ok(x) => x,
             Err(error) => {
@@ -56,7 +76,9 @@ async fn main() {
     let dur = std::time::Instant::now() - start;
     println!("The duration to await ms: {}", dur.as_millis());
 
-    for content in x {
-        println!("\n\nQuestion/Answer:\n {}", &content);
-    }
+    Util::clear_terminal();
+    println!("{}", selected_question_content[0]);
+    Util::move_cursor_beginning();
+    std::io::stdin().read_line(&mut input);
 }
+
