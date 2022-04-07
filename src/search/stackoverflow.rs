@@ -1,5 +1,6 @@
 use crate::search::duckduckgo::DuckDuckGo;
 use crate::search::util::Util;
+use colored::Colorize;
 use regex::Regex;
 use reqwest;
 use std::collections::HashMap;
@@ -8,57 +9,11 @@ use std::process;
 pub struct StackOverFlow {}
 
 impl StackOverFlow {
-    pub async fn get_links(querry: &str) -> Vec<String> {
-        // let start = std::time::Instant::now();
-        let vqd = tokio::task::spawn(DuckDuckGo::get_vqd(querry.to_owned()));
-        let base_addr = "https://links.duckduckgo.com/d.js?q={querry}%20site%3Astackoverflow.com&l=us-en&dl=en&ss_mkt=us&vqd={vqd}";
-        // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
-        let re = Regex::new("\"http[s].?://[a-z]*?stackoverflow.com/.*?\"").unwrap();
-        let mut links = vec![];
-
-        let vqd = match vqd.await {
-            Ok(vqd) => vqd,
-            Err(error) => {
-                eprintln!(
-                    "There was an error retrieving the vqd, the given error is: {}",
-                    error
-                );
-                process::exit(101);
-            }
-        };
-
-        let body = match reqwest::get(base_addr.replace("{querry}", querry).replace("{vqd}", &vqd))
-            .await
-        {
-            Ok(res) => match res.text().await {
-                Ok(body) => body,
-                Err(error) => {
-                    eprintln!("There was an error reading the response of the stackoverflow search, the given error is: {}", error);
-                    process::exit(102);
-                }
-            },
-            Err(error) => {
-                eprintln!("There was an error requesting stackoverflow to give available threads on the given search, the given error is: {}", error);
-                process::exit(103);
-            }
-        };
-
-        let links_match = re.captures_iter(body.as_str());
-
-        for link in links_match {
-            links.push(link[0].to_string().replace("\"", ""));
-        }
-
-        // let dur = std::time::Instant::now() - start;
-        // println!("The duration in ms for get links: {}", dur.as_millis());
-
-        links
-    }
-
     pub async fn get_questions(search: &str) -> HashMap<String, String> {
+        let service_url = "stackoverflow.com";
         // let start = std::time::Instant::now();
         let querry = Util::get_url_compatible_string(String::from(search));
-        let links = StackOverFlow::get_links(&querry).await;
+        let links = DuckDuckGo::get_links(&querry, service_url).await;
 
         let mut links_map = HashMap::new();
         for link in links {
@@ -98,13 +53,13 @@ impl StackOverFlow {
                 match body.text().await {
                     Ok(body_text) => body_text,
                     Err(error) => {
-                        eprintln!("There was an error reading the body of the just got \"good\" request, the given error is: {}", error);
+                        eprintln!("There was an error reading the body of the just got \"good\" request, the given error is: {}", format!("{}", error).red());
                         return vec![String::from("Nothing in here, there was an error retrieving content!")];
                     }
                 }
             },
             Err(error) => {
-                eprintln!("There was an error reading the content of a question (debug: second part), the given error is: {}", error);
+                eprintln!("There was an error reading the content of a question (debug: second part), the given error is: {}", format!("{}", error).red());
                 return vec![String::from("Nothing in here, there was an error retrieving content!")];
             },
         };

@@ -1,3 +1,4 @@
+use colored::Colorize;
 use urlencoding;
 
 pub struct Util {}
@@ -13,7 +14,7 @@ impl Util {
         let mut text = match urlencoding::decode(text) {
             Ok(text) => text.to_string(),
             Err(error) => {
-                eprintln!("There was an error decoding the given html text, skipping this step, the given error is: {}", error);
+                eprintln!("There was an error decoding the given html text, skipping this step, the given error is: {}", format!("{}", error).red());
                 text.to_string()
             }
         };

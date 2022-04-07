@@ -1,4 +1,5 @@
 mod search;
+use colored::Colorize;
 use search::stackoverflow::StackOverFlow;
 use std::{borrow::BorrowMut, future};
 use std::{env, process};
@@ -28,7 +29,7 @@ async fn main() {
         Err(error) => {
             eprintln!(
                 "There was an error parsing user input, the given error is: {}",
-                error
+                format!("{}", error).red()
             );
             process::exit(109);
         }
@@ -42,7 +43,7 @@ async fn main() {
         Some(x) => match x.await {
             Ok(x) => x,
             Err(error) => {
-                eprintln!("There was an error awaiting for the response for the chosen question, the given error is: {}", error);
+                eprintln!("There was an error awaiting for the response for the chosen question, the given error is: {}", format!("{}", error).red());
                 process::exit(111);
             }
         },
