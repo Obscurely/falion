@@ -80,16 +80,16 @@ async fn main() {
     let dur = std::time::Instant::now() - start;
     println!("The duration to await ms: {}", dur.as_millis());
 
-    Util::clear_terminal();
+    Util::clear_terminal(&mut stdout);
 
     let mut r = 0;
     println!("{}", format!("Question/Answer:\n").green());
     println!("{}", selected_question_content[r]);
-    Util::move_cursor_beginning();
+    Util::move_cursor_beginning(&mut stdout);
 
     terminal::enable_raw_mode();
     loop {
-        Util::move_cursor_beginning();
+        Util::move_cursor_beginning(&mut stdout);
         //matching the key
         match event::read().unwrap() {
             //i think this speaks for itself
@@ -101,10 +101,10 @@ async fn main() {
                     terminal::disable_raw_mode();
                     if r < selected_question_content.len() -1 {
                         r += 1;
-                        Util::clear_terminal();
+                        Util::clear_terminal(&mut stdout);
                         println!("{}", format!("Question/Answer:\n").green());
                         println!("{}", selected_question_content[r]);
-                        Util::move_cursor_beginning();
+                        Util::move_cursor_beginning(&mut stdout);
                     }
                     terminal::enable_raw_mode();
                 }
@@ -115,15 +115,22 @@ async fn main() {
                     terminal::disable_raw_mode();
                     if r > 0 {
                         r -= 1;
-                        Util::clear_terminal();
+                        Util::clear_terminal(&mut stdout);
                         println!("{}", format!("Question/Answer:\n").green());
                         println!("{}", selected_question_content[r]);
-                        Util::move_cursor_beginning();
+                        Util::move_cursor_beginning(&mut stdout);
                     }
                     terminal::enable_raw_mode();
                 }
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('q'),
+                modifiers: event::KeyModifiers::CONTROL,
+            }) => {
+                    terminal::disable_raw_mode();
+                    std::process::exit(0);
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('c'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
                     terminal::disable_raw_mode();

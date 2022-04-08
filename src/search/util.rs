@@ -48,12 +48,13 @@ impl Util {
         text
     }
 
-    pub fn clear_terminal() {
-        crossterm::execute!(std::io::stdout(), terminal::Clear(terminal::ClearType::All));
-        crossterm::execute!(std::io::stdout(), crossterm::cursor::MoveTo(0, 0));
+    pub fn clear_terminal(out: &mut std::io::Stdout) {
+        crossterm::execute!(out, terminal::Clear(terminal::ClearType::All));
+        crossterm::execute!(out, terminal::ScrollUp(u16::MAX));
+        crossterm::execute!(out , crossterm::cursor::MoveTo(0, 0));
     }
 
-    pub fn move_cursor_beginning() {
-        crossterm::execute!(std::io::stdout(), crossterm::cursor::MoveTo(0, 0));
+    pub fn move_cursor_beginning(out: &mut std::io::Stdout) {
+        crossterm::execute!(out, crossterm::cursor::MoveTo(0, 0));
     }
 }
