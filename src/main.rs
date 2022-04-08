@@ -13,13 +13,14 @@ async fn main() {
     match terminal::disable_raw_mode() {
         Ok(_) => (),
         Err(error) => {
-            eprintln!("Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
+            eprintln!("[512] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
         }
     }
 
     let args = env::args().collect::<Vec<String>>();
     let mut search_text = args.join(" ");
     search_text = search_text.replace((args[0].to_string() + " ").as_str(), "");
+
     let body = StackOverFlow::get_questions(search_text.as_str()).await;
     let body_values = body.values();
     let body_keys = body.keys();
@@ -45,7 +46,7 @@ async fn main() {
         match std::io::stdin().read_line(&mut input) {
             Ok(_) => (),
             Err(error) => {
-                eprintln!("There was an error reading the input, can't continue, the given error is: {}", format!("{}", error).red());
+                eprintln!("[113] There was an error reading the input, can't continue, the given error is: {}", format!("{}", error).red());
                 process::exit(113);
             }
         };
@@ -66,7 +67,7 @@ async fn main() {
                 },
                 Err(error) => {
                     eprintln!(
-                        "There was an error parsing user input, the given error is: {}",
+                        "[504] There was an error parsing user input, the given error is: {}",
                         format!("{}", error).red()
                     );
                     println!("\nPlease try again:");
@@ -75,7 +76,7 @@ async fn main() {
                     match std::io::stdin().read_line(&mut input) {
                         Ok(_) => (),
                         Err(error) => {
-                            eprintln!("There was an error reading the input, can't continue, the given error is: {}", format!("{}", error).red());
+                            eprintln!("[113] There was an error reading the input, can't continue, the given error is: {}", format!("{}", error).red());
                             process::exit(113);
                         }
                     };
@@ -90,7 +91,7 @@ async fn main() {
             selected_question_content = match content_awaited.get_mut(&index) {
                 Some(val) => val.to_owned(),
                 None => {
-                    eprintln!("There was an retrieving an already awaited response, can't continue");
+                    eprintln!("[112] There was an retrieving an already awaited response, can't continue");
                     process::exit(112);
                 }
             }  
@@ -103,12 +104,12 @@ async fn main() {
                         x
                     },
                     Err(error) => {
-                        eprintln!("There was an error awaiting for the response for the chosen question, the given error is: {}", format!("{}", error).red());
+                        eprintln!("[111] There was an error awaiting for the response for the chosen question, the given error is: {}", format!("{}", error).red());
                         process::exit(111);
                     }
                 },
                 None => {
-                    eprintln!("There was an error getting the question content for the chosen question.");
+                    eprintln!("[110] There was an error getting the question content for the chosen question.");
                     process::exit(110);
                 }
             };
@@ -124,7 +125,7 @@ async fn main() {
         match terminal::enable_raw_mode() {
             Ok(_) => (),
             Err(error) => {
-                eprintln!("Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
+                eprintln!("[505] Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
             }
         }
         loop {
@@ -140,7 +141,7 @@ async fn main() {
                         match terminal::disable_raw_mode() {
                             Ok(_) => (),
                             Err(error) => {
-                                eprintln!("Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
+                                eprintln!("[506] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
                             }
                         }
                         if r < selected_question_content.len() -1 {
@@ -153,7 +154,7 @@ async fn main() {
                         match terminal::enable_raw_mode() {
                             Ok(_) => (),
                             Err(error) => {
-                                eprintln!("Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
+                                eprintln!("[507] Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
                             }
                         }
                     }
@@ -164,7 +165,7 @@ async fn main() {
                         match terminal::disable_raw_mode() {
                             Ok(_) => (),
                             Err(error) => {
-                                eprintln!("Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
+                                eprintln!("[508] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
                             }
                         }
                         if r > 0 {
@@ -177,7 +178,7 @@ async fn main() {
                         match terminal::enable_raw_mode() {
                             Ok(_) => (),
                             Err(error) => {
-                                eprintln!("Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
+                                eprintln!("[509] Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
                             }
                         }
                     }
@@ -188,7 +189,7 @@ async fn main() {
                         match terminal::disable_raw_mode() {
                             Ok(_) => (),
                             Err(error) => {
-                                eprintln!("Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
+                                eprintln!("[510] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
                             }
                         }
                         Util::clear_terminal(&mut stdout);
@@ -202,7 +203,7 @@ async fn main() {
                         match terminal::disable_raw_mode() {
                             Ok(_) => (),
                             Err(error) => {
-                                eprintln!("Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
+                                eprintln!("[511] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
                             }
                         }
                         std::process::exit(0);

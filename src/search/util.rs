@@ -15,7 +15,7 @@ impl Util {
         let mut text = match urlencoding::decode(text) {
             Ok(text) => text.to_string(),
             Err(error) => {
-                eprintln!("There was an error decoding the given html text, skipping this step, the given error is: {}", format!("{}", error).red());
+                eprintln!("[513] There was an error decoding the given html text, skipping this step, the given error is: {}", format!("{}", error).red());
                 text.to_string()
             }
         };
@@ -52,19 +52,19 @@ impl Util {
         match crossterm::execute!(out, terminal::Clear(terminal::ClearType::All)) {
             Ok(_) => (),
             Err(error) => {
-                eprintln!("Warning, there was an error clearing the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
+                eprintln!("[514] Warning, there was an error clearing the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
             }
         }
         match crossterm::execute!(out, terminal::ScrollUp(u16::MAX)) {
             Ok(_) => (),
             Err(error) => {
-                eprintln!("Warning, there was an error scrolling up the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
+                eprintln!("[515] Warning, there was an error scrolling up the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
             }
         }
         match crossterm::execute!(out , crossterm::cursor::MoveTo(0, 0)) {
             Ok(_) => (),
             Err(error) => {
-                eprintln!("Warning, there was an error moving the cursor of the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
+                eprintln!("[516] Warning, there was an error moving the cursor of the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
             }
         }
     }
@@ -73,7 +73,7 @@ impl Util {
         match crossterm::execute!(out , crossterm::cursor::MoveTo(0, 0)) {
             Ok(_) => (),
             Err(error) => {
-                eprintln!("Warning, there was an error moving the cursor of the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
+                eprintln!("[517] Warning, there was an error moving the cursor of the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
             }
         }
     }

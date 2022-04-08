@@ -19,7 +19,7 @@ impl StackOverFlow {
             let title = match title.last() {
                 Some(title) => title.replace('-', " "),
                 None => {
-                    eprintln!("There was an error retrieving a title from a found thread, skipping since it may be invalid.");
+                    eprintln!("[500] There was an error retrieving a title from a found thread, skipping since it may be invalid.");
                     continue;
                 }
             };
@@ -40,7 +40,7 @@ impl StackOverFlow {
 
         let body = body.await;
         if body.is_err() {
-            eprintln!("There was an error reading the content of a question (debug: first part).");
+            eprintln!("[501] There was an error reading the content of a question (debug: first part).");
             return vec![String::from(
                 "Nothing in here, there was an error retireving content!",
             )];
@@ -51,13 +51,13 @@ impl StackOverFlow {
                 match body.text().await {
                     Ok(body_text) => body_text,
                     Err(error) => {
-                        eprintln!("There was an error reading the body of the just got \"good\" request, the given error is: {}", format!("{}", error).red());
+                        eprintln!("[502] There was an error reading the body of the just got \"good\" request, the given error is: {}", format!("{}", error).red());
                         return vec![String::from("Nothing in here, there was an error retrieving content!")];
                     }
                 }
             },
             Err(error) => {
-                eprintln!("There was an error reading the content of a question (debug: second part), the given error is: {}", format!("{}", error).red());
+                eprintln!("[503] There was an error reading the content of a question (debug: second part), the given error is: {}", format!("{}", error).red());
                 return vec![String::from("Nothing in here, there was an error retrieving content!")];
             },
         };

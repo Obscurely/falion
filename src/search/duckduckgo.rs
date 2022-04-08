@@ -16,17 +16,17 @@ impl DuckDuckGo {
                 Ok(body) => match body.text().await {
                     Ok(body) => body,
                     Err(error) => {
-                        eprintln!("There was an error reading the body of the vqd request from duckduckgo, the given error is: {}", format!("{}", error).red());
+                        eprintln!("[106] There was an error reading the body of the vqd request from duckduckgo, the given error is: {}", format!("{}", error).red());
                         process::exit(106);
                     }
                 },
                 Err(error) => {
-                    eprintln!("There was an error retrieving the response for vqd from duckduckgo (debug: second part), the given error is: {}", format!("{}", error).red());
+                    eprintln!("[105] There was an error retrieving the response for vqd from duckduckgo (debug: second part), the given error is: {}", format!("{}", error).red());
                     process::exit(105);
                 }
             },
             Err(error) => {
-                eprintln!("There was an error retrieving the response for vqd from duckduckgo (debug: first part), the given error is: {}", format!("{}", error).red());
+                eprintln!("[104] There was an error retrieving the response for vqd from duckduckgo (debug: first part), the given error is: {}", format!("{}", error).red());
                 process::exit(104);
             }
         };
@@ -35,13 +35,13 @@ impl DuckDuckGo {
             Some(matches) => match matches.get(0) {
                 Some(matches) => matches.as_str(),
                 None => {
-                    eprintln!("There was an error reading the found matches with regex");
+                    eprintln!("[108] There was an error reading the found matches with regex");
                     process::exit(108);
                 }
             },
             None => {
                 eprintln!(
-                    "There was an error capturing regex matches on the vqd body from duckduckgo"
+                    "[107] There was an error capturing regex matches on the vqd body from duckduckgo"
                 );
                 process::exit(107);
             }
@@ -63,7 +63,7 @@ impl DuckDuckGo {
             Ok(vqd) => vqd,
             Err(error) => {
                 eprintln!(
-                    "There was an error retrieving the vqd, the given error is: {}",
+                    "[101] There was an error retrieving the vqd, the given error is: {}",
                     format!("{}", error).red()
                 );
                 process::exit(101);
@@ -76,12 +76,12 @@ impl DuckDuckGo {
             Ok(res) => match res.text().await {
                 Ok(body) => body,
                 Err(error) => {
-                    eprintln!("There was an error reading the response of the stackoverflow search, the given error is: {}", format!("{}", error).red());
+                    eprintln!("[102] There was an error reading the response of the stackoverflow search, the given error is: {}", format!("{}", error).red());
                     process::exit(102);
                 }
             },
             Err(error) => {
-                eprintln!("There was an error requesting stackoverflow to give available threads on the given search, the given error is: {}", format!("{}", error).red());
+                eprintln!("[103] There was an error requesting stackoverflow to give available threads on the given search, the given error is: {}", format!("{}", error).red());
                 process::exit(103);
             }
         };
