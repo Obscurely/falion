@@ -1,10 +1,8 @@
 use crate::search::duckduckgo::DuckDuckGo;
 use crate::search::util::Util;
 use colored::Colorize;
-use regex::Regex;
 use reqwest;
 use std::collections::HashMap;
-use std::process;
 
 pub struct StackOverFlow {}
 
@@ -17,9 +15,9 @@ impl StackOverFlow {
 
         let mut links_map = HashMap::new();
         for link in links {
-            let title: Vec<&str> = link.split("/").collect();
+            let title: Vec<&str> = link.split('/').collect();
             let title = match title.last() {
-                Some(title) => title.replace("-", " "),
+                Some(title) => title.replace('-', " "),
                 None => {
                     eprintln!("There was an error retrieving a title from a found thread, skipping since it may be invalid.");
                     continue;

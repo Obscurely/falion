@@ -47,7 +47,7 @@ impl DuckDuckGo {
             }
         };
 
-        vqd_match.to_string().replace("'", "").replace("vqd=", "")
+        vqd_match.to_string().replace('\'', "").replace("vqd=", "")
     }
 
     pub async fn get_links(querry: &str, site: &str) -> Vec<String> {
@@ -89,7 +89,7 @@ impl DuckDuckGo {
         let links_match = re.captures_iter(body.as_str());
 
         for link in links_match {
-            links.push(link[0].to_string().replace("\"", ""));
+            links.push(link[0].to_string().replace('"', ""));
         }
 
         // let dur = std::time::Instant::now() - start;

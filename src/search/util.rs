@@ -49,12 +49,32 @@ impl Util {
     }
 
     pub fn clear_terminal(out: &mut std::io::Stdout) {
-        crossterm::execute!(out, terminal::Clear(terminal::ClearType::All));
-        crossterm::execute!(out, terminal::ScrollUp(u16::MAX));
-        crossterm::execute!(out , crossterm::cursor::MoveTo(0, 0));
+        match crossterm::execute!(out, terminal::Clear(terminal::ClearType::All)) {
+            Ok(_) => (),
+            Err(error) => {
+                eprintln!("Warning, there was an error clearing the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
+            }
+        }
+        match crossterm::execute!(out, terminal::ScrollUp(u16::MAX)) {
+            Ok(_) => (),
+            Err(error) => {
+                eprintln!("Warning, there was an error scrolling up the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
+            }
+        }
+        match crossterm::execute!(out , crossterm::cursor::MoveTo(0, 0)) {
+            Ok(_) => (),
+            Err(error) => {
+                eprintln!("Warning, there was an error moving the cursor of the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
+            }
+        }
     }
 
     pub fn move_cursor_beginning(out: &mut std::io::Stdout) {
-        crossterm::execute!(out, crossterm::cursor::MoveTo(0, 0));
+        match crossterm::execute!(out , crossterm::cursor::MoveTo(0, 0)) {
+            Ok(_) => (),
+            Err(error) => {
+                eprintln!("Warning, there was an error moving the cursor of the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
+            }
+        }
     }
 }
