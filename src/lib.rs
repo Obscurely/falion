@@ -3,9 +3,9 @@ use crate::search::util::Util;
 use colored::Colorize;
 use crossterm::event;
 use crossterm::terminal;
-use tokio::task::JoinHandle;
 use std::collections::HashMap;
 use std::{io, process};
+use tokio::task::JoinHandle;
 
 pub fn get_valid_question_select(contents: &Vec<JoinHandle<Vec<String>>>) -> usize {
     println!("\n{}", "Input your choice: ".green());
@@ -55,7 +55,11 @@ pub fn get_valid_question_select(contents: &Vec<JoinHandle<Vec<String>>>) -> usi
     selected_question
 }
 
-pub async fn get_question_content(contents: &mut Vec<JoinHandle<Vec<String>>>, content_awaited: &mut HashMap<usize, Vec<String>>, index: usize) -> Vec<String> {
+pub async fn get_question_content(
+    contents: &mut Vec<JoinHandle<Vec<String>>>,
+    content_awaited: &mut HashMap<usize, Vec<String>>,
+    index: usize,
+) -> Vec<String> {
     let mut selected_question_content = vec![String::from("")];
     if content_awaited.contains_key(&index) {
         selected_question_content = match content_awaited.get_mut(&index) {

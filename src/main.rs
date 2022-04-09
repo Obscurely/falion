@@ -1,8 +1,8 @@
 use colored::Colorize;
 use crossterm::terminal;
+use falion::search::stackoverflow::StackOverFlow;
 use std::collections::HashMap;
 use std::{env, io};
-use falion::search::stackoverflow::StackOverFlow;
 
 #[tokio::main]
 async fn main() {
@@ -35,7 +35,7 @@ async fn main() {
             value.clone(),
         )));
     }
-    
+
     let mut content_awaited: HashMap<usize, Vec<String>> = HashMap::new(); // storing what was already awaited in a different var
     loop {
         // print the search querry
@@ -54,7 +54,8 @@ async fn main() {
 
         // get user to select a question and get the content for it
         let index = falion::get_valid_question_select(&contents) - 1;
-        let selected_question_content = falion::get_question_content(&mut contents, &mut content_awaited, index).await;
+        let selected_question_content =
+            falion::get_question_content(&mut contents, &mut content_awaited, index).await;
 
         falion::loop_through_question(&mut stdout, &selected_question_content);
     }
