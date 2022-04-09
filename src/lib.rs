@@ -104,14 +104,10 @@ pub fn loop_through_question(stdout: &mut io::Stdout, selected_question_content:
     Util::move_cursor_beginning(stdout);
 
     // enable raw mode in order to be able to use keybings
-    match terminal::enable_raw_mode() {
-        Ok(_) => (),
-        Err(error) => {
-            eprintln!("[505] Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
-        }
-    }
+    Util::enable_terminal_raw_mode();
+    
     loop {
-        Util::move_cursor_beginning(stdout);
+        // Util::move_cursor_beginning(stdout);
         //matching the key
         let event_read = match event::read() {
             Ok(ev) => ev,
@@ -127,12 +123,7 @@ pub fn loop_through_question(stdout: &mut io::Stdout, selected_question_content:
                 modifiers: event::KeyModifiers::CONTROL,
                 //clearing the screen and printing our message
             }) => {
-                match terminal::disable_raw_mode() {
-                    Ok(_) => (),
-                    Err(error) => {
-                        eprintln!("[506] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
-                    }
-                }
+                Util::disable_terminal_raw_mode();
                 if r < selected_question_content.len() - 1 {
                     r += 1;
                     Util::clear_terminal(stdout);
@@ -140,23 +131,13 @@ pub fn loop_through_question(stdout: &mut io::Stdout, selected_question_content:
                     println!("{}", selected_question_content[r]);
                     Util::move_cursor_beginning(stdout);
                 }
-                match terminal::enable_raw_mode() {
-                    Ok(_) => (),
-                    Err(error) => {
-                        eprintln!("[507] Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
-                    }
-                }
+                Util::enable_terminal_raw_mode();
             }
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('b'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
-                match terminal::disable_raw_mode() {
-                    Ok(_) => (),
-                    Err(error) => {
-                        eprintln!("[508] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
-                    }
-                }
+                Util::disable_terminal_raw_mode();
                 if r > 0 {
                     r -= 1;
                     Util::clear_terminal(stdout);
@@ -164,23 +145,37 @@ pub fn loop_through_question(stdout: &mut io::Stdout, selected_question_content:
                     println!("{}", selected_question_content[r]);
                     Util::move_cursor_beginning(stdout);
                 }
-                match terminal::enable_raw_mode() {
-                    Ok(_) => (),
-                    Err(error) => {
-                        eprintln!("[509] Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
-                    }
-                }
+                Util::enable_terminal_raw_mode();
             }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('j'),
+                modifiers: event::KeyModifiers::NONE,
+            }) => {
+                    Util::move_cursor_down(stdout);
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('k'),
+                modifiers: event::KeyModifiers::NONE,
+            }) => {
+                    Util::move_cursor_up(stdout);
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('d'),
+                modifiers: event::KeyModifiers::CONTROL,
+            }) => {
+                    Util::move_cursor_down_5(stdout);
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('u'),
+                modifiers: event::KeyModifiers::CONTROL,
+            }) => {
+                    Util::move_cursor_up_5(stdout);
+                }
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('q'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
-                match terminal::disable_raw_mode() {
-                    Ok(_) => (),
-                    Err(error) => {
-                        eprintln!("[510] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
-                    }
-                }
+                Util::disable_terminal_raw_mode();
                 Util::clear_terminal(stdout);
 
                 break;
@@ -189,12 +184,7 @@ pub fn loop_through_question(stdout: &mut io::Stdout, selected_question_content:
                 code: event::KeyCode::Char('c'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
-                match terminal::disable_raw_mode() {
-                    Ok(_) => (),
-                    Err(error) => {
-                        eprintln!("[511] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
-                    }
-                }
+                Util::disable_terminal_raw_mode();
                 std::process::exit(0);
             }
             _ => (),

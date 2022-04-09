@@ -77,4 +77,58 @@ impl Util {
             }
         }
     }
+
+    pub fn move_cursor_down(out: &mut std::io::Stdout) {
+        match crossterm::execute!(out, terminal::ScrollDown(1)) {
+            Ok(_) => (),
+            Err(error) => {
+                eprintln!("[519] Warning. there was an error moving the cursor down, program may not work as expected! the given error is: {}", format!("{}", error).red());
+            }
+        }
+    }
+
+    pub fn move_cursor_up(out: &mut std::io::Stdout) {
+        match crossterm::execute!(out, terminal::ScrollUp(1)) {
+            Ok(_) => (),
+            Err(error) => {
+                eprintln!("[520] Warning. there was an error moving the cursor up, program may not work as expected! the given error is: {}", format!("{}", error).red());
+            }
+        }
+    }
+
+    pub fn move_cursor_down_5(out: &mut std::io::Stdout) {
+        match crossterm::execute!(out, terminal::ScrollDown(5)) {
+            Ok(_) => (),
+            Err(error) => {
+                eprintln!("[521] Warning. there was an error moving the cursor down 5 lines, program may not work as expected! the given error is: {}", format!("{}", error).red());
+            }
+        }
+    }
+
+    pub fn move_cursor_up_5(out: &mut std::io::Stdout) {
+        match crossterm::execute!(out, terminal::ScrollUp(5)) {
+            Ok(_) => (),
+            Err(error) => {
+                eprintln!("[522] Warning. there was an error moving the cursor up 5 lines, program may not work as expected! the given error is: {}", format!("{}", error).red());
+            }
+        }
+    }
+
+    pub fn disable_terminal_raw_mode() {
+        match terminal::disable_raw_mode() {
+            Ok(_) => (),
+            Err(error) => {
+                eprintln!("[510] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
+            }
+        }
+    }
+
+    pub fn enable_terminal_raw_mode() {
+        match terminal::enable_raw_mode() {
+            Ok(_) => (),
+            Err(error) => {
+                eprintln!("[505] Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
+            }
+        }
+    }
 }
