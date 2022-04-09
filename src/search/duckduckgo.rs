@@ -9,6 +9,7 @@ impl DuckDuckGo {
     pub async fn get_vqd(querry: String) -> String {
         let base_addr = "https://www.duckduckgo.com/?q={querry}%20site%3Astackoverflow.com";
         let body = tokio::task::spawn(reqwest::get(base_addr.replace("{querry}", &querry)));
+        // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
         let re = Regex::new(r"vqd='[0-9][-].*?'").unwrap();
 
         let body = match body.await {

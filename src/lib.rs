@@ -113,7 +113,14 @@ pub fn loop_through_question(stdout: &mut io::Stdout, selected_question_content:
     loop {
         Util::move_cursor_beginning(stdout);
         //matching the key
-        match event::read().unwrap() {
+        let event_read = match event::read() {
+            Ok(ev) => ev,
+            Err(error) => {
+                eprintln!("[518] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is: {}", format!("{}", error).red());
+                continue;
+            }
+        };
+        match event_read {
             //i think this speaks for itself
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('n'),
