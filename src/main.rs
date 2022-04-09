@@ -1,11 +1,11 @@
 mod search;
-use colored::Colorize;
-use search::stackoverflow::StackOverFlow;
-use std::{env, process, io};
-use std::collections::HashMap;
-use crossterm::terminal;
-use crossterm::event;
 use crate::search::util::Util;
+use colored::Colorize;
+use crossterm::event;
+use crossterm::terminal;
+use search::stackoverflow::StackOverFlow;
+use std::collections::HashMap;
+use std::{env, io, process};
 
 #[tokio::main]
 async fn main() {
@@ -34,7 +34,11 @@ async fn main() {
 
     let mut content_awaited: HashMap<usize, Vec<String>> = HashMap::new();
     loop {
-        println!("{}: {}", "Your input search querry".green(), (&search_text).to_string().blue());
+        println!(
+            "{}: {}",
+            "Your input search querry".green(),
+            (&search_text).to_string().blue()
+        );
         let mut i = 1;
         for key in (&body_keys).clone().into_iter().collect::<Vec<&String>>() {
             println!("{}. {}", i, key);
@@ -50,7 +54,7 @@ async fn main() {
                 process::exit(113);
             }
         };
-        let mut selected_question: usize = 1; 
+        let mut selected_question: usize = 1;
 
         let mut valid_input = false;
         while !valid_input {
@@ -64,14 +68,14 @@ async fn main() {
 
                     valid_input = true;
                     input_int
-                },
+                }
                 Err(error) => {
                     eprintln!(
                         "[504] There was an error parsing user input, the given error is: {}",
                         format!("{}", error).red()
                     );
                     println!("\nPlease try again:");
-                    
+
                     input.clear();
                     match std::io::stdin().read_line(&mut input) {
                         Ok(_) => (),
@@ -91,18 +95,19 @@ async fn main() {
             selected_question_content = match content_awaited.get_mut(&index) {
                 Some(val) => val.to_owned(),
                 None => {
-                    eprintln!("[112] There was an retrieving an already awaited response, can't continue");
+                    eprintln!(
+                        "[112] There was an retrieving an already awaited response, can't continue"
+                    );
                     process::exit(112);
                 }
-            }  
-        }
-        else {
+            }
+        } else {
             selected_question_content = match contents.get_mut(index) {
                 Some(x) => match x.await {
                     Ok(x) => {
                         content_awaited.insert(index, x.clone());
                         x
-                    },
+                    }
                     Err(error) => {
                         eprintln!("[111] There was an error awaiting for the response for the chosen question, the given error is: {}", format!("{}", error).red());
                         process::exit(111);
@@ -114,7 +119,7 @@ async fn main() {
                 }
             };
         }
-        
+
         Util::clear_terminal(&mut stdout);
 
         let mut r = 0;
@@ -138,79 +143,78 @@ async fn main() {
                     modifiers: event::KeyModifiers::CONTROL,
                     //clearing the screen and printing our message
                 }) => {
-                        match terminal::disable_raw_mode() {
-                            Ok(_) => (),
-                            Err(error) => {
-                                eprintln!("[506] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
-                            }
-                        }
-                        if r < selected_question_content.len() -1 {
-                            r += 1;
-                            Util::clear_terminal(&mut stdout);
-                            println!("{}", "Question/Answer:\n".green());
-                            println!("{}", selected_question_content[r]);
-                            Util::move_cursor_beginning(&mut stdout);
-                        }
-                        match terminal::enable_raw_mode() {
-                            Ok(_) => (),
-                            Err(error) => {
-                                eprintln!("[507] Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
-                            }
+                    match terminal::disable_raw_mode() {
+                        Ok(_) => (),
+                        Err(error) => {
+                            eprintln!("[506] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
                         }
                     }
+                    if r < selected_question_content.len() - 1 {
+                        r += 1;
+                        Util::clear_terminal(&mut stdout);
+                        println!("{}", "Question/Answer:\n".green());
+                        println!("{}", selected_question_content[r]);
+                        Util::move_cursor_beginning(&mut stdout);
+                    }
+                    match terminal::enable_raw_mode() {
+                        Ok(_) => (),
+                        Err(error) => {
+                            eprintln!("[507] Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
+                        }
+                    }
+                }
                 event::Event::Key(event::KeyEvent {
                     code: event::KeyCode::Char('b'),
                     modifiers: event::KeyModifiers::CONTROL,
                 }) => {
-                        match terminal::disable_raw_mode() {
-                            Ok(_) => (),
-                            Err(error) => {
-                                eprintln!("[508] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
-                            }
-                        }
-                        if r > 0 {
-                            r -= 1;
-                            Util::clear_terminal(&mut stdout);
-                            println!("{}", "Question/Answer:\n".green());
-                            println!("{}", selected_question_content[r]);
-                            Util::move_cursor_beginning(&mut stdout);
-                        }
-                        match terminal::enable_raw_mode() {
-                            Ok(_) => (),
-                            Err(error) => {
-                                eprintln!("[509] Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
-                            }
+                    match terminal::disable_raw_mode() {
+                        Ok(_) => (),
+                        Err(error) => {
+                            eprintln!("[508] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
                         }
                     }
+                    if r > 0 {
+                        r -= 1;
+                        Util::clear_terminal(&mut stdout);
+                        println!("{}", "Question/Answer:\n".green());
+                        println!("{}", selected_question_content[r]);
+                        Util::move_cursor_beginning(&mut stdout);
+                    }
+                    match terminal::enable_raw_mode() {
+                        Ok(_) => (),
+                        Err(error) => {
+                            eprintln!("[509] Warning, there was an error enabling raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
+                        }
+                    }
+                }
                 event::Event::Key(event::KeyEvent {
                     code: event::KeyCode::Char('q'),
                     modifiers: event::KeyModifiers::CONTROL,
                 }) => {
-                        match terminal::disable_raw_mode() {
-                            Ok(_) => (),
-                            Err(error) => {
-                                eprintln!("[510] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
-                            }
+                    match terminal::disable_raw_mode() {
+                        Ok(_) => (),
+                        Err(error) => {
+                            eprintln!("[510] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
                         }
-                        Util::clear_terminal(&mut stdout);
-
-                        break;
                     }
+                    Util::clear_terminal(&mut stdout);
+
+                    break;
+                }
                 event::Event::Key(event::KeyEvent {
                     code: event::KeyCode::Char('c'),
                     modifiers: event::KeyModifiers::CONTROL,
                 }) => {
-                        match terminal::disable_raw_mode() {
-                            Ok(_) => (),
-                            Err(error) => {
-                                eprintln!("[511] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
-                            }
+                    match terminal::disable_raw_mode() {
+                        Ok(_) => (),
+                        Err(error) => {
+                            eprintln!("[511] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
                         }
-                        std::process::exit(0);
                     }
+                    std::process::exit(0);
+                }
                 _ => (),
             }
         }
     }
 }
-

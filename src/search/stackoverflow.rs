@@ -40,7 +40,9 @@ impl StackOverFlow {
 
         let body = body.await;
         if body.is_err() {
-            eprintln!("[501] There was an error reading the content of a question (debug: first part).");
+            eprintln!(
+                "[501] There was an error reading the content of a question (debug: first part)."
+            );
             return vec![String::from(
                 "Nothing in here, there was an error retireving content!",
             )];

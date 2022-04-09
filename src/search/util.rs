@@ -61,7 +61,7 @@ impl Util {
                 eprintln!("[515] Warning, there was an error scrolling up the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
             }
         }
-        match crossterm::execute!(out , crossterm::cursor::MoveTo(0, 0)) {
+        match crossterm::execute!(out, crossterm::cursor::MoveTo(0, 0)) {
             Ok(_) => (),
             Err(error) => {
                 eprintln!("[516] Warning, there was an error moving the cursor of the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
@@ -70,7 +70,7 @@ impl Util {
     }
 
     pub fn move_cursor_beginning(out: &mut std::io::Stdout) {
-        match crossterm::execute!(out , crossterm::cursor::MoveTo(0, 0)) {
+        match crossterm::execute!(out, crossterm::cursor::MoveTo(0, 0)) {
             Ok(_) => (),
             Err(error) => {
                 eprintln!("[517] Warning, there was an error moving the cursor of the terminal, program may not work as expected! the given error is: {}", format!("{}", error).red());
