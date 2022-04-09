@@ -105,7 +105,7 @@ pub fn loop_through_question(stdout: &mut io::Stdout, selected_question_content:
 
     // enable raw mode in order to be able to use keybings
     Util::enable_terminal_raw_mode();
-    
+
     loop {
         // Util::move_cursor_beginning(stdout);
         //matching the key
@@ -151,26 +151,26 @@ pub fn loop_through_question(stdout: &mut io::Stdout, selected_question_content:
                 code: event::KeyCode::Char('j'),
                 modifiers: event::KeyModifiers::NONE,
             }) => {
-                    Util::move_cursor_down(stdout);
-                }
+                Util::move_cursor_down(stdout);
+            }
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('k'),
                 modifiers: event::KeyModifiers::NONE,
             }) => {
-                    Util::move_cursor_up(stdout);
-                }
+                Util::move_cursor_up(stdout);
+            }
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('d'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
-                    Util::move_cursor_down_5(stdout);
-                }
+                Util::move_cursor_down_5(stdout);
+            }
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('u'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
-                    Util::move_cursor_up_5(stdout);
-                }
+                Util::move_cursor_up_5(stdout);
+            }
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('q'),
                 modifiers: event::KeyModifiers::CONTROL,
