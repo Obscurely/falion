@@ -6,7 +6,13 @@ use std::{env, io};
 
 #[tokio::main]
 async fn main() {
-    let term_width = usize::from(terminal::size().unwrap().0);
+    let term_width = usize::from( match terminal::size() {
+        Ok(size) => size.0,
+        Err(error) => {
+            eprintln!("[520] Warning! There was a problem detecting the terminal width, using 1920 (could use 1milion), the terminal should take care of it, it's just not gonna be as nice, the given error is: {}", format!("{}", error).red());
+            1920
+        }
+    });
     // getting stdout into var in order to manipulate the terminal
     let mut stdout = io::stdout();
 
@@ -20,6 +26,10 @@ async fn main() {
 
     // getting the search text from the args of the terminal
     let args = env::args().collect::<Vec<String>>();
+    if args.len() < 2 {
+        eprintln!("[115] {}", "You have to provide a search querry, either surronded by \" or the querry as it is after the program's name.".to_string().red());
+        std::process::exit(115);
+    }
     let mut search_text = args.join(" ");
     search_text = search_text.replace((args[0].to_string() + " ").as_str(), "");
 

@@ -90,6 +90,13 @@ impl DuckDuckGo {
         let links_match = re.captures_iter(body.as_str());
 
         for link in links_match {
+            // let link_part = match link.get(0) {
+            //     Some(value) => value.to_owned,
+            //     None => {
+            //         eprintln!("[521] There was an error getting a part of the current link, continuing with the next iteration.");
+            //         continue;
+            //     }
+            // };
             links.push(link[0].to_string().replace('"', ""));
         }
 

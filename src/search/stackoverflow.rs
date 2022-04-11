@@ -70,7 +70,14 @@ impl StackOverFlow {
         body_split.reverse();
 
         for question in body_split {
-            let question_content = question.split("</div>").collect::<Vec<&str>>()[0];
+            let question_content_split = question.split("</div>").collect::<Vec<&str>>();
+            let question_content = match question_content_split.get(0) {
+                Some(value) => value,
+                None => {
+                    eprintln!("[522] Warning! There was an error getting a certain part of the html response from stackoverflow, continuing with next iteration.");
+                    continue;
+                }
+            };
             question_contents.push(Util::beautify_text_in_html(question_content, term_width));
         }
 

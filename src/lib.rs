@@ -99,8 +99,20 @@ pub fn loop_through_question(stdout: &mut io::Stdout, selected_question_content:
 
     // print the question content
     let mut r = 0;
-    println!("{}", "Question/Answer:\n".green());
-    println!("{}", selected_question_content[r]);
+    let mut recieved_content = match selected_question_content.get(r) {
+        Some(value) => value,
+        None => {
+            eprintln!("[520] Warning! There was an error reading this question's content, returning back to the home page");
+            return;
+        }
+    };
+    if r == 0 {
+        println!("{}", "Question:\n".green());
+    }
+    else {
+        println!("{}", format!("Answer {}:\n", r).green());
+    }
+    println!("{}", recieved_content);
     Util::move_cursor_beginning(stdout);
 
     // enable raw mode in order to be able to use keybings
@@ -127,8 +139,20 @@ pub fn loop_through_question(stdout: &mut io::Stdout, selected_question_content:
                 if r < selected_question_content.len() - 1 {
                     r += 1;
                     Util::clear_terminal(stdout);
-                    println!("{}", "Question/Answer:\n".green());
-                    println!("{}", selected_question_content[r]);
+                    recieved_content = match selected_question_content.get(r) {
+                        Some(value) => value,
+                        None => {
+                            eprintln!("[520] Warning! There was an error reading this question's content, returning back to the home page");
+                            return;
+                        }
+                    };
+                    if r == 0 {
+                        println!("{}", "Question:\n".green());
+                    }
+                    else {
+                        println!("{}", format!("Answer {}:\n", r).green());
+                    }
+                    println!("{}", recieved_content);
                     Util::move_cursor_beginning(stdout);
                 }
                 Util::enable_terminal_raw_mode();
@@ -141,8 +165,20 @@ pub fn loop_through_question(stdout: &mut io::Stdout, selected_question_content:
                 if r > 0 {
                     r -= 1;
                     Util::clear_terminal(stdout);
-                    println!("{}", "Question/Answer:\n".green());
-                    println!("{}", selected_question_content[r]);
+                    if r == 0 {
+                        println!("{}", "Question:\n".green());
+                    }
+                    else {
+                        println!("{}", format!("Answer {}:\n", r).green());
+                    }
+                    recieved_content = match selected_question_content.get(r) {
+                        Some(value) => value,
+                        None => {
+                            eprintln!("[520] Warning! There was an error reading this question's content, returning back to the home page");
+                            return;
+                        }
+                    };
+                    println!("{}", recieved_content);
                     Util::move_cursor_beginning(stdout);
                 }
                 Util::enable_terminal_raw_mode();
