@@ -6,6 +6,7 @@ use std::{env, io};
 
 #[tokio::main]
 async fn main() {
+    let term_width = usize::from(terminal::size().unwrap().0);
     // getting stdout into var in order to manipulate the terminal
     let mut stdout = io::stdout();
 
@@ -33,7 +34,7 @@ async fn main() {
     for value in body_values {
         contents.push(tokio::task::spawn(StackOverFlow::get_question_content(
             value.clone(),
-        )));
+        term_width)));
     }
 
     let mut content_awaited: HashMap<usize, Vec<String>> = HashMap::new(); // storing what was already awaited in a different var

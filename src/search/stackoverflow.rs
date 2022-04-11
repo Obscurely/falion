@@ -32,7 +32,7 @@ impl StackOverFlow {
         links_map
     }
 
-    pub async fn get_question_content(question_url: String) -> Vec<String> {
+    pub async fn get_question_content(question_url: String, term_width: usize) -> Vec<String> {
         // let start = std::time::Instant::now();
         let body = tokio::task::spawn(reqwest::get(question_url));
         let question_sep = "<div class=\"s-prose js-post-body\" itemprop=\"text\">"; // we use this to split the response since it's unique and the start of the answear in the html.
@@ -71,7 +71,7 @@ impl StackOverFlow {
 
         for question in body_split {
             let question_content = question.split("</div>").collect::<Vec<&str>>()[0];
-            question_contents.push(Util::beautify_text_in_html(question_content));
+            question_contents.push(Util::beautify_text_in_html(question_content, term_width));
         }
 
         // let dur = std::time::Instant::now() - start;
