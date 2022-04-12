@@ -6,9 +6,9 @@ use regex::Regex;
 pub struct DuckDuckGo {}
 
 impl DuckDuckGo {
-    pub async fn get_vqd(querry: String) -> String {
-        let base_addr = "https://www.duckduckgo.com/?q={querry}%20site%3Astackoverflow.com";
-        let body = tokio::task::spawn(reqwest::get(base_addr.replace("{querry}", &querry)));
+    pub async fn get_vqd(querry: String, site: String) -> String {
+        let base_addr = "https://www.duckduckgo.com/?q={querry}%20site%3A{site}";
+        let body = tokio::task::spawn(reqwest::get(base_addr.replace("{querry}", &querry).replace("{site}", &site)));
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
         let re = Regex::new(r"vqd='[0-9][-].*?'").unwrap();
 
@@ -53,11 +53,12 @@ impl DuckDuckGo {
 
     pub async fn get_links(querry: &str, site: &str) -> Vec<String> {
         // let start = std::time::Instant::now();
-        let vqd = tokio::task::spawn(DuckDuckGo::get_vqd(querry.to_owned()));
+        let vqd = tokio::task::spawn(DuckDuckGo::get_vqd(querry.to_owned(), site.to_owned()));
         let base_addr = "https://links.duckduckgo.com/d.js?q={querry}%20site%3A{SITE}&l=us-en&dl=en&ss_mkt=us&vqd={vqd}";
         let base_addr = base_addr.replace("{SITE}", site);
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
-        let re = Regex::new("\"http[s].?://[a-z]*?stackoverflow.com/.*?\"").unwrap();
+        let re_base = "\"https://[a-z]*?.?{SITE}/.*?\"";
+        let re = Regex::new(re_base.replace("{SITE}", site).as_ref()).unwrap();
         let mut links = vec![];
 
         let vqd = match vqd.await {
@@ -77,12 +78,12 @@ impl DuckDuckGo {
             Ok(res) => match res.text().await {
                 Ok(body) => body,
                 Err(error) => {
-                    eprintln!("[102] There was an error reading the response of the stackoverflow search, the given error is: {}", format!("{}", error).red());
+                    eprintln!("[102] There was an error reading the response of the {} search, the given error is: {}", site, format!("{}", error).red());
                     process::exit(102);
                 }
             },
             Err(error) => {
-                eprintln!("[103] There was an error requesting stackoverflow to give available threads on the given search, the given error is: {}", format!("{}", error).red());
+                eprintln!("[103] There was an error requesting {} to give available threads on the given search, the given error is: {}", site, format!("{}", error).red());
                 process::exit(103);
             }
         };

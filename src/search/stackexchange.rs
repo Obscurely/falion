@@ -4,11 +4,11 @@ use colored::Colorize;
 use reqwest;
 use std::collections::HashMap;
 
-pub struct StackOverFlow {}
+pub struct StackExchange {}
 
-impl StackOverFlow {
+impl StackExchange {
     pub async fn get_questions(search: &str) -> HashMap<String, String> {
-        let service_url = "stackoverflow.com";
+        let service_url = "stackexchange.com";
         // let start = std::time::Instant::now();
         let querry = Util::get_url_compatible_string(String::from(search));
         let links = DuckDuckGo::get_links(&querry, service_url).await;

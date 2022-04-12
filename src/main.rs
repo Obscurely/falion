@@ -1,6 +1,6 @@
 use colored::Colorize;
 use crossterm::terminal;
-use falion::search::stackoverflow::StackOverFlow;
+use falion::search::{stackoverflow::StackOverFlow, stackexchange::StackExchange};
 use std::collections::HashMap;
 use std::{env, io};
 
@@ -34,7 +34,7 @@ async fn main() {
     search_text = search_text.replace((args[0].to_string() + " ").as_str(), "");
 
     // getting the question links for the provided search querry
-    let body = StackOverFlow::get_questions(search_text.as_str()).await;
+    let body = StackExchange::get_questions(search_text.as_str()).await;
     let body_values = body.values();
     let body_keys = body.keys();
 
