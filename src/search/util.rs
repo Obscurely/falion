@@ -2,6 +2,9 @@ use colored::Colorize;
 use crossterm::terminal;
 use urlencoding;
 use html2text;
+use crate::search::duckduckgo::DuckDuckGo;
+use std::collections::HashMap;
+
 
 pub struct Util {}
 
@@ -48,6 +51,8 @@ impl Util {
 
         html2text::from_read(text.as_bytes(), term_width)
     }
+
+    
 
     pub fn clear_terminal(out: &mut std::io::Stdout) {
         match crossterm::execute!(out, terminal::Clear(terminal::ClearType::All)) {

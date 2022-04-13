@@ -165,7 +165,7 @@ pub fn loop_through_question(stdout: &mut io::Stdout, selected_question_content:
                 if r > 0 {
                     r -= 1;
                     Util::clear_terminal(stdout);
-                    if r == 0 {
+                        if r == 0 {
                         println!("{}", "Question:\n".green());
                     }
                     else {

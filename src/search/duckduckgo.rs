@@ -1,4 +1,6 @@
 use colored::Colorize;
+use crate::search::util::Util;
+use std::collections::HashMap;
 use std::process;
 
 use regex::Regex;
@@ -105,5 +107,29 @@ impl DuckDuckGo {
         // println!("The duration in ms for get links: {}", dur.as_millis());
 
         links
+    }
+
+    pub async fn get_links_formated(service_url: &str, search: &str) -> HashMap<String, String> {
+        // let start = std::time::Instant::now();
+        let querry = Util::get_url_compatible_string(String::from(search));
+        let links = DuckDuckGo::get_links(&querry, service_url).await;
+
+        let mut links_map = HashMap::new();
+        for link in links {
+            let title: Vec<&str> = link.split('/').collect();
+            let title = match title.last() {
+                Some(title) => service_url.to_string() + ": " + &title.replace('-', " "),
+                None => {
+                    eprintln!("[500] There was an error retrieving a title from a found thread, skipping since it may be invalid.");
+                    continue;
+                }
+            };
+
+            links_map.insert(title, link);
+        }
+        // let dur = std::time::Instant::now() - start;
+        // println!("The duration in ms for get questions: {}", dur.as_millis());
+
+        links_map
     }
 }

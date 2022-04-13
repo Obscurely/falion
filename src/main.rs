@@ -1,5 +1,6 @@
 use colored::Colorize;
 use crossterm::terminal;
+use falion::search::github_gist::GithubGist;
 use falion::search::{stackoverflow::StackOverFlow, stackexchange::StackExchange};
 use std::collections::HashMap;
 use std::{env, io};
@@ -23,6 +24,12 @@ async fn main() {
             eprintln!("[512] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
         }
     }
+
+    // let content = GithubGist::get_gist_content("https://gist.github.com/hofmannsven/9164408".to_string()).await;
+    // println!("{}", content[0]);
+
+    // let mut shit = String::from("");
+    // std::io::stdin().read_line(&mut shit);
 
     // getting the search text from the args of the terminal
     let args = env::args().collect::<Vec<String>>();
