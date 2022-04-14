@@ -1,5 +1,7 @@
 use colored::Colorize;
 use crossterm::terminal;
+use falion::search::duckduckgo::DuckDuckGo;
+use falion::search::duckduckgo_search::DuckSearch;
 use falion::search::github_gist::GithubGist;
 use falion::search::{stackoverflow::StackOverFlow, stackexchange::StackExchange};
 use std::collections::HashMap;
@@ -27,6 +29,18 @@ async fn main() {
 
     // let content = GithubGist::get_gist_content("https://gist.github.com/hofmannsven/9164408".to_string()).await;
     // println!("{}", content[0]);
+
+    // let links = DuckDuckGo::get_links_direct_formated("threading c#").await;
+
+    // for link in links {
+    //     println!("{} {}", link.0, link.1);
+    //     let content = DuckSearch::get_page_content(link.1.as_ref(), term_width).await;
+    //     println!("{}", content);
+    //     if true {
+    //         break;
+    //     }
+    // }
+
 
     // let mut shit = String::from("");
     // std::io::stdin().read_line(&mut shit);

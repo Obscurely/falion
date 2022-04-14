@@ -136,6 +136,7 @@ dependencies = [
  "regex",
  "reqwest",
  "tokio",
+ "url",
  "urlencoding",
 ]
 
