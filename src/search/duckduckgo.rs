@@ -11,27 +11,27 @@ pub struct DuckDuckGo {}
 impl DuckDuckGo {
     async fn get_vqd(querry: String, site: String) -> String {
         let base_addr = "https://www.duckduckgo.com/?q={querry}%20site%3A{site}";
-        let body = reqwest::get(
+        let body = match reqwest::get(
             base_addr
                 .replace("{querry}", &querry)
                 .replace("{site}", &site),
-        );
-        // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
-        let re = Regex::new(r"vqd='[0-9][-].*?'").unwrap();
-
-        let body = match body.await {
-            Ok(body) => match body.text().await {
-                Ok(body) => body,
+        )
+        .await
+        {
+            Ok(response) => match response.text().await {
+                Ok(content) => content,
                 Err(error) => {
-                    eprintln!("[105] There was an error retrieving the response for vqd from duckduckgo (debug: second part), the given error is: {}", format!("{}", error).red());
-                    process::exit(105);
+                    eprintln!("[130] There was an error reading the body of the vqd duckduckgo request, the given error is: {}", format!("{}", error).red());
+                    process::exit(130);
                 }
             },
             Err(error) => {
-                eprintln!("[104] There was an error retrieving the response for vqd from duckduckgo (debug: first part), the given error is: {}", format!("{}", error).red());
-                process::exit(104);
+                eprintln!("[131] There was an error getting a repsponse from duckduckgo for the vqd, the given error is: {}", format!("{}", error).red());
+                process::exit(130);
             }
         };
+        // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
+        let re = Regex::new(r"vqd='[0-9][-].*?'").unwrap();
 
         let vqd_match = match re.captures(body.as_str()) {
             Some(matches) => match matches.get(0) {
@@ -54,23 +54,21 @@ impl DuckDuckGo {
 
     async fn get_vqd_direct(querry: String) -> String {
         let base_addr = "https://www.duckduckgo.com/?q={querry}";
-        let body = reqwest::get(base_addr.replace("{querry}", &querry));
-        // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
-        let re = Regex::new(r"vqd='[0-9][-].*?'").unwrap();
-
-        let body = match body.await {
-            Ok(body) => match body.text().await {
-                Ok(body) => body,
+        let body = match reqwest::get(base_addr.replace("{querry}", &querry)).await {
+            Ok(response) => match response.text().await {
+                Ok(content) => content,
                 Err(error) => {
-                    eprintln!("[105] There was an error retrieving the response for vqd from duckduckgo (debug: second part), the given error is: {}", format!("{}", error).red());
-                    process::exit(105);
+                    eprintln!("[130] There was an error reading the body of the vqd duckduckgo request, the given error is: {}", format!("{}", error).red());
+                    process::exit(130);
                 }
             },
             Err(error) => {
-                eprintln!("[104] There was an error retrieving the response for vqd from duckduckgo (debug: first part), the given error is: {}", format!("{}", error).red());
-                process::exit(104);
+                eprintln!("[131] There was an error getting a repsponse from duckduckgo for the vqd, the given error is: {}", format!("{}", error).red());
+                process::exit(130);
             }
         };
+        // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
+        let re = Regex::new(r"vqd='[0-9][-].*?'").unwrap();
 
         let vqd_match = match re.captures(body.as_str()) {
             Some(matches) => match matches.get(0) {
@@ -93,15 +91,13 @@ impl DuckDuckGo {
 
     async fn get_links(querry: &str, site: &str) -> Vec<String> {
         // let start = std::time::Instant::now();
-        let vqd = DuckDuckGo::get_vqd(querry.to_owned(), site.to_owned());
+        let vqd = DuckDuckGo::get_vqd(querry.to_owned(), site.to_owned()).await;
         let base_addr = "https://links.duckduckgo.com/d.js?q={querry}%20site%3A{SITE}&l=us-en&dl=en&ss_mkt=us&vqd={vqd}";
         let base_addr = base_addr.replace("{SITE}", site);
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
         let re_base = "\"https://[a-z]*?.?{SITE}/.*?\"";
         let re = Regex::new(re_base.replace("{SITE}", site).as_ref()).unwrap();
         let mut links = vec![];
-
-        let vqd = vqd.await;
 
         let body = match reqwest::get(base_addr.replace("{querry}", querry).replace("{vqd}", &vqd))
             .await
@@ -142,7 +138,7 @@ impl DuckDuckGo {
 
     async fn get_links_direct(querry: &str) -> Vec<String> {
         // let start = std::time::Instant::now();
-        let vqd = DuckDuckGo::get_vqd_direct(querry.to_owned());
+        let vqd = DuckDuckGo::get_vqd_direct(querry.to_owned()).await;
         let base_addr =
             "https://links.duckduckgo.com/d.js?q={querry}&l=us-en&dl=en&ss_mkt=us&vqd={vqd}";
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
@@ -150,7 +146,6 @@ impl DuckDuckGo {
         let re = Regex::new(re_base).unwrap();
         let mut links = vec![];
 
-        let vqd = vqd.await;
         let body = match reqwest::get(base_addr.replace("{querry}", querry).replace("{vqd}", &vqd))
             .await
         {
