@@ -152,6 +152,8 @@ impl DuckDuckGo {
         // let dur = std::time::Instant::now() - start;
         // println!("The duration in ms for get links: {}", dur.as_millis());
 
+        // reversing the links vector because the way we recieve them is from the worst match to the greatest.
+        links.reverse();
         links
     }
 
@@ -210,7 +212,9 @@ impl DuckDuckGo {
 
         // let dur = std::time::Instant::now() - start;
         // println!("The duration in ms for get links: {}", dur.as_millis());
-
+        
+        // reversing the links vector because the way we recieve them is from the worst match to the greatest.
+        links.reverse();
         links
     }
 

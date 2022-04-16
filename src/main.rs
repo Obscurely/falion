@@ -3,6 +3,7 @@ use crossterm::terminal;
 use falion::search::duckduckgo::DuckDuckGo;
 use falion::search::duckduckgo_search::DuckSearch;
 use falion::search::github_gist::GithubGist;
+use falion::search::geeksforgeeks::GeeksForGeeks;
 use falion::search::{stackoverflow::StackOverFlow, stackexchange::StackExchange};
 use std::collections::HashMap;
 use std::{env, io};
@@ -27,6 +28,16 @@ async fn main() {
         }
     }
 
+    let article_links = GeeksForGeeks::get_links("c# threading").await;
+    for link in article_links {
+        println!("{}", link.1);
+        let content = GeeksForGeeks::get_page_content(link.1, term_width).await;
+        println!("{}", content);
+        if true {
+            break;
+        }
+    }
+
     // let content = GithubGist::get_gist_content("https://gist.github.com/hofmannsven/9164408".to_string()).await;
     // println!("{}", content[0]);
 
@@ -42,8 +53,8 @@ async fn main() {
     // }
 
 
-    // let mut shit = String::from("");
-    // std::io::stdin().read_line(&mut shit);
+    let mut shit = String::from("");
+    std::io::stdin().read_line(&mut shit);
 
     // getting the search text from the args of the terminal
     let args = env::args().collect::<Vec<String>>();
