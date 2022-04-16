@@ -1,10 +1,9 @@
+use crate::search::duckduckgo::DuckDuckGo;
 use colored::Colorize;
 use crossterm::terminal;
-use urlencoding;
 use html2text;
-use crate::search::duckduckgo::DuckDuckGo;
 use std::collections::HashMap;
-
+use urlencoding;
 
 pub struct Util {}
 
@@ -16,43 +15,8 @@ impl Util {
     }
 
     pub fn beautify_text_in_html(text: &str, term_width: usize) -> String {
-        // let text = match urlencoding::decode(text) {
-        //     Ok(text) => text.to_string(),
-        //     Err(error) => {
-        //         eprintln!("[513] There was an error decoding the given html text, skipping this step, the given error is: {}", format!("{}", error).red());
-        //         text.to_string()
-        //     }
-        // };
-
-        // text = text
-        //     .replace("<blockquote>", "")
-        //     .replace("</blockquote>", "")
-        //     .replace("<p>", "")
-        //     .replace("</p>", "")
-        //     .replace("<code>", "<<--\n")
-        //     .replace("</code>", "\n-->>")
-        //     .replace("<pre>", "")
-        //     .replace("</pre>", "")
-        //     .replace("<strong>", "")
-        //     .replace("</strong>", "")
-        //     .replace("<h1>", "\n\t")
-        //     .replace("</h1>", "\n")
-        //     .replace("<h2>", "\n\t")
-        //     .replace("</h2>", "\n")
-        //     .replace("<h3>", "\n\t")
-        //     .replace("</h3>", "\n")
-        //     .replace("<h4>", "\n\t")
-        //     .replace("</h4>", "\n")
-        //     .replace("<hr>", "==\n")
-        //     .replace("</hr>", "\n==")
-        //     .replace("<em>", "")
-        //     .replace("</em>", "")
-        //     .replace("<hr />", "\n");
-
         html2text::from_read(text.as_bytes(), term_width)
     }
-
-    
 
     pub fn clear_terminal(out: &mut std::io::Stdout) {
         match crossterm::execute!(out, terminal::Clear(terminal::ClearType::All)) {

@@ -14,35 +14,26 @@ impl StackExchange {
 
     pub async fn get_question_content(question_url: String, term_width: usize) -> Vec<String> {
         // let start = std::time::Instant::now();
-        let body = tokio::task::spawn(reqwest::get(question_url));
-        let question_sep = "<div class=\"s-prose js-post-body\" itemprop=\"text\">"; // we use this to split the response since it's unique and the start of the answear in the html.
-        let mut question_contents = vec![];
-
-        let body = body.await;
-        if body.is_err() {
-            eprintln!(
-                "[501] There was an error reading the content of a question (debug: first part)."
-            );
-            return vec![String::from(
-                "Nothing in here, there was an error retireving content!",
-            )];
-        }
-
-        let body = match body.expect("Even tho checking the content of the question resulted in being ok there was still an error, this is really weird, stopping the program for safety!") {
-            Ok(body) => {
-                match body.text().await {
-                    Ok(body_text) => body_text,
-                    Err(error) => {
-                        eprintln!("[502] There was an error reading the body of the just got \"good\" request, the given error is: {}", format!("{}", error).red());
-                        return vec![String::from("Nothing in here, there was an error retrieving content!")];
-                    }
+        let body = match reqwest::get(question_url).await {
+            Ok(response) => match response.text().await {
+                Ok(body) => body,
+                Err(error) => {
+                    eprintln!("[545] Warning! There was an error reading the content of a stackexchange.com question, the given error is: {}", format!("{}", error).red());
+                    return vec![String::from(
+                        "Nothing in here, there was an error retrieving content!",
+                    )];
                 }
             },
             Err(error) => {
-                eprintln!("[503] There was an error reading the content of a question (debug: second part), the given error is: {}", format!("{}", error).red());
-                return vec![String::from("Nothing in here, there was an error retrieving content!")];
-            },
+                eprintln!("[546] Warning! There was an error getting a response from stackexchange.com, the given error is: {}", format!("{}", error).red());
+                return vec![String::from(
+                    "Nothing in here, there was an error retrieving content!",
+                )];
+            }
         };
+
+        let question_sep = "<div class=\"s-prose js-post-body\" itemprop=\"text\">"; // we use this to split the response since it's unique and the start of the answear in the html.
+        let mut question_contents = vec![];
 
         let mut body_split: Vec<&str> = body.split(question_sep).collect();
         body_split.reverse();
@@ -50,9 +41,9 @@ impl StackExchange {
         body_split.reverse();
 
         for question in body_split {
-            let question_content_split = question.split("</div>").collect::<Vec<&str>>();
-            let question_content = match question_content_split.get(0) {
-                Some(value) => value,
+            let question_content_split = question.split_once("</div>");
+            let question_content = match question_content_split {
+                Some(value) => value.0,
                 None => {
                     eprintln!("[522] Warning! There was an error getting a certain part of the html response from stackoverflow, continuing with next iteration.");
                     continue;

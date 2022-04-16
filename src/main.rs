@@ -2,15 +2,15 @@ use colored::Colorize;
 use crossterm::terminal;
 use falion::search::duckduckgo::DuckDuckGo;
 use falion::search::duckduckgo_search::DuckSearch;
-use falion::search::github_gist::GithubGist;
 use falion::search::geeksforgeeks::GeeksForGeeks;
-use falion::search::{stackoverflow::StackOverFlow, stackexchange::StackExchange};
+use falion::search::github_gist::GithubGist;
+use falion::search::{stackexchange::StackExchange, stackoverflow::StackOverFlow};
 use std::collections::HashMap;
 use std::{env, io};
 
 #[tokio::main]
 async fn main() {
-    let term_width = usize::from( match terminal::size() {
+    let term_width = usize::from(match terminal::size() {
         Ok(size) => size.0,
         Err(error) => {
             eprintln!("[520] Warning! There was a problem detecting the terminal width, using 1920 (could use 1milion), the terminal should take care of it, it's just not gonna be as nice, the given error is: {}", format!("{}", error).red());
@@ -28,15 +28,15 @@ async fn main() {
         }
     }
 
-    let article_links = GeeksForGeeks::get_links("c# threading").await;
-    for link in article_links {
-        println!("{}", link.1);
-        let content = GeeksForGeeks::get_page_content(link.1, term_width).await;
-        println!("{}", content);
-        if true {
-            break;
-        }
-    }
+    // let article_links = GeeksForGeeks::get_links("c# threading").await;
+    // for link in article_links {
+    //     println!("{}", link.1);
+    //     let content = GeeksForGeeks::get_page_content(link.1, term_width).await;
+    //     println!("{}", content);
+    //     if true {
+    //         break;
+    //     }
+    // }
 
     // let content = GithubGist::get_gist_content("https://gist.github.com/hofmannsven/9164408".to_string()).await;
     // println!("{}", content[0]);
@@ -52,9 +52,8 @@ async fn main() {
     //     }
     // }
 
-
-    let mut shit = String::from("");
-    std::io::stdin().read_line(&mut shit);
+    // let mut shit = String::from("");
+    // std::io::stdin().read_line(&mut shit);
 
     // getting the search text from the args of the terminal
     let args = env::args().collect::<Vec<String>>();
@@ -66,7 +65,7 @@ async fn main() {
     search_text = search_text.replace((args[0].to_string() + " ").as_str(), "");
 
     // getting the question links for the provided search querry
-    let body = StackExchange::get_questions(search_text.as_str()).await;
+    let body = StackOverFlow::get_questions(search_text.as_str()).await;
     let body_values = body.values();
     let body_keys = body.keys();
 
@@ -76,7 +75,8 @@ async fn main() {
     for value in body_values {
         contents.push(tokio::task::spawn(StackOverFlow::get_question_content(
             value.clone(),
-        term_width)));
+            term_width,
+        )));
     }
 
     let mut content_awaited: HashMap<usize, Vec<String>> = HashMap::new(); // storing what was already awaited in a different var

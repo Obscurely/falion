@@ -1,5 +1,5 @@
-use colored::Colorize;
 use crate::search::util::Util;
+use colored::Colorize;
 use std::collections::HashMap;
 use std::process;
 use url;
@@ -11,19 +11,17 @@ pub struct DuckDuckGo {}
 impl DuckDuckGo {
     async fn get_vqd(querry: String, site: String) -> String {
         let base_addr = "https://www.duckduckgo.com/?q={querry}%20site%3A{site}";
-        let body = tokio::task::spawn(reqwest::get(base_addr.replace("{querry}", &querry).replace("{site}", &site)));
+        let body = reqwest::get(
+            base_addr
+                .replace("{querry}", &querry)
+                .replace("{site}", &site),
+        );
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
         let re = Regex::new(r"vqd='[0-9][-].*?'").unwrap();
 
         let body = match body.await {
-            Ok(body) => match body {
-                Ok(body) => match body.text().await {
-                    Ok(body) => body,
-                    Err(error) => {
-                        eprintln!("[106] There was an error reading the body of the vqd request from duckduckgo, the given error is: {}", format!("{}", error).red());
-                        process::exit(106);
-                    }
-                },
+            Ok(body) => match body.text().await {
+                Ok(body) => body,
                 Err(error) => {
                     eprintln!("[105] There was an error retrieving the response for vqd from duckduckgo (debug: second part), the given error is: {}", format!("{}", error).red());
                     process::exit(105);
@@ -56,19 +54,13 @@ impl DuckDuckGo {
 
     async fn get_vqd_direct(querry: String) -> String {
         let base_addr = "https://www.duckduckgo.com/?q={querry}";
-        let body = tokio::task::spawn(reqwest::get(base_addr.replace("{querry}", &querry)));
+        let body = reqwest::get(base_addr.replace("{querry}", &querry));
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
         let re = Regex::new(r"vqd='[0-9][-].*?'").unwrap();
 
         let body = match body.await {
-            Ok(body) => match body {
-                Ok(body) => match body.text().await {
-                    Ok(body) => body,
-                    Err(error) => {
-                        eprintln!("[106] There was an error reading the body of the vqd request from duckduckgo, the given error is: {}", format!("{}", error).red());
-                        process::exit(106);
-                    }
-                },
+            Ok(body) => match body.text().await {
+                Ok(body) => body,
                 Err(error) => {
                     eprintln!("[105] There was an error retrieving the response for vqd from duckduckgo (debug: second part), the given error is: {}", format!("{}", error).red());
                     process::exit(105);
@@ -101,7 +93,7 @@ impl DuckDuckGo {
 
     async fn get_links(querry: &str, site: &str) -> Vec<String> {
         // let start = std::time::Instant::now();
-        let vqd = tokio::task::spawn(DuckDuckGo::get_vqd(querry.to_owned(), site.to_owned()));
+        let vqd = DuckDuckGo::get_vqd(querry.to_owned(), site.to_owned());
         let base_addr = "https://links.duckduckgo.com/d.js?q={querry}%20site%3A{SITE}&l=us-en&dl=en&ss_mkt=us&vqd={vqd}";
         let base_addr = base_addr.replace("{SITE}", site);
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
@@ -109,16 +101,7 @@ impl DuckDuckGo {
         let re = Regex::new(re_base.replace("{SITE}", site).as_ref()).unwrap();
         let mut links = vec![];
 
-        let vqd = match vqd.await {
-            Ok(vqd) => vqd,
-            Err(error) => {
-                eprintln!(
-                    "[101] There was an error retrieving the vqd, the given error is: {}",
-                    format!("{}", error).red()
-                );
-                process::exit(101);
-            }
-        };
+        let vqd = vqd.await;
 
         let body = match reqwest::get(base_addr.replace("{querry}", querry).replace("{vqd}", &vqd))
             .await
@@ -159,24 +142,15 @@ impl DuckDuckGo {
 
     async fn get_links_direct(querry: &str) -> Vec<String> {
         // let start = std::time::Instant::now();
-        let vqd = tokio::task::spawn(DuckDuckGo::get_vqd_direct(querry.to_owned()));
-        let base_addr = "https://links.duckduckgo.com/d.js?q={querry}&l=us-en&dl=en&ss_mkt=us&vqd={vqd}";
+        let vqd = DuckDuckGo::get_vqd_direct(querry.to_owned());
+        let base_addr =
+            "https://links.duckduckgo.com/d.js?q={querry}&l=us-en&dl=en&ss_mkt=us&vqd={vqd}";
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
         let re_base = "\"https://.*?\"";
         let re = Regex::new(re_base).unwrap();
         let mut links = vec![];
 
-        let vqd = match vqd.await {
-            Ok(vqd) => vqd,
-            Err(error) => {
-                eprintln!(
-                    "[101] There was an error retrieving the vqd, the given error is: {}",
-                    format!("{}", error).red()
-                );
-                process::exit(101);
-            }
-        };
-
+        let vqd = vqd.await;
         let body = match reqwest::get(base_addr.replace("{querry}", querry).replace("{vqd}", &vqd))
             .await
         {
@@ -204,7 +178,9 @@ impl DuckDuckGo {
             //     }
             // };
             let current_link = link[0].to_string();
-            if current_link.contains("https://duckduckgo") || current_link.contains("https://www.duckduckgo") {
+            if current_link.contains("https://duckduckgo")
+                || current_link.contains("https://www.duckduckgo")
+            {
                 continue;
             }
             links.push(current_link.replace('"', ""));
@@ -212,7 +188,7 @@ impl DuckDuckGo {
 
         // let dur = std::time::Instant::now() - start;
         // println!("The duration in ms for get links: {}", dur.as_millis());
-        
+
         // reversing the links vector because the way we recieve them is from the worst match to the greatest.
         links.reverse();
         links

@@ -14,8 +14,16 @@ impl GithubGist {
     }
 
     pub async fn get_gist_content(gist_url: String) -> Vec<String> {
-        let gist_page = match reqwest::get(&gist_url).await {
-            Ok(page) => page,
+        let gist_page_content = match reqwest::get(&gist_url).await {
+            Ok(page) => match page.text().await {
+                Ok(content) => content,
+                Err(error) => {
+                    eprintln!("[523] Warning! There was an error reading the recieved request from gist.github.com, the given error is: {}", format!("{}", error).red());
+                    return vec![String::from(
+                        "Nothing in here, there was an error retireving content!",
+                    )];
+                }
+            },
             Err(error) => {
                 eprintln!(
                 "[525] There was an error recieving the content of a gist page, the given error is: {}", format!("{}", error).red()
@@ -26,13 +34,6 @@ impl GithubGist {
             }
         };
 
-        let gist_page_content = gist_page.text().await; 
-        if gist_page_content.is_err() {
-            eprintln!("[526] There was an error reading the content of a gist page");
-            return vec![String::from("Nothing in here, there was an erro retrieving content!")]
-        }
-
-        let gist_page_content = gist_page_content.expect("Even tho the content of the gist page was checked, it still failed!");
         // using unwrap here is ok since the pattern is already pre tested.
         let relative_gist_path = gist_url.replace("https://gist.github.com/", "\"/");
         let re = Regex::new((relative_gist_path + "/raw/.*?\"").as_ref()).unwrap();
@@ -42,13 +43,16 @@ impl GithubGist {
         let mut gist_file_urls = vec![];
 
         for gist_file_url in gist_files_urls_match {
-            gist_file_urls.push("https://gist.githubusercontent.com".to_string() + &gist_file_url[0].replace("\"", ""));
+            gist_file_urls.push(
+                "https://gist.githubusercontent.com".to_string()
+                    + &gist_file_url[0].replace("\"", ""),
+            );
         }
 
         let mut gist_files = vec![];
         for gist_file_url in gist_file_urls {
             gist_files.push(tokio::task::spawn(reqwest::get(gist_file_url)));
-        };
+        }
 
         let gist_files = futures::future::join_all(gist_files).await;
         let mut gist_files_awaited = vec![];
@@ -61,7 +65,7 @@ impl GithubGist {
                             eprintln!("[528] Warning! There was an error reading the content of a gist (debug: part 2), the given error is: {}", format!("{}", error).red());
                             return vec![String::from(
                                 "Nothing in here, there was an error retireving content!",
-                            )];           
+                            )];
                         }
                     }
                 }
@@ -75,17 +79,35 @@ impl GithubGist {
         }
 
         let mut gist_files_content = vec![];
+
         for gist_file_awaited in gist_files_awaited {
-            let gist_file_content = gist_file_awaited.text().await;
-            if gist_file_content.is_err() {
-                eprintln!("[529] Warning! There was a problem reading the content of a response from a gist.");
-                return vec![String::from(
-                    "Nothing in here, there was an error retireving content!",
-                )];
-            }
-            gist_files_content.push(gist_file_content.expect("[530] Warning! Even tho the response content check was good it still failed!"));
+            gist_files_content.push(tokio::task::spawn(gist_file_awaited.text()));
+        }
+        let gist_files_content = futures::future::join_all(gist_files_content).await;
+
+        let mut gist_files_content_awaited = vec![];
+        for gist_file_content in gist_files_content {
+            gist_files_content_awaited.push(match gist_file_content {
+                Ok(content) => {
+                    match content {
+                        Ok(content) => content,
+                        Err(error) => {
+                            eprintln!("[530] Warning! There was an error reading the content of a recieved request from gist.github.com (debug: second_part), the given error is: {}", format!("{}", error).red());
+                            return vec![String::from(
+                                "Nothing in here, there was an error retireving content!",
+                            )];
+                        }
+                    }
+                }
+                Err(error) => {
+                    eprintln!("[531] Warning! There was an error reading the content of a recieved request from gist.github.com (debug: first part), the given error is: {}", format!("{}", error).red());
+                    return vec![String::from(
+                        "Nothing in here, there was an error retireving content!",
+                    )];
+                }
+            })
         }
 
-        gist_files_content
+        gist_files_content_awaited
     }
 }
