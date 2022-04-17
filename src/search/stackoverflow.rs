@@ -3,6 +3,7 @@ use crate::search::util::Util;
 use colored::Colorize;
 use reqwest;
 use std::collections::HashMap;
+use indexmap::IndexMap;
 
 pub struct StackOverFlow {}
 
@@ -58,10 +59,10 @@ impl StackOverFlow {
         question_contents
     }
 
-    pub async fn get_questions_and_content(querry: &str, term_width: usize) -> HashMap<String, tokio::task::JoinHandle<Vec<String>>> {
+    pub async fn get_questions_and_content(querry: &str, term_width: usize) -> IndexMap<String, tokio::task::JoinHandle<Vec<String>>> {
         let links = StackOverFlow::get_links(querry).await;
         
-        let mut page_content = HashMap::new();
+        let mut page_content = IndexMap::new();
         for link in links {
             page_content.insert(link.0.replacen("questions ", "", 1), tokio::task::spawn(StackOverFlow::get_question_content(link.1, term_width)));
         }

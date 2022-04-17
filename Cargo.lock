@@ -133,6 +133,7 @@ dependencies = [
  "crossterm",
  "futures",
  "html2text",
+ "indexmap",
  "regex",
  "reqwest",
  "tokio",

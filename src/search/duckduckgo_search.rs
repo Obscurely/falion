@@ -3,6 +3,7 @@ use crate::search::util::Util;
 use colored::Colorize;
 use reqwest;
 use std::collections::HashMap;
+use indexmap::IndexMap;
 
 pub struct DuckSearch {}
 
@@ -31,10 +32,10 @@ impl DuckSearch {
         Util::beautify_text_in_html(page.as_ref(), term_width)
     }
 
-    pub async fn get_name_and_content(querry: &str, term_width: usize) -> HashMap<String, tokio::task::JoinHandle<String>> {
+    pub async fn get_name_and_content(querry: &str, term_width: usize) -> IndexMap<String, tokio::task::JoinHandle<String>> {
         let links = DuckSearch::get_links(querry).await;
         
-        let mut page_content = HashMap::new();
+        let mut page_content = IndexMap::new();
         for link in links {
             page_content.insert(link.0, tokio::task::spawn(DuckSearch::get_page_content(link.1, term_width)));
         }

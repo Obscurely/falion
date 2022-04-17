@@ -1,7 +1,9 @@
 mod search;
 use colored::Colorize;
 use crossterm::terminal;
+use std::borrow::Borrow;
 use std::{env, io};
+use indexmap::IndexMap;
 use search::stackoverflow::StackOverFlow;
 use search::stackexchange::StackExchange;
 use search::github_gist::GithubGist;
@@ -48,51 +50,22 @@ async fn main() {
     let results_awaited = futures::join!(stackoverflow_results, stackexchange_results, github_gist_results, geeksforgeeks_results, duck_search_results);
 
     // transfer the awaited futures back into the variables
-    let stackoverflow_results = results_awaited.0;
-    let stackexchange_results = results_awaited.1;
-    let github_gist_results = results_awaited.2;
-    let geeksforgeeks_results = results_awaited.3;
-    let duck_search_results = results_awaited.4;
+    let mut stackoverflow_results = results_awaited.0;
+    let mut stackexchange_results = results_awaited.1;
+    let mut github_gist_results = results_awaited.2;
+    let mut geeksforgeeks_results = results_awaited.3;
+    let mut duck_search_results = results_awaited.4;
+    
+    // vars to store the awaited results in
+    let mut stackoverflow_awaited: IndexMap<String, Vec<String>> = IndexMap::new();
+    let mut stackexchange_awaited: IndexMap<String, Vec<String>> = IndexMap::new();
+    let mut github_gist_awaited: IndexMap<String, Vec<String>> = IndexMap::new();
+    let mut geeksforgeeks_awaited: IndexMap<String, String> = IndexMap::new();
+    let mut duck_search_awaited: IndexMap<String, String> = IndexMap::new();
 
-    // println!("Stackoverflow: ");
-    // for l in stackoverflow_results {
-    //     println!("{}", l.0);
-    // }
-    // println!("Stackexchange: ");
-    // for l in stackexchange_results {
-    //     println!("{}", l.0);
-    // }
-    // println!("Github Gist: ");
-    // for l in github_gist_results {
-    //     println!("{}", l.0);
-    // }
-    // println!("GeeksForGeeks: ");
-    // for l in geeksforgeeks_results {
-    //     println!("{}", l.0);
-    // }
-    // println!("Duck search: ");
-    // for l in duck_search_results {
-    //     println!("{}", l.0);
-    // }
+    let test = falion::get_index_hash_with_string(0, &mut geeksforgeeks_results, &mut geeksforgeeks_awaited).await.unwrap(); 
+    println!("At key: {}, there is content: \n\n {}", test.0, test.1);
 
-    // let mut tt = String::from("");
-    // io::stdin().read_line(&mut tt);
-
-    // let links = GeeksForGeeks::get_links(&search_text).await;
-
-    // println!("Done");
-    // println!("{}", links.len());
-
-    // let mut s = vec![];
-    // for t in links {
-    //     println!("{}: {}", t.0, t.1);
-    //     s.push(tokio::task::spawn(GeeksForGeeks::get_page_content(t.1, term_width)));
-    //     // println!("{}", content);
-
-    //     // if true {
-    //     //     break;
-    //     // }
-    // }
-
-    // let s = futures::future::join_all(s).await;
+    let mut test = String::from("");
+    io::stdin().read_line(&mut test);
 }

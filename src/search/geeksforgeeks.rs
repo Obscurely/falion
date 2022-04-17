@@ -3,16 +3,17 @@ use crate::search::util::Util;
 use colored::Colorize;
 use reqwest;
 use std::collections::HashMap;
+use indexmap::IndexMap;
 
 pub struct GeeksForGeeks {}
 
 impl GeeksForGeeks {
-    pub async fn get_links(search: &str) -> HashMap<String, String> {
+    async fn get_links(search: &str) -> HashMap<String, String> {
         let service_url = "geeksforgeeks.org";
         DuckDuckGo::get_links_formated(service_url, search).await
     }
 
-    pub async fn get_page_content(question_url: String, term_width: usize) -> String {
+    async fn get_page_content(question_url: String, term_width: usize) -> String {
         let content_sep_first = "<article";
         let content_sep_second = "</article>";
 
@@ -47,10 +48,10 @@ impl GeeksForGeeks {
         Util::beautify_text_in_html(article, term_width)
     }
 
-    pub async fn get_name_and_content(querry: &str, term_width: usize) -> HashMap<String, tokio::task::JoinHandle<String>> {
+    pub async fn get_name_and_content(querry: &str, term_width: usize) -> IndexMap<String, tokio::task::JoinHandle<String>> {
         let links = GeeksForGeeks::get_links(querry).await;
 
-        let mut page_content = HashMap::new();
+        let mut page_content = IndexMap::new();
         for link in links {
             page_content.insert(link.0, tokio::task::spawn(GeeksForGeeks::get_page_content(link.1, term_width)));
         }

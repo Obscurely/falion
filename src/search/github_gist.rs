@@ -3,6 +3,7 @@ use colored::Colorize;
 use regex::Regex;
 use reqwest;
 use std::collections::HashMap;
+use indexmap::IndexMap;
 
 pub struct GithubGist {}
 
@@ -110,10 +111,10 @@ impl GithubGist {
         gist_files_content_awaited
     }
 
-    pub async fn get_name_and_content(querry: &str) -> HashMap<String, tokio::task::JoinHandle<Vec<String>>> {
+    pub async fn get_name_and_content(querry: &str) -> IndexMap<String, tokio::task::JoinHandle<Vec<String>>> {
         let links = GithubGist::get_links(querry).await;
 
-        let mut page_content = HashMap::new();
+        let mut page_content = IndexMap::new();
         for link in links {
             page_content.insert(link.0, tokio::task::spawn(GithubGist::get_gist_content(link.1)));
         }
