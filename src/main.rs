@@ -1,7 +1,10 @@
 mod search;
 use colored::Colorize;
 use crossterm::terminal;
+use crossterm::event;
+use falion::search::util::Util;
 use std::borrow::Borrow;
+use std::process;
 use std::{env, io};
 use indexmap::IndexMap;
 use search::stackoverflow::StackOverFlow;
@@ -96,9 +99,124 @@ async fn main() {
         println!("(4) [  GeeksForGeeks  ] {}", &geeksforgeeks_current);
         println!("(5) [DuckDuckGo Search] {}", &duck_search_current);
 
+        // input key setup
+        Util::enable_terminal_raw_mode();
+        let event_read = match event::read() {
+            Ok(ev) => ev,
+            Err(error) => {
+                eprintln!("[518] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is: {}", format!("{}", error).red());
+                continue;
+            }
+        };
+
+        // matching the pressed key
+        match event_read {
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('1'),
+                modifiers: event::KeyModifiers::NONE,
+                //clearing the screen and printing our message
+            }) => {
+                    Util::disable_terminal_raw_mode();
+                    Util::clear_terminal(&mut stdout);
+                    let content = match falion::get_key_map_with_vec(&stackoverflow_current, &mut stackoverflow_results, &mut stackoverflow_awaited).await {
+                        Some(content) => content,
+                        None => {
+                            vec![String::from("[596] Warning! There was an error getting the content for the specified key.\nPress [Ctrl + q] to go back!")]
+                        }
+                    };
+
+                    falion::loop_prompt_stacks(&content, &mut stdout);
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('2'),
+                modifiers: event::KeyModifiers::NONE,
+                //clearing the screen and printing our message
+            }) => {
+                    Util::disable_terminal_raw_mode();
+                    Util::clear_terminal(&mut stdout);
+                    let content = match falion::get_key_map_with_vec(&stackexchange_current, &mut stackexchange_results, &mut stackexchange_awaited).await {
+                        Some(content) => content,
+                        None => {
+                            vec![String::from("[596] Warning! There was an error getting the content for the specified key.\nPress [Ctrl + q] to go back!")]
+                        }
+                    };
+
+                    falion::loop_prompt_stacks(&content, &mut stdout);
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('3'),
+                modifiers: event::KeyModifiers::NONE,
+                //clearing the screen and printing our message
+            }) => {
+                    Util::disable_terminal_raw_mode();
+                    Util::clear_terminal(&mut stdout);
+                    let content = match falion::get_key_map_with_vec(&github_gist_current, &mut github_gist_results, &mut github_gist_awaited).await {
+                        Some(content) => content,
+                        None => {
+                            vec![String::from("[596] Warning! There was an error getting the content for the specified key.\nPress [Ctrl + q] to go back!")]
+                        }
+                    };
+
+                    falion::loop_prompt_gist(&content, &mut stdout);
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('4'),
+                modifiers: event::KeyModifiers::NONE,
+                //clearing the screen and printing our message
+            }) => {
+                    Util::disable_terminal_raw_mode();
+                    Util::clear_terminal(&mut stdout);
+                    let content = match falion::get_key_map_with_string(&geeksforgeeks_current, &mut geeksforgeeks_results, &mut geeksforgeeks_awaited).await {
+                        Some(content) => content,
+                        None => {
+                            String::from("[596] Warning! There was an error getting the content for the specified key.\nPress [Ctrl + q] to go back!")
+                        }
+                    };
+
+                    falion::loop_prompt_geeksforgeeks(&content, &mut stdout);
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('5'),
+                modifiers: event::KeyModifiers::NONE,
+                //clearing the screen and printing our message
+            }) => {
+                    Util::disable_terminal_raw_mode();
+                    Util::clear_terminal(&mut stdout);
+                    let content = match falion::get_key_map_with_string(&duck_search_current, &mut duck_search_results, &mut duck_search_awaited).await {
+                        Some(content) => content,
+                        None => {
+                            String::from("[596] Warning! There was an error getting the content for the specified key.\nPress [Ctrl + q] to go back!")
+                        }
+                    };
+
+                    falion::loop_prompt_duckduckgo(&content, &mut stdout);
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('c'),
+                modifiers: event::KeyModifiers::CONTROL,
+            }) => {
+                    Util::disable_terminal_raw_mode();
+                    Util::clear_terminal(&mut stdout);
+                    process::exit(0);
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('C'),
+                modifiers: event::KeyModifiers::CONTROL,
+            }) => {
+                    Util::disable_terminal_raw_mode();
+                    Util::clear_terminal(&mut stdout);
+                    process::exit(0);
+                }
+            _ => {
+                Util::disable_terminal_raw_mode();
+            },
+        }
+
+        // clearing the terminal, since everything needed is gonna be printed again.
+        Util::clear_terminal(&mut stdout);
         // to not exit
-        let mut test = String::from("");
-        io::stdin().read_line(&mut test);
+        // let mut test = String::from("");
+        // io::stdin().read_line(&mut test);
    }
 
     // let test = falion::get_index_hash_with_string(0, &mut geeksforgeeks_results, &mut geeksforgeeks_awaited).await.unwrap(); 
