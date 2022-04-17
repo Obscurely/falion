@@ -63,9 +63,50 @@ async fn main() {
     let mut geeksforgeeks_awaited: IndexMap<String, String> = IndexMap::new();
     let mut duck_search_awaited: IndexMap<String, String> = IndexMap::new();
 
-    let test = falion::get_index_hash_with_string(0, &mut geeksforgeeks_results, &mut geeksforgeeks_awaited).await.unwrap(); 
-    println!("At key: {}, there is content: \n\n {}", test.0, test.1);
+    // main interface loop
+    let default_error = String::from("There was an error getting any results!"); 
 
-    let mut test = String::from("");
-    io::stdin().read_line(&mut test);
+    let stackoverflow_current = match falion::get_key_at_index_map_with_vec(0, &stackoverflow_results) {
+        Some(value) => value,
+        None => default_error.to_owned(),
+    };
+    let stackexchange_current = match falion::get_key_at_index_map_with_vec(0, &stackexchange_results) {
+        Some(value) => value,
+        None => default_error.to_owned(),
+    };
+    let github_gist_current = match falion::get_key_at_index_map_with_vec(0, &github_gist_results) {
+        Some(value) => value,
+        None => default_error.to_owned(),
+    };
+    let geeksforgeeks_current = match falion::get_key_at_index_map_with_string(0, &geeksforgeeks_results) {
+        Some(value) => value,
+        None => default_error.to_owned(),
+    };
+    let duck_search_current = match falion::get_key_at_index_map_with_string(0, &duck_search_results) {
+        Some(value) => value,
+        None => default_error.to_owned(),
+    };
+    loop {
+        // printing search querry
+        println!("Your search querry is: {}", search_text.green());
+        // printing options
+        println!("(1) [  StackOverFlow  ] {}", &stackoverflow_current);
+        println!("(2) [  StackExchange  ] {}", &stackexchange_current);
+        println!("(3) [   Github Gist   ] {}", &github_gist_current);
+        println!("(4) [  GeeksForGeeks  ] {}", &geeksforgeeks_current);
+        println!("(5) [DuckDuckGo Search] {}", &duck_search_current);
+
+        // to not exit
+        let mut test = String::from("");
+        io::stdin().read_line(&mut test);
+   }
+
+    // let test = falion::get_index_hash_with_string(0, &mut geeksforgeeks_results, &mut geeksforgeeks_awaited).await.unwrap(); 
+    // println!("At key: {}, there is content: \n\n {}", test.0, test.1);
+
+    // let test = falion::get_index_hash_with_string(0, &mut geeksforgeeks_results, &mut geeksforgeeks_awaited).await.unwrap(); 
+    // println!("At key: {}, there is content: \n\n {}", test.0, test.1);
+
+    // let mut test = String::from("");
+    // io::stdin().read_line(&mut test);
 }

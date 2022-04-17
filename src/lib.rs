@@ -2,7 +2,33 @@ pub mod search;
 use colored::Colorize;
 use indexmap::IndexMap;
 
-pub async fn get_index_hash_with_vec(index: usize, results: &mut IndexMap<String, tokio::task::JoinHandle<Vec<String>>>, awaited: &mut IndexMap<String, Vec<String>>) -> Option<(String, Vec<String>)> {
+pub fn get_key_at_index_map_with_vec(index: usize, results: &IndexMap<String, tokio::task::JoinHandle<Vec<String>>>) -> Option<String> {
+    if results.len() > index {
+        let current = match results.get_index(index) {
+            Some(value) => value,
+            None => return None,
+        };
+
+        return Some(current.0.to_string());
+    }
+
+    None
+}
+
+pub fn get_key_at_index_map_with_string(index: usize, results: &IndexMap<String, tokio::task::JoinHandle<String>>) -> Option<String> {
+    if results.len() > index {
+        let current = match results.get_index(index) {
+            Some(value) => value,
+            None => return None,
+        };
+
+        return Some(current.0.to_string());
+    }
+
+    None
+}
+
+pub async fn get_index_map_with_vec(index: usize, results: &mut IndexMap<String, tokio::task::JoinHandle<Vec<String>>>, awaited: &mut IndexMap<String, Vec<String>>) -> Option<(String, Vec<String>)> {
     if results.len() > index {
         let current = match results.get_index_mut(index) {
             Some(val) => val,
@@ -26,7 +52,7 @@ pub async fn get_index_hash_with_vec(index: usize, results: &mut IndexMap<String
     None
 }
 
-pub async fn get_index_hash_with_string(index: usize, results: &mut IndexMap<String, tokio::task::JoinHandle<String>>, awaited: &mut IndexMap<String, String>) -> Option<(String, String)> {
+pub async fn get_index_map_with_string(index: usize, results: &mut IndexMap<String, tokio::task::JoinHandle<String>>, awaited: &mut IndexMap<String, String>) -> Option<(String, String)> {
     if results.len() > index {
         let current = match results.get_index_mut(index) {
             Some(val) => val,
@@ -51,7 +77,7 @@ pub async fn get_index_hash_with_string(index: usize, results: &mut IndexMap<Str
 }
 
 
-pub async fn get_key_hash_with_vec(key: &str, results: &mut IndexMap<String, tokio::task::JoinHandle<Vec<String>>>, awaited: &mut IndexMap<String, Vec<String>>) -> Option<Vec<String>> {
+pub async fn get_key_map_with_vec(key: &str, results: &mut IndexMap<String, tokio::task::JoinHandle<Vec<String>>>, awaited: &mut IndexMap<String, Vec<String>>) -> Option<Vec<String>> {
     if awaited.contains_key(key) {
         return Some(awaited.get(key).unwrap().clone());
     } else if results.contains_key(key) {
@@ -71,7 +97,7 @@ pub async fn get_key_hash_with_vec(key: &str, results: &mut IndexMap<String, tok
     None
 }
 
-pub async fn get_key_hash_with_string(key: &str, results: &mut IndexMap<String, tokio::task::JoinHandle<String>>, awaited: &mut IndexMap<String, String>) -> Option<String> {
+pub async fn get_key_map_with_string(key: &str, results: &mut IndexMap<String, tokio::task::JoinHandle<String>>, awaited: &mut IndexMap<String, String>) -> Option<String> {
     if awaited.contains_key(key) {
         return Some(awaited.get(key).unwrap().clone());
     } else if results.contains_key(key) {
