@@ -1,18 +1,17 @@
 use crate::search::duckduckgo::DuckDuckGo;
 use crate::search::util::Util;
 use colored::Colorize;
-use regex::Regex;
 use reqwest;
 use std::collections::HashMap;
 
 pub struct DuckSearch {}
 
 impl DuckSearch {
-    pub async fn get_links(search: &str) -> HashMap<String, String> {
+    async fn get_links(search: &str) -> HashMap<String, String> {
         DuckDuckGo::get_links_direct_formated(search).await
     }
 
-    pub async fn get_page_content(link: &str, term_width: usize) -> String {
+    async fn get_page_content(link: String, term_width: usize) -> String {
         let page = match reqwest::get(link).await {
             Ok(page) => match page.text().await {
                 Ok(content) => content,
@@ -30,5 +29,16 @@ impl DuckSearch {
         };
 
         Util::beautify_text_in_html(page.as_ref(), term_width)
+    }
+
+    pub async fn get_name_and_content(querry: &str, term_width: usize) -> HashMap<String, tokio::task::JoinHandle<String>> {
+        let links = DuckSearch::get_links(querry).await;
+        
+        let mut page_content = HashMap::new();
+        for link in links {
+            page_content.insert(link.0, tokio::task::spawn(DuckSearch::get_page_content(link.1, term_width)));
+        }
+
+        page_content
     }
 }

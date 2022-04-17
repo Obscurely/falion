@@ -196,16 +196,15 @@ impl DuckDuckGo {
 
         let mut links_map = HashMap::new();
         for link in links {
-            let title: Vec<&str> = link.split('/').collect();
-            let title = match title.last() {
-                Some(title) => service_url.to_string() + ": " + &title.replace('-', " "),
-                None => {
-                    eprintln!("[500] There was an error retrieving a title from a found thread, skipping since it may be invalid.");
+            let link_parsed = match url::Url::parse(&link) {
+                Ok(parsed) => parsed,
+                Err(error) => {
+                    eprintln!("[531] There was an error parsing the url in the current loop iter, moving on to the next url, the given error is: {}", format!("{}", error).red());
                     continue;
                 }
             };
 
-            links_map.insert(title, link);
+            links_map.insert(link_parsed.path().replacen('/', "", 1).replace('/', " "), link);
         }
         // let dur = std::time::Instant::now() - start;
         // println!("The duration in ms for get questions: {}", dur.as_millis());
@@ -222,12 +221,12 @@ impl DuckDuckGo {
             let link_parsed = match url::Url::parse(&link) {
                 Ok(parsed) => parsed,
                 Err(error) => {
-                    eprintln!("[531] There was an error parsing the url in the current loop iter, moving on to the next url, the given error is: {}", format!("{}", error));
+                    eprintln!("[531] There was an error parsing the url in the current loop iter, moving on to the next url, the given error is: {}", format!("{}", error).red());
                     continue;
                 }
             };
             let link_host = match link_parsed.host_str() {
-                Some(host) => host.to_string(),
+                Some(host) => host.to_string() + link_parsed.path().replace('/', " ").as_ref(),
                 None => {
                     eprintln!("[532] There was an error getting the host of the url in the current loop iter, moving on to the next url.");
                     continue;

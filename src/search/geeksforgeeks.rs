@@ -46,4 +46,15 @@ impl GeeksForGeeks {
 
         Util::beautify_text_in_html(article, term_width)
     }
+
+    pub async fn get_name_and_content(querry: &str, term_width: usize) -> HashMap<String, tokio::task::JoinHandle<String>> {
+        let links = GeeksForGeeks::get_links(querry).await;
+
+        let mut page_content = HashMap::new();
+        for link in links {
+            page_content.insert(link.0, tokio::task::spawn(GeeksForGeeks::get_page_content(link.1, term_width)));
+        }
+
+        page_content
+    }
 }

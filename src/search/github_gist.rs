@@ -1,5 +1,4 @@
 use crate::search::duckduckgo::DuckDuckGo;
-use crate::search::util::Util;
 use colored::Colorize;
 use regex::Regex;
 use reqwest;
@@ -8,12 +7,12 @@ use std::collections::HashMap;
 pub struct GithubGist {}
 
 impl GithubGist {
-    pub async fn get_gists(search: &str) -> HashMap<String, String> {
+    async fn get_links(search: &str) -> HashMap<String, String> {
         let service_url = "gist.github.com";
         DuckDuckGo::get_links_formated(service_url, search).await
     }
 
-    pub async fn get_gist_content(gist_url: String) -> Vec<String> {
+    async fn get_gist_content(gist_url: String) -> Vec<String> {
         let gist_page_content = match reqwest::get(&gist_url).await {
             Ok(page) => match page.text().await {
                 Ok(content) => content,
@@ -45,7 +44,7 @@ impl GithubGist {
         for gist_file_url in gist_files_urls_match {
             gist_file_urls.push(
                 "https://gist.githubusercontent.com".to_string()
-                    + &gist_file_url[0].replace("\"", ""),
+                    + &gist_file_url[0].replace('"', ""),
             );
         }
 
@@ -109,5 +108,16 @@ impl GithubGist {
         }
 
         gist_files_content_awaited
+    }
+
+    pub async fn get_name_and_content(querry: &str) -> HashMap<String, tokio::task::JoinHandle<Vec<String>>> {
+        let links = GithubGist::get_links(querry).await;
+
+        let mut page_content = HashMap::new();
+        for link in links {
+            page_content.insert(link.0, tokio::task::spawn(GithubGist::get_gist_content(link.1)));
+        }
+
+        page_content
     }
 }

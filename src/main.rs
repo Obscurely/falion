@@ -1,12 +1,12 @@
+mod search;
 use colored::Colorize;
 use crossterm::terminal;
-use falion::search::duckduckgo::DuckDuckGo;
-use falion::search::duckduckgo_search::DuckSearch;
-use falion::search::geeksforgeeks::GeeksForGeeks;
-use falion::search::github_gist::GithubGist;
-use falion::search::{stackexchange::StackExchange, stackoverflow::StackOverFlow};
-use std::collections::HashMap;
 use std::{env, io};
+use search::stackoverflow::StackOverFlow;
+use search::stackexchange::StackExchange;
+use search::github_gist::GithubGist;
+use search::geeksforgeeks::GeeksForGeeks;
+use search::duckduckgo_search::DuckSearch;
 
 #[tokio::main]
 async fn main() {
@@ -28,34 +28,7 @@ async fn main() {
         }
     }
 
-    // let article_links = GeeksForGeeks::get_links("c# threading").await;
-    // for link in article_links {
-    //     println!("{}", link.1);
-    //     let content = GeeksForGeeks::get_page_content(link.1, term_width).await;
-    //     println!("{}", content);
-    //     if true {
-    //         break;
-    //     }
-    // }
-
-    // let content = GithubGist::get_gist_content("https://gist.github.com/hofmannsven/9164408".to_string()).await;
-    // println!("{}", content[0]);
-
-    // let links = DuckDuckGo::get_links_direct_formated("threading c#").await;
-
-    // for link in links {
-    //     println!("{} {}", link.0, link.1);
-    //     let content = DuckSearch::get_page_content(link.1.as_ref(), term_width).await;
-    //     println!("{}", content);
-    //     if true {
-    //         break;
-    //     }
-    // }
-
-    // let mut shit = String::from("");
-    // std::io::stdin().read_line(&mut shit);
-
-    // getting the search text from the args of the terminal
+    // getting args list and making a string from it
     let args = env::args().collect::<Vec<String>>();
     if args.len() < 2 {
         eprintln!("[115] {}", "You have to provide a search querry, either surronded by \" or the querry as it is after the program's name.".to_string().red());
@@ -64,42 +37,62 @@ async fn main() {
     let mut search_text = args.join(" ");
     search_text = search_text.replace((args[0].to_string() + " ").as_str(), "");
 
-    // getting the question links for the provided search querry
-    let body = StackOverFlow::get_questions(search_text.as_str()).await;
-    let body_values = body.values();
-    let body_keys = body.keys();
+    // getting futures of the resources we want results from
+    let stackoverflow_results = StackOverFlow::get_questions_and_content(&search_text, term_width);
+    let stackexchange_results = StackExchange::get_questions_and_content(&search_text, term_width);
+    let github_gist_results = GithubGist::get_name_and_content(&search_text);
+    let geeksforgeeks_results = GeeksForGeeks::get_name_and_content(&search_text, term_width);
+    let duck_search_results = DuckSearch::get_name_and_content(&search_text, term_width);
 
-    // async getting the content for every link in order to be awaited when needed,
-    // this makes it so on a fast connecting you don't even have to wait after seeing the list with questions
-    let mut contents = vec![];
-    for value in body_values {
-        contents.push(tokio::task::spawn(StackOverFlow::get_question_content(
-            value.clone(),
-            term_width,
-        )));
-    }
+    // awaiting them all at the same time
+    let results_awaited = futures::join!(stackoverflow_results, stackexchange_results, github_gist_results, geeksforgeeks_results, duck_search_results);
 
-    let mut content_awaited: HashMap<usize, Vec<String>> = HashMap::new(); // storing what was already awaited in a different var
-    loop {
-        // print the search querry
-        println!(
-            "{}: {}",
-            "Your input search querry".green(),
-            (&search_text).to_string().blue()
-        );
+    // transfer the awaited futures back into the variables
+    let stackoverflow_results = results_awaited.0;
+    let stackexchange_results = results_awaited.1;
+    let github_gist_results = results_awaited.2;
+    let geeksforgeeks_results = results_awaited.3;
+    let duck_search_results = results_awaited.4;
 
-        // print the questions
-        let mut i = 1;
-        for key in (&body_keys).clone().into_iter().collect::<Vec<&String>>() {
-            println!("{}. {}", i, key);
-            i += 1;
-        }
+    // println!("Stackoverflow: ");
+    // for l in stackoverflow_results {
+    //     println!("{}", l.0);
+    // }
+    // println!("Stackexchange: ");
+    // for l in stackexchange_results {
+    //     println!("{}", l.0);
+    // }
+    // println!("Github Gist: ");
+    // for l in github_gist_results {
+    //     println!("{}", l.0);
+    // }
+    // println!("GeeksForGeeks: ");
+    // for l in geeksforgeeks_results {
+    //     println!("{}", l.0);
+    // }
+    // println!("Duck search: ");
+    // for l in duck_search_results {
+    //     println!("{}", l.0);
+    // }
 
-        // get user to select a question and get the content for it
-        let index = falion::get_valid_question_select(&contents) - 1;
-        let selected_question_content =
-            falion::get_question_content(&mut contents, &mut content_awaited, index).await;
+    // let mut tt = String::from("");
+    // io::stdin().read_line(&mut tt);
 
-        falion::loop_through_question(&mut stdout, &selected_question_content);
-    }
+    // let links = GeeksForGeeks::get_links(&search_text).await;
+
+    // println!("Done");
+    // println!("{}", links.len());
+
+    // let mut s = vec![];
+    // for t in links {
+    //     println!("{}: {}", t.0, t.1);
+    //     s.push(tokio::task::spawn(GeeksForGeeks::get_page_content(t.1, term_width)));
+    //     // println!("{}", content);
+
+    //     // if true {
+    //     //     break;
+    //     // }
+    // }
+
+    // let s = futures::future::join_all(s).await;
 }

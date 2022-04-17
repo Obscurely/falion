@@ -1,8 +1,6 @@
-use crate::search::duckduckgo::DuckDuckGo;
 use colored::Colorize;
 use crossterm::terminal;
 use html2text;
-use std::collections::HashMap;
 use urlencoding;
 
 pub struct Util {}

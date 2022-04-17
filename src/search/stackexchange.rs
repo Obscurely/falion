@@ -7,25 +7,25 @@ use std::collections::HashMap;
 pub struct StackExchange {}
 
 impl StackExchange {
-    pub async fn get_questions(search: &str) -> HashMap<String, String> {
+    async fn get_links(search: &str) -> HashMap<String, String> {
         let service_url = "stackexchange.com";
         DuckDuckGo::get_links_formated(service_url, search).await
     }
 
-    pub async fn get_question_content(question_url: String, term_width: usize) -> Vec<String> {
+    async fn get_question_content(question_url: String, term_width: usize) -> Vec<String> {
         // let start = std::time::Instant::now();
         let body = match reqwest::get(question_url).await {
             Ok(response) => match response.text().await {
                 Ok(body) => body,
                 Err(error) => {
-                    eprintln!("[545] Warning! There was an error reading the content of a stackexchange.com question, the given error is: {}", format!("{}", error).red());
+                    eprintln!("[570] Warning! There was an error reading the content of a stackexchange.com question, the given error is: {}", format!("{}", error).red());
                     return vec![String::from(
                         "Nothing in here, there was an error retrieving content!",
                     )];
                 }
             },
             Err(error) => {
-                eprintln!("[546] Warning! There was an error getting a response from stackexchange.com, the given error is: {}", format!("{}", error).red());
+                eprintln!("[571] Warning! There was an error getting a response from stackexchange.com, the given error is: {}", format!("{}", error).red());
                 return vec![String::from(
                     "Nothing in here, there was an error retrieving content!",
                 )];
@@ -56,5 +56,16 @@ impl StackExchange {
         // println!("The duration in ms for get questions: {}", dur.as_millis());
 
         question_contents
+    }
+
+    pub async fn get_questions_and_content(querry: &str, term_width: usize) -> HashMap<String, tokio::task::JoinHandle<Vec<String>>> {
+        let links = StackExchange::get_links(querry).await;
+
+        let mut page_content = HashMap::new();
+        for link in links {
+            page_content.insert(link.0.replacen("questions ", "", 1), tokio::task::spawn(StackExchange::get_question_content(link.1, term_width)));
+        }
+
+        page_content
     }
 }
