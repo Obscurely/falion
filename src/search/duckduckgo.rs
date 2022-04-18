@@ -175,7 +175,7 @@ impl DuckDuckGo {
         links
     }
 
-    pub async fn get_links_formated(service_url: &str, search: &str) -> HashMap<String, String> {
+    pub async fn get_links_formated(service_url: &str, search: &str, enable_warnings: bool) -> HashMap<String, String> {
         // let start = std::time::Instant::now();
         let querry = Util::get_url_compatible_string(String::from(search));
         let links = DuckDuckGo::get_links(&querry, service_url).await;
@@ -185,7 +185,9 @@ impl DuckDuckGo {
             let link_parsed = match url::Url::parse(&link) {
                 Ok(parsed) => parsed,
                 Err(error) => {
-                    eprintln!("{} {}", "[501][Warning] There was an error parsing the url in the current loop iter, moving on to the next url, the given error is:".yellow(), format!("{}", error).red());
+                    if enable_warnings {
+                        eprintln!("{} {}", "[501][Warning] There was an error parsing the url in the current loop iter, moving on to the next url, the given error is:".yellow(), format!("{}", error).red());
+                    }
                     continue;
                 }
             };
@@ -198,7 +200,7 @@ impl DuckDuckGo {
         links_map
     }
 
-    pub async fn get_links_direct_formated(search: &str) -> HashMap<String, String> {
+    pub async fn get_links_direct_formated(search: &str, enable_warnings: bool) -> HashMap<String, String> {
         let querry = Util::get_url_compatible_string(String::from(search));
         let links = DuckDuckGo::get_links_direct(&querry).await;
 
@@ -207,14 +209,18 @@ impl DuckDuckGo {
             let link_parsed = match url::Url::parse(&link) {
                 Ok(parsed) => parsed,
                 Err(error) => {
-                    eprintln!("{} {}", "[502][Warning] There was an error parsing the url in the current loop iter, moving on to the next url, the given error is:".yellow(), format!("{}", error).red());
+                    if enable_warnings {
+                        eprintln!("{} {}", "[502][Warning] There was an error parsing the url in the current loop iter, moving on to the next url, the given error is:".yellow(), format!("{}", error).red());
+                    }
                     continue;
                 }
             };
             let link_host = match link_parsed.host_str() {
                 Some(host) => host.to_string() + " |" + link_parsed.path().replace('/', " ").as_ref(),
                 None => {
-                    eprintln!("{}", "[503][Warning] There was an error getting the host of the url in the current loop iter, moving on to the next url.".yellow());
+                    if enable_warnings {
+                        eprintln!("{}", "[503][Warning] There was an error getting the host of the url in the current loop iter, moving on to the next url.".yellow());
+                    }
                     continue;
                 }
             };

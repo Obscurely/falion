@@ -83,14 +83,16 @@ pub async fn get_index_map_with_string(index: usize, results: &mut IndexMap<Stri
 }
 
 
-pub async fn get_key_map_with_vec(key: &str, results: &mut IndexMap<String, tokio::task::JoinHandle<Vec<String>>>, awaited: &mut IndexMap<String, Vec<String>>) -> Option<Vec<String>> {
+pub async fn get_key_map_with_vec(key: &str, results: &mut IndexMap<String, tokio::task::JoinHandle<Vec<String>>>, awaited: &mut IndexMap<String, Vec<String>>, enable_warnings: bool) -> Option<Vec<String>> {
     if awaited.contains_key(key) {
         return Some(awaited.get(key).unwrap().clone());
     } else if results.contains_key(key) {
         let current = match results.get_mut(key).unwrap().await {
             Ok(value) => value,
             Err(error) => {
-                eprintln!("{} {}", "[535][Warning] There was an error awaiting the value at the specified key, the key existed, the given error is:".yellow(), format!("{}", error).red());
+                if enable_warnings {
+                    eprintln!("{} {}", "[535][Warning] There was an error awaiting the value at the specified key, the key existed, the given error is:".yellow(), format!("{}", error).red());
+                }
                 return None;
             }
         };
@@ -103,14 +105,16 @@ pub async fn get_key_map_with_vec(key: &str, results: &mut IndexMap<String, toki
     None
 }
 
-pub async fn get_key_map_with_string(key: &str, results: &mut IndexMap<String, tokio::task::JoinHandle<String>>, awaited: &mut IndexMap<String, String>) -> Option<String> {
+pub async fn get_key_map_with_string(key: &str, results: &mut IndexMap<String, tokio::task::JoinHandle<String>>, awaited: &mut IndexMap<String, String>, enable_warnings: bool) -> Option<String> {
     if awaited.contains_key(key) {
         return Some(awaited.get(key).unwrap().clone());
     } else if results.contains_key(key) {
         let current = match results.get_mut(key).unwrap().await {
             Ok(value) => value,
             Err(error) => {
-                eprintln!("{} {}", "[536][Warning] There was an error awaiting the value at the specified key, the key existed, the given error is:".yellow(), format!("{}", error).red());
+                if enable_warnings {
+                    eprintln!("{} {}", "[536][Warning] There was an error awaiting the value at the specified key, the key existed, the given error is:".yellow(), format!("{}", error).red());
+                }
                 return None;
             }
         };
@@ -123,9 +127,11 @@ pub async fn get_key_map_with_string(key: &str, results: &mut IndexMap<String, t
     None
 }
 
-pub fn loop_prompt_stacks(content: &Vec<String>, stdout: &mut io::Stdout) {
+pub fn loop_prompt_stacks(content: &Vec<String>, stdout: &mut io::Stdout, enable_warnings: bool) {
     if content.is_empty() {
-        eprintln!("{}", "[537][Warning] The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".yellow());
+        if enable_warnings {
+            eprintln!("{}", "[537][Warning] The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".yellow());
+        }
         println!("Press enter to continue!");
         let mut temp = String::from("");
         std::io::stdin().read_line(&mut temp);
@@ -147,11 +153,13 @@ pub fn loop_prompt_stacks(content: &Vec<String>, stdout: &mut io::Stdout) {
             println!("\n{}", "End of answers! Can't go any further!".green());
         }
 
-        Util::enable_terminal_raw_mode();
+        Util::enable_terminal_raw_mode(enable_warnings);
         let event_read = match event::read() {
             Ok(ev) => ev,
             Err(error) => {
-                eprintln!("{} {}", "[538][Warning] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is:".yellow(), format!("{}", error).red());
+                if enable_warnings {
+                    eprintln!("{} {}", "[538][Warning] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is:".yellow(), format!("{}", error).red());
+                }
                 continue;
             }
         };
@@ -181,31 +189,33 @@ pub fn loop_prompt_stacks(content: &Vec<String>, stdout: &mut io::Stdout) {
                 modifiers: event::KeyModifiers::CONTROL,
                 //clearing the screen and printing our message
             }) => {
-                    Util::disable_terminal_raw_mode();
+                    Util::disable_terminal_raw_mode(enable_warnings);
                     return;
                 }
            event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('c'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
-                    Util::disable_terminal_raw_mode();
-                    Util::clear_terminal(stdout);
+                    Util::disable_terminal_raw_mode(enable_warnings);
+                    Util::clear_terminal(stdout, enable_warnings);
                     process::exit(0);
                 }
             _ => {
-                Util::disable_terminal_raw_mode();
+                Util::disable_terminal_raw_mode(enable_warnings);
             },
         }
 
         // clearing the terminal, since everything needed is gonna be printed again.
-        Util::disable_terminal_raw_mode();
-        Util::clear_terminal(stdout);
+        Util::disable_terminal_raw_mode(enable_warnings);
+        Util::clear_terminal(stdout, enable_warnings);
     }
 }
 
-pub fn loop_prompt_gist(content: &Vec<String>, stdout: &mut io::Stdout) {
+pub fn loop_prompt_gist(content: &Vec<String>, stdout: &mut io::Stdout, enable_warnings: bool) {
     if content.is_empty() {
-        eprintln!("{}", "[539][Warning] The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".yellow());
+        if enable_warnings {
+            eprintln!("{}", "[539][Warning] The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".yellow());
+        }
         println!("Press enter to continue!");
         let mut temp = String::from("");
         std::io::stdin().read_line(&mut temp);
@@ -222,11 +232,13 @@ pub fn loop_prompt_gist(content: &Vec<String>, stdout: &mut io::Stdout) {
             println!("\n{}", "End of files in gist! Can't go any further!".green());
         }
 
-        Util::enable_terminal_raw_mode();
+        Util::enable_terminal_raw_mode(enable_warnings);
         let event_read = match event::read() {
             Ok(ev) => ev,
             Err(error) => {
-                eprintln!("{} {}", "[540][Warning] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is:".yellow(), format!("{}", error).red());
+                if enable_warnings {
+                    eprintln!("{} {}", "[540][Warning] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is:".yellow(), format!("{}", error).red());
+                }
                 continue;
             }
         };
@@ -256,31 +268,33 @@ pub fn loop_prompt_gist(content: &Vec<String>, stdout: &mut io::Stdout) {
                 modifiers: event::KeyModifiers::CONTROL,
                 //clearing the screen and printing our message
             }) => {
-                    Util::disable_terminal_raw_mode();
+                    Util::disable_terminal_raw_mode(enable_warnings);
                     return;
                 }
            event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('c'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
-                    Util::disable_terminal_raw_mode();
-                    Util::clear_terminal(stdout);
+                    Util::disable_terminal_raw_mode(enable_warnings);
+                    Util::clear_terminal(stdout, enable_warnings);
                     process::exit(0);
                 }
             _ => {
-                Util::disable_terminal_raw_mode();
+                Util::disable_terminal_raw_mode(enable_warnings);
             },
         }
 
         // clearing the terminal, since everything needed is gonna be printed again.
-        Util::disable_terminal_raw_mode();
-        Util::clear_terminal(stdout);
+        Util::disable_terminal_raw_mode(enable_warnings);
+        Util::clear_terminal(stdout, enable_warnings);
     }
 }
 
-pub fn loop_prompt_geeksforgeeks(content: &str, stdout: &mut io::Stdout) {
+pub fn loop_prompt_geeksforgeeks(content: &str, stdout: &mut io::Stdout, enable_warnings: bool) {
     if content.is_empty() {
-        eprintln!("{}", "[541][Warning] The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".yellow());
+        if enable_warnings {
+            eprintln!("{}", "[541][Warning] The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".yellow());
+        }
         println!("Press enter to continue!");
         let mut temp = String::from("");
         std::io::stdin().read_line(&mut temp);
@@ -294,11 +308,13 @@ pub fn loop_prompt_geeksforgeeks(content: &str, stdout: &mut io::Stdout) {
         // inform use if it's only one page
         println!("\n{}", "There is only one page! Can't go back or further!".green());
 
-        Util::enable_terminal_raw_mode();
+        Util::enable_terminal_raw_mode(enable_warnings);
         let event_read = match event::read() {
             Ok(ev) => ev,
             Err(error) => {
-                eprintln!("{} {}", "[542][Warning] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is:".yellow(), format!("{}", error).red());
+                if enable_warnings {
+                    eprintln!("{} {}", "[542][Warning] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is:".yellow(), format!("{}", error).red());
+                }
                 continue;
             }
         };
@@ -310,31 +326,33 @@ pub fn loop_prompt_geeksforgeeks(content: &str, stdout: &mut io::Stdout) {
                 modifiers: event::KeyModifiers::CONTROL,
                 //clearing the screen and printing our message
             }) => {
-                    Util::disable_terminal_raw_mode();
+                    Util::disable_terminal_raw_mode(enable_warnings);
                     return;
                 }
            event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('c'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
-                    Util::disable_terminal_raw_mode();
-                    Util::clear_terminal(stdout);
+                    Util::disable_terminal_raw_mode(enable_warnings);
+                    Util::clear_terminal(stdout, enable_warnings);
                     process::exit(0);
                 }
             _ => {
-                Util::disable_terminal_raw_mode();
+                Util::disable_terminal_raw_mode(enable_warnings);
             },
         }
 
         // clearing the terminal, since everything needed is gonna be printed again.
-        Util::disable_terminal_raw_mode();
-        Util::clear_terminal(stdout);
+        Util::disable_terminal_raw_mode(enable_warnings);
+        Util::clear_terminal(stdout, enable_warnings);
     }
 }
 
-pub fn loop_prompt_duckduckgo(content: &str, stdout: &mut io::Stdout) {
+pub fn loop_prompt_duckduckgo(content: &str, stdout: &mut io::Stdout, enable_warnings: bool) {
     if content.is_empty() {
-        eprintln!("{}", "[543][Warning] The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".yellow());
+        if enable_warnings {
+            eprintln!("{}", "[543][Warning] The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".yellow());
+        }
         println!("Press enter to continue!");
         let mut temp = String::from("");
         std::io::stdin().read_line(&mut temp);
@@ -348,11 +366,13 @@ pub fn loop_prompt_duckduckgo(content: &str, stdout: &mut io::Stdout) {
         // inform use if it's only one page
         println!("\n{}", "There is only one page! Can't go back or further!".green());
 
-        Util::enable_terminal_raw_mode();
+        Util::enable_terminal_raw_mode(enable_warnings);
         let event_read = match event::read() {
             Ok(ev) => ev,
             Err(error) => {
-                eprintln!("{} {}", "[544][Warning] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is:".yellow(), format!("{}", error).red());
+                if enable_warnings {
+                    eprintln!("{} {}", "[544][Warning] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is:".yellow(), format!("{}", error).red());
+                }
                 continue;
             }
         };
@@ -364,25 +384,25 @@ pub fn loop_prompt_duckduckgo(content: &str, stdout: &mut io::Stdout) {
                 modifiers: event::KeyModifiers::CONTROL,
                 //clearing the screen and printing our message
             }) => {
-                    Util::disable_terminal_raw_mode();
+                    Util::disable_terminal_raw_mode(enable_warnings);
                     return;
                 }
            event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('c'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
-                    Util::disable_terminal_raw_mode();
-                    Util::clear_terminal(stdout);
+                    Util::disable_terminal_raw_mode(enable_warnings);
+                    Util::clear_terminal(stdout, enable_warnings);
                     process::exit(0);
                 }
             _ => {
-                Util::disable_terminal_raw_mode();
+                Util::disable_terminal_raw_mode(enable_warnings);
             },
         }
 
         // clearing the terminal, since everything needed is gonna be printed again.
-        Util::disable_terminal_raw_mode();
-        Util::clear_terminal(stdout);
+        Util::disable_terminal_raw_mode(enable_warnings);
+        Util::clear_terminal(stdout, enable_warnings);
     }
 }
 

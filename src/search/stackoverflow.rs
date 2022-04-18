@@ -8,25 +8,29 @@ use indexmap::IndexMap;
 pub struct StackOverFlow {}
 
 impl StackOverFlow {
-    async fn get_links(search: &str) -> HashMap<String, String> {
+    async fn get_links(search: &str, enable_warnings: bool) -> HashMap<String, String> {
         let service_url = "stackoverflow.com";
-        DuckDuckGo::get_links_formated(service_url, search).await
+        DuckDuckGo::get_links_formated(service_url, search, enable_warnings).await
     }
 
-    async fn get_question_content(question_url: String, term_width: usize) -> Vec<String> {
+    async fn get_question_content(question_url: String, term_width: usize, enable_warnings: bool) -> Vec<String> {
         // let start = std::time::Instant::now();
         let body = match reqwest::get(question_url).await {
             Ok(response) => match response.text().await {
                 Ok(body) => body,
                 Err(error) => {
-                    eprintln!("{} {}", "[519][Warning] There was an error reading the content of a stackoverflow.com question, the given error is:".yellow(), format!("{}", error).red());
+                    if enable_warnings {
+                        eprintln!("{} {}", "[519][Warning] There was an error reading the content of a stackoverflow.com question, the given error is:".yellow(), format!("{}", error).red());
+                    }
                     return vec![String::from(
                         "Nothing in here, there was an error retrieving content!",
                     )];
                 }
             },
             Err(error) => {
-                eprintln!("{} {}", "[520][Warning] There was an error getting a response from stackoverflow.com, the given error is:".yellow(), format!("{}", error).red());
+                if enable_warnings {
+                    eprintln!("{} {}", "[520][Warning] There was an error getting a response from stackoverflow.com, the given error is:".yellow(), format!("{}", error).red());
+                }
                 return vec![String::from(
                     "Nothing in here, there was an error retrieving content!",
                 )];
@@ -46,7 +50,9 @@ impl StackOverFlow {
             let question_content = match question_content_split {
                 Some(value) => value.0,
                 None => {
-                    eprintln!("{}", "[521][Warning] There was an error getting a certain part of the html response from stackoverflow, continuing with next iteration.".yellow());
+                    if enable_warnings {
+                        eprintln!("{}", "[521][Warning] There was an error getting a certain part of the html response from stackoverflow, continuing with next iteration.".yellow());
+                    }
                     continue;
                 }
             };
@@ -59,13 +65,13 @@ impl StackOverFlow {
         question_contents
     }
 
-    pub async fn get_questions_and_content(querry: &str, term_width: usize) -> IndexMap<String, tokio::task::JoinHandle<Vec<String>>> {
-        let links = StackOverFlow::get_links(querry).await;
+    pub async fn get_questions_and_content(querry: &str, term_width: usize, enable_warnings: bool) -> IndexMap<String, tokio::task::JoinHandle<Vec<String>>> {
+        let links = StackOverFlow::get_links(querry, enable_warnings).await;
         
         let mut page_content = IndexMap::new();
         for link in links {
             // using unwrap here is ok since it's always gonna have a space
-            page_content.insert(link.0.replacen("questions ", "", 1).split_once(' ').unwrap().1.replace('-', " "), tokio::task::spawn(StackOverFlow::get_question_content(link.1, term_width)));
+            page_content.insert(link.0.replacen("questions ", "", 1).split_once(' ').unwrap().1.replace('-', " "), tokio::task::spawn(StackOverFlow::get_question_content(link.1, term_width, enable_warnings)));
         }
 
         page_content

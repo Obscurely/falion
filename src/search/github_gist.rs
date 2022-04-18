@@ -8,26 +8,30 @@ use indexmap::IndexMap;
 pub struct GithubGist {}
 
 impl GithubGist {
-    async fn get_links(search: &str) -> HashMap<String, String> {
+    async fn get_links(search: &str, enable_warnings: bool) -> HashMap<String, String> {
         let service_url = "gist.github.com";
-        DuckDuckGo::get_links_formated(service_url, search).await
+        DuckDuckGo::get_links_formated(service_url, search, enable_warnings).await
     }
 
-    async fn get_gist_content(gist_url: String) -> Vec<String> {
+    async fn get_gist_content(gist_url: String, enable_warnings: bool) -> Vec<String> {
         let gist_page_content = match reqwest::get(&gist_url).await {
             Ok(page) => match page.text().await {
                 Ok(content) => content,
                 Err(error) => {
-                    eprintln!("{} {}", "[510][Warning] There was an error reading the recieved request from gist.github.com, the given error is:".yellow(), format!("{}", error).red());
+                    if enable_warnings {
+                        eprintln!("{} {}", "[510][Warning] There was an error reading the recieved request from gist.github.com, the given error is:".yellow(), format!("{}", error).red());
+                    }
                     return vec![String::from(
                         "Nothing in here, there was an error retireving content!",
                     )];
                 }
             },
             Err(error) => {
-                eprintln!(
-                "{} {}", "[511][Warning] There was an error recieving the content of a gist page, the given error is:".yellow(), format!("{}", error).red()
-                );
+                if enable_warnings {
+                    eprintln!(
+                    "{} {}", "[511][Warning] There was an error recieving the content of a gist page, the given error is:".yellow(), format!("{}", error).red()
+                    );
+                }
                 return vec![String::from(
                     "Nothing in here, there was an error retireving content!",
                 )];
@@ -62,7 +66,9 @@ impl GithubGist {
                     match value {
                         Ok(content) => content,
                         Err(error) => {
-                            eprintln!("{} {}", "[512][Warning] There was an error reading the content of a gist (debug: part 2), the given error is:".yellow(), format!("{}", error).red());
+                            if enable_warnings {
+                                eprintln!("{} {}", "[512][Warning] There was an error reading the content of a gist (debug: part 2), the given error is:".yellow(), format!("{}", error).red());
+                            }
                             return vec![String::from(
                                 "Nothing in here, there was an error retireving content!",
                             )];
@@ -70,7 +76,9 @@ impl GithubGist {
                     }
                 }
                 Err(error) => {
-                    eprintln!("{} {}", "[513][Warning] There was an error reading the content of a gist (debug: part 1), the given error is:".yellow(), format!("{}", error).red());
+                    if enable_warnings {
+                        eprintln!("{} {}", "[513][Warning] There was an error reading the content of a gist (debug: part 1), the given error is:".yellow(), format!("{}", error).red());
+                    }
                     return vec![String::from(
                         "Nothing in here, there was an error retireving content!",
                     )];
@@ -92,7 +100,9 @@ impl GithubGist {
                     match content {
                         Ok(content) => content,
                         Err(error) => {
-                            eprintln!("{} {}", "[514][Warning] There was an error reading the content of a recieved request from gist.github.com (debug: part 2), the given error is:".yellow(), format!("{}", error).red());
+                            if enable_warnings {
+                                eprintln!("{} {}", "[514][Warning] There was an error reading the content of a recieved request from gist.github.com (debug: part 2), the given error is:".yellow(), format!("{}", error).red());
+                            }
                             return vec![String::from(
                                 "Nothing in here, there was an error retireving content!",
                             )];
@@ -100,7 +110,9 @@ impl GithubGist {
                     }
                 }
                 Err(error) => {
-                    eprintln!("{} {}", "[515][Warning] There was an error reading the content of a recieved request from gist.github.com (debug: part 1), the given error is:".yellow(), format!("{}", error).red());
+                    if enable_warnings {
+                        eprintln!("{} {}", "[515][Warning] There was an error reading the content of a recieved request from gist.github.com (debug: part 1), the given error is:".yellow(), format!("{}", error).red());
+                    }
                     return vec![String::from(
                         "Nothing in here, there was an error retireving content!",
                     )];
@@ -111,12 +123,12 @@ impl GithubGist {
         gist_files_content_awaited
     }
 
-    pub async fn get_name_and_content(querry: &str) -> IndexMap<String, tokio::task::JoinHandle<Vec<String>>> {
-        let links = GithubGist::get_links(querry).await;
+    pub async fn get_name_and_content(querry: &str, enable_warnings: bool) -> IndexMap<String, tokio::task::JoinHandle<Vec<String>>> {
+        let links = GithubGist::get_links(querry, enable_warnings).await;
 
         let mut page_content = IndexMap::new();
         for link in links {
-            page_content.insert(link.0.replace(' ', " | "), tokio::task::spawn(GithubGist::get_gist_content(link.1)));
+            page_content.insert(link.0.replace(' ', " | "), tokio::task::spawn(GithubGist::get_gist_content(link.1, enable_warnings)));
         }
 
         page_content
