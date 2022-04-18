@@ -13,10 +13,56 @@ use search::stackexchange::StackExchange;
 use search::github_gist::GithubGist;
 use search::geeksforgeeks::GeeksForGeeks;
 use search::duckduckgo_search::DuckSearch;
+use argparse;
 
 #[tokio::main]
 async fn main() {
-    let enable_warnings = false;
+    let mut enable_warnings = false;
+    let mut print_key_binds = false;
+    let mut search_text = vec![String::from("")];
+    { // this block limits scope of borrows by ap.refer() method
+    let mut ap = argparse::ArgumentParser::new();
+    ap.set_description("An open source, privacy focused tool for getting programming resources fast, efficient and asyncronous from the terminal. By the time you see the results most of the pages are fully loaded. All the searches are done through DuckDuckGO. For more information about the program and keybinds, please read the README.md on github: insert link here.");
+    ap.refer(&mut enable_warnings)
+    .add_option(&["-v", "--verbose"], argparse::StoreTrue,
+    "Print the warnings.");
+    ap.refer(&mut print_key_binds).add_option(&["-k", "--key-binds"], argparse::StoreTrue, "Print list of the keybinds and exit");
+    ap.refer(&mut search_text).required().add_argument("", argparse::ParseList, "Your querry, inside quotation marks (\") or not, either way it works as long as there isn't any argument in between when not using qoutation marks.");
+    ap.parse_args_or_exit();
+    }
+
+    if print_key_binds {
+        // first informative line
+        println!("{}", "Key Binds list for falion!".green());
+        println!("{}", "Note: where '..' is used it means from that to that like '1..5' would mean from 1 to 5.".green());
+
+        // main menu binds
+        println!("{}", "\nMain menu:".blue());
+        println!("[1..5]         = Access that resource.");
+        println!("SHIFT + [1..5] = Go to the next element in the list of that resource.");
+        println!("ALT + [1..5]   = Go to the previous element in the list of that resource.");
+        println!("CTRL + n       = Move to the next element in the list of every resource.");
+        println!("CTRL + b       = Move back to the previous element in the list of every resource.");
+        println!("CTRL + c       = Clear terminal and exit.");
+
+        // sub menus binds
+        println!("{}", "\nSub menus for the resources:".blue());
+        println!("CTRL + n       = Move to the next element in the content list (like questions & answers).");
+        println!("CTRL + b       = Move back to the previous element in the content list.");
+        println!("CTRL + q       = Go back to the main menu.");
+        println!("CTRL + c       = Clear terminal and exit.");
+
+        // end of keybinds print
+        println!("{}", "\nThese were all the key binds, enjoy using Falion!".green());
+        process::exit(202);
+    }
+
+    let search_text = search_text.join(" ");
+    if search_text.is_empty() {
+        println!("{}", "You haven't provided a search querry!".red());
+        println!("Run falion -h for more informations!");
+        process::exit(201);
+    }
 
     let term_width = usize::from(match terminal::size() {
         Ok(size) => size.0,
@@ -41,13 +87,13 @@ async fn main() {
     }
 
     // getting args list and making a string from it
-    let args = env::args().collect::<Vec<String>>();
-    if args.len() < 2 {
-        eprintln!("{}{}", "[113][Error] ".red(), "You have to provide a search querry, either surronded by \" or the querry as it is after the program's name.".to_string().red());
-        std::process::exit(113);
-    }
-    let mut search_text = args.join(" ");
-    search_text = search_text.replace((args[0].to_string() + " ").as_str(), "");
+    // let args = env::args().collect::<Vec<String>>();
+    // if args.len() < 2 {
+    //     eprintln!("{}{}", "[113][Error] ".red(), "You have to provide a search querry, either surronded by \" or the querry as it is after the program's name.".to_string().red());
+    //     std::process::exit(113);
+    // }
+    // let mut search_text = args.join(" ");
+    // search_text = search_text.replace((args[0].to_string() + " ").as_str(), "");
 
     // getting futures of the resources we want results from
     let stackoverflow_results = StackOverFlow::get_questions_and_content(&search_text, term_width, enable_warnings);
