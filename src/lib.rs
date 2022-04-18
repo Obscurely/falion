@@ -163,25 +163,7 @@ pub fn loop_prompt_stacks(content: &Vec<String>, stdout: &mut io::Stdout) {
                     }
                 }
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('N'),
-                modifiers: event::KeyModifiers::CONTROL,
-                //clearing the screen and printing our message
-            }) => {
-                    if content.len() > current_index + 1 {
-                        current_index += 1;
-                    }
-                }
-            event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('b'),
-                modifiers: event::KeyModifiers::CONTROL,
-                //clearing the screen and printing our message
-            }) => {
-                    if current_index > 0 {
-                        current_index -= 1;
-                    }
-                }
-            event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('B'),
                 modifiers: event::KeyModifiers::CONTROL,
                 //clearing the screen and printing our message
             }) => {
@@ -197,24 +179,8 @@ pub fn loop_prompt_stacks(content: &Vec<String>, stdout: &mut io::Stdout) {
                     Util::disable_terminal_raw_mode();
                     return;
                 }
-            event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('Q'),
-                modifiers: event::KeyModifiers::CONTROL,
-                //clearing the screen and printing our message
-            }) => {
-                    Util::disable_terminal_raw_mode();
-                    return;
-                }
            event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('c'),
-                modifiers: event::KeyModifiers::CONTROL,
-            }) => {
-                    Util::disable_terminal_raw_mode();
-                    Util::clear_terminal(stdout);
-                    process::exit(0);
-                }
-            event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('C'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
                     Util::disable_terminal_raw_mode();
@@ -267,25 +233,7 @@ pub fn loop_prompt_gist(content: &Vec<String>, stdout: &mut io::Stdout) {
                     }
                 }
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('N'),
-                modifiers: event::KeyModifiers::CONTROL,
-                //clearing the screen and printing our message
-            }) => {
-                    if content.len() > current_index + 1 {
-                        current_index += 1;
-                    }
-                }
-            event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('b'),
-                modifiers: event::KeyModifiers::CONTROL,
-                //clearing the screen and printing our message
-            }) => {
-                    if current_index > 0 {
-                        current_index -= 1;
-                    }
-                }
-            event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('B'),
                 modifiers: event::KeyModifiers::CONTROL,
                 //clearing the screen and printing our message
             }) => {
@@ -301,24 +249,8 @@ pub fn loop_prompt_gist(content: &Vec<String>, stdout: &mut io::Stdout) {
                     Util::disable_terminal_raw_mode();
                     return;
                 }
-            event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('Q'),
-                modifiers: event::KeyModifiers::CONTROL,
-                //clearing the screen and printing our message
-            }) => {
-                    Util::disable_terminal_raw_mode();
-                    return;
-                }
            event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('c'),
-                modifiers: event::KeyModifiers::CONTROL,
-            }) => {
-                    Util::disable_terminal_raw_mode();
-                    Util::clear_terminal(stdout);
-                    process::exit(0);
-                }
-            event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('C'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
                     Util::disable_terminal_raw_mode();
@@ -368,24 +300,8 @@ pub fn loop_prompt_geeksforgeeks(content: &str, stdout: &mut io::Stdout) {
                     Util::disable_terminal_raw_mode();
                     return;
                 }
-            event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('Q'),
-                modifiers: event::KeyModifiers::CONTROL,
-                //clearing the screen and printing our message
-            }) => {
-                    Util::disable_terminal_raw_mode();
-                    return;
-                }
            event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('c'),
-                modifiers: event::KeyModifiers::CONTROL,
-            }) => {
-                    Util::disable_terminal_raw_mode();
-                    Util::clear_terminal(stdout);
-                    process::exit(0);
-                }
-            event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('C'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
                     Util::disable_terminal_raw_mode();
@@ -435,24 +351,8 @@ pub fn loop_prompt_duckduckgo(content: &str, stdout: &mut io::Stdout) {
                     Util::disable_terminal_raw_mode();
                     return;
                 }
-            event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('Q'),
-                modifiers: event::KeyModifiers::CONTROL,
-                //clearing the screen and printing our message
-            }) => {
-                    Util::disable_terminal_raw_mode();
-                    return;
-                }
            event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('c'),
-                modifiers: event::KeyModifiers::CONTROL,
-            }) => {
-                    Util::disable_terminal_raw_mode();
-                    Util::clear_terminal(stdout);
-                    process::exit(0);
-                }
-            event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('C'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
                     Util::disable_terminal_raw_mode();

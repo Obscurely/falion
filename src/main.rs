@@ -4,6 +4,7 @@ use crossterm::terminal;
 use crossterm::event;
 use falion::search::util::Util;
 use std::borrow::Borrow;
+use std::io::Read;
 use std::process;
 use std::{env, io};
 use indexmap::IndexMap;
@@ -69,27 +70,34 @@ async fn main() {
     // main interface loop
     let default_error = String::from("There was an error getting any results!"); 
 
-    let stackoverflow_current = match falion::get_key_at_index_map_with_vec(0, &stackoverflow_results) {
+    let mut stackoverflow_index = 0;
+    let mut stackoverflow_current = match falion::get_key_at_index_map_with_vec(stackoverflow_index, &stackoverflow_results) {
         Some(value) => value,
         None => default_error.to_owned(),
     };
-    let stackexchange_current = match falion::get_key_at_index_map_with_vec(0, &stackexchange_results) {
+    let mut stackexchange_index = 0;
+    let mut stackexchange_current = match falion::get_key_at_index_map_with_vec(stackexchange_index, &stackexchange_results) {
         Some(value) => value,
         None => default_error.to_owned(),
     };
-    let github_gist_current = match falion::get_key_at_index_map_with_vec(0, &github_gist_results) {
+    let mut github_gist_index = 0;
+    let mut github_gist_current = match falion::get_key_at_index_map_with_vec(github_gist_index, &github_gist_results) {
         Some(value) => value,
         None => default_error.to_owned(),
     };
-    let geeksforgeeks_current = match falion::get_key_at_index_map_with_string(0, &geeksforgeeks_results) {
+    let mut geeksforgeeks_index = 0;
+    let mut geeksforgeeks_current = match falion::get_key_at_index_map_with_string(geeksforgeeks_index, &geeksforgeeks_results) {
         Some(value) => value,
         None => default_error.to_owned(),
     };
-    let duck_search_current = match falion::get_key_at_index_map_with_string(0, &duck_search_results) {
+    let mut duck_search_index = 0;
+    let mut duck_search_current = match falion::get_key_at_index_map_with_string(duck_search_index, &duck_search_results) {
         Some(value) => value,
         None => default_error.to_owned(),
     };
     loop {
+        // clearing the output in order to start clean.
+        Util::clear_terminal(&mut stdout);
         // printing search querry
         println!("Your search querry is: {}", search_text.green());
         // printing options
@@ -128,6 +136,32 @@ async fn main() {
                     falion::loop_prompt_stacks(&content, &mut stdout);
                 }
             event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('!'),
+                modifiers: event::KeyModifiers::NONE,
+                //clearing the screen and printing our message
+            }) => {
+                    stackoverflow_current = match falion::get_key_at_index_map_with_vec(stackoverflow_index + 1, &stackoverflow_results) {
+                        Some(key) => {
+                            stackoverflow_index += 1;
+                            key
+                        },
+                        None => stackoverflow_current,
+                    };
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('1'),
+                modifiers: event::KeyModifiers::ALT,
+                //clearing the screen and printing our message
+            }) => {
+                    stackoverflow_current = match falion::get_key_at_index_map_with_vec(stackoverflow_index - 1, &stackoverflow_results) {
+                        Some(key) => {
+                            stackoverflow_index -= 1;
+                            key
+                        },
+                        None => stackoverflow_current,
+                    };
+                }
+            event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('2'),
                 modifiers: event::KeyModifiers::NONE,
                 //clearing the screen and printing our message
@@ -142,6 +176,32 @@ async fn main() {
                     };
 
                     falion::loop_prompt_stacks(&content, &mut stdout);
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('@'),
+                modifiers: event::KeyModifiers::NONE,
+                //clearing the screen and printing our message
+            }) => {
+                    stackexchange_current = match falion::get_key_at_index_map_with_vec(stackexchange_index + 1, &stackexchange_results) {
+                        Some(key) => {
+                            stackexchange_index += 1;
+                            key
+                        },
+                        None => stackexchange_current,
+                    };
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('2'),
+                modifiers: event::KeyModifiers::ALT,
+                //clearing the screen and printing our message
+            }) => {
+                    stackexchange_current = match falion::get_key_at_index_map_with_vec(stackexchange_index - 1, &stackexchange_results) {
+                        Some(key) => {
+                            stackexchange_index -= 1;
+                            key
+                        },
+                        None => stackexchange_current,
+                    };
                 }
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('3'),
@@ -160,6 +220,32 @@ async fn main() {
                     falion::loop_prompt_gist(&content, &mut stdout);
                 }
             event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('#'),
+                modifiers: event::KeyModifiers::NONE,
+                //clearing the screen and printing our message
+            }) => {
+                    github_gist_current = match falion::get_key_at_index_map_with_vec(github_gist_index + 1, &github_gist_results) {
+                        Some(key) => {
+                            github_gist_index += 1;
+                            key
+                        },
+                        None => github_gist_current,
+                    };
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('3'),
+                modifiers: event::KeyModifiers::ALT,
+                //clearing the screen and printing our message
+            }) => {
+                    github_gist_current = match falion::get_key_at_index_map_with_vec(github_gist_index - 1, &github_gist_results) {
+                        Some(key) => {
+                            github_gist_index -= 1;
+                            key
+                        },
+                        None => github_gist_current,
+                    };
+                }
+            event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('4'),
                 modifiers: event::KeyModifiers::NONE,
                 //clearing the screen and printing our message
@@ -174,6 +260,32 @@ async fn main() {
                     };
 
                     falion::loop_prompt_geeksforgeeks(&content, &mut stdout);
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('$'),
+                modifiers: event::KeyModifiers::NONE,
+                //clearing the screen and printing our message
+            }) => {
+                    geeksforgeeks_current = match falion::get_key_at_index_map_with_string(geeksforgeeks_index + 1, &geeksforgeeks_results) {
+                        Some(key) => {
+                            geeksforgeeks_index += 1;
+                            key
+                        },
+                        None => geeksforgeeks_current,
+                    };
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('4'),
+                modifiers: event::KeyModifiers::ALT,
+                //clearing the screen and printing our message
+            }) => {
+                    geeksforgeeks_current = match falion::get_key_at_index_map_with_string(geeksforgeeks_index - 1, &geeksforgeeks_results) {
+                        Some(key) => {
+                            geeksforgeeks_index -= 1;
+                            key
+                        },
+                        None => geeksforgeeks_current,
+                    };
                 }
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('5'),
@@ -192,15 +304,115 @@ async fn main() {
                     falion::loop_prompt_duckduckgo(&content, &mut stdout);
                 }
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('c'),
-                modifiers: event::KeyModifiers::CONTROL,
+                code: event::KeyCode::Char('%'),
+                modifiers: event::KeyModifiers::NONE,
+                //clearing the screen and printing our message
             }) => {
-                    Util::disable_terminal_raw_mode();
-                    Util::clear_terminal(&mut stdout);
-                    process::exit(0);
+                    duck_search_current = match falion::get_key_at_index_map_with_string(duck_search_index + 1, &duck_search_results) {
+                        Some(key) => {
+                            duck_search_index += 1;
+                            key
+                        },
+                        None => duck_search_current,
+                    };
                 }
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('C'),
+                code: event::KeyCode::Char('5'),
+                modifiers: event::KeyModifiers::ALT,
+                //clearing the screen and printing our message
+            }) => {
+                    duck_search_current = match falion::get_key_at_index_map_with_string(duck_search_index - 1, &duck_search_results) {
+                        Some(key) => {
+                            duck_search_index -= 1;
+                            key
+                        },
+                        None => duck_search_current,
+                    };
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('n'),
+                modifiers: event::KeyModifiers::CONTROL,
+                //clearing the screen and printing our message
+            }) => {
+                    stackoverflow_current = match falion::get_key_at_index_map_with_vec(stackoverflow_index + 1, &stackoverflow_results) {
+                        Some(key) => {
+                            stackoverflow_index += 1;
+                            key
+                        },
+                        None => stackoverflow_current,
+                    };
+                    stackexchange_current = match falion::get_key_at_index_map_with_vec(stackexchange_index + 1, &stackexchange_results) {
+                        Some(key) => {
+                            stackexchange_index += 1;
+                            key
+                        },
+                        None => stackexchange_current,
+                    };
+                    github_gist_current = match falion::get_key_at_index_map_with_vec(github_gist_index + 1, &github_gist_results) {
+                        Some(key) => {
+                            github_gist_index += 1;
+                            key
+                        },
+                        None => github_gist_current,
+                    };
+                    geeksforgeeks_current = match falion::get_key_at_index_map_with_string(geeksforgeeks_index + 1, &geeksforgeeks_results) {
+                        Some(key) => {
+                            geeksforgeeks_index += 1;
+                            key
+                        },
+                        None => geeksforgeeks_current,
+                    };
+                    duck_search_current = match falion::get_key_at_index_map_with_string(duck_search_index + 1, &duck_search_results) {
+                        Some(key) => {
+                            duck_search_index += 1;
+                            key
+                        },
+                        None => duck_search_current,
+                    };
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('b'),
+                modifiers: event::KeyModifiers::CONTROL,
+                //clearing the screen and printing our message
+            }) => {
+                    stackoverflow_current = match falion::get_key_at_index_map_with_vec(stackoverflow_index - 1, &stackoverflow_results) {
+                        Some(key) => {
+                            stackoverflow_index -= 1;
+                            key
+                        },
+                        None => stackoverflow_current,
+                    };
+                    stackexchange_current = match falion::get_key_at_index_map_with_vec(stackexchange_index - 1, &stackexchange_results) {
+                        Some(key) => {
+                            stackexchange_index -= 1;
+                            key
+                        },
+                        None => stackexchange_current,
+                    };
+                    github_gist_current = match falion::get_key_at_index_map_with_vec(github_gist_index - 1, &github_gist_results) {
+                        Some(key) => {
+                            github_gist_index -= 1;
+                            key
+                        },
+                        None => github_gist_current,
+                    };
+                    geeksforgeeks_current = match falion::get_key_at_index_map_with_string(geeksforgeeks_index - 1, &geeksforgeeks_results) {
+                        Some(key) => {
+                            geeksforgeeks_index -= 1;
+                            key
+                        },
+                        None => geeksforgeeks_current,
+                    };
+                    duck_search_current = match falion::get_key_at_index_map_with_string(duck_search_index - 1, &duck_search_results) {
+                        Some(key) => {
+                            duck_search_index -= 1;
+                            key
+                        },
+                        None => duck_search_current,
+                    };
+                }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('c'),
                 modifiers: event::KeyModifiers::CONTROL,
             }) => {
                     Util::disable_terminal_raw_mode();
@@ -214,6 +426,7 @@ async fn main() {
 
         // clearing the terminal, since everything needed is gonna be printed again.
         Util::clear_terminal(&mut stdout);
+        Util::disable_terminal_raw_mode();
         // to not exit
         // let mut test = String::from("");
         // io::stdin().read_line(&mut test);
