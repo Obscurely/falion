@@ -21,13 +21,13 @@ impl DuckDuckGo {
             Ok(response) => match response.text().await {
                 Ok(content) => content,
                 Err(error) => {
-                    eprintln!("[130] There was an error reading the body of the vqd duckduckgo request, the given error is: {}", format!("{}", error).red());
-                    process::exit(130);
+                    eprintln!("{} {}", "[101][Error] There was an error reading the body of the vqd duckduckgo request, the given error is:".red(), format!("{}", error).red());
+                    process::exit(101);
                 }
             },
             Err(error) => {
-                eprintln!("[131] There was an error getting a repsponse from duckduckgo for the vqd, the given error is: {}", format!("{}", error).red());
-                process::exit(130);
+                eprintln!("{} {}", "[102][Error] There was an error getting a repsponse from duckduckgo for the vqd, the given error is:".red(), format!("{}", error).red());
+                process::exit(102);
             }
         };
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
@@ -37,15 +37,15 @@ impl DuckDuckGo {
             Some(matches) => match matches.get(0) {
                 Some(matches) => matches.as_str(),
                 None => {
-                    eprintln!("[108] There was an error reading the found matches with regex");
-                    process::exit(108);
+                    eprintln!("{}", "[103][Error] There was an error reading the found matches with regex".red());
+                    process::exit(103);
                 }
             },
             None => {
                 eprintln!(
-                    "[107] There was an error capturing regex matches on the vqd body from duckduckgo"
+                    "{}", "[104][Error] There was an error capturing regex matches on the vqd body from duckduckgo".red(),
                 );
-                process::exit(107);
+                process::exit(104);
             }
         };
 
@@ -58,13 +58,13 @@ impl DuckDuckGo {
             Ok(response) => match response.text().await {
                 Ok(content) => content,
                 Err(error) => {
-                    eprintln!("[130] There was an error reading the body of the vqd duckduckgo request, the given error is: {}", format!("{}", error).red());
-                    process::exit(130);
+                    eprintln!("{} {}", "[105][Error] There was an error reading the body of the vqd duckduckgo request, the given error is:".red(), format!("{}", error).red());
+                    process::exit(105);
                 }
             },
             Err(error) => {
-                eprintln!("[131] There was an error getting a repsponse from duckduckgo for the vqd, the given error is: {}", format!("{}", error).red());
-                process::exit(130);
+                eprintln!("{} {}", "[106][Error] There was an error getting a repsponse from duckduckgo for the vqd, the given error is:".red(), format!("{}", error).red());
+                process::exit(106);
             }
         };
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
@@ -74,15 +74,15 @@ impl DuckDuckGo {
             Some(matches) => match matches.get(0) {
                 Some(matches) => matches.as_str(),
                 None => {
-                    eprintln!("[108] There was an error reading the found matches with regex");
-                    process::exit(108);
+                    eprintln!("{}", "[107][Error] There was an error reading the found matches with regex".red());
+                    process::exit(107);
                 }
             },
             None => {
                 eprintln!(
-                    "[107] There was an error capturing regex matches on the vqd body from duckduckgo"
+                    "{}", "[108][Error] There was an error capturing regex matches on the vqd body from duckduckgo".red(),
                 );
-                process::exit(107);
+                process::exit(108);
             }
         };
 
@@ -105,26 +105,19 @@ impl DuckDuckGo {
             Ok(res) => match res.text().await {
                 Ok(body) => body,
                 Err(error) => {
-                    eprintln!("[102] There was an error reading the response of the {} search, the given error is: {}", site, format!("{}", error).red());
-                    process::exit(102);
+                    eprintln!("{} {} {} {}", "[109][Error] There was an error reading the response of the ".red(), site, "search, the given error is:".red(), format!("{}", error).red());
+                    process::exit(109);
                 }
             },
             Err(error) => {
-                eprintln!("[103] There was an error requesting {} to give available threads on the given search, the given error is: {}", site, format!("{}", error).red());
-                process::exit(103);
+                eprintln!("{}{} {} {}", "[110][Error] There was an error requesting ".red(), site, "to give available threads on the given search, the given error is:".red(), format!("{}", error).red());
+                process::exit(110);
             }
         };
 
         let links_match = re.captures_iter(body.as_str());
 
         for link in links_match {
-            // let link_part = match link.get(0) {
-            //     Some(value) => value.to_owned,
-            //     None => {
-            //         eprintln!("[521] There was an error getting a part of the current link, continuing with the next iteration.");
-            //         continue;
-            //     }
-            // };
             links.push(link[0].to_string().replace('"', ""));
         }
 
@@ -152,26 +145,19 @@ impl DuckDuckGo {
             Ok(res) => match res.text().await {
                 Ok(body) => body,
                 Err(error) => {
-                    eprintln!("[102] There was an error reading the response of the search, the given error is: {}", format!("{}", error).red());
-                    process::exit(102);
+                    eprintln!("{} {}", "[111][Error] There was an error reading the response of the search, the given error is:".red(), format!("{}", error).red());
+                    process::exit(111);
                 }
             },
             Err(error) => {
-                eprintln!("[103] There was an error requesting to give available threads on the given search, the given error is: {}", format!("{}", error).red());
-                process::exit(103);
+                eprintln!("{} {}", "[112][Error] There was an error requesting to give available threads on the given search, the given error is:".red(), format!("{}", error).red());
+                process::exit(112);
             }
         };
 
         let links_match = re.captures_iter(body.as_str());
 
         for link in links_match {
-            // let link_part = match link.get(0) {
-            //     Some(value) => value.to_owned,
-            //     None => {
-            //         eprintln!("[521] There was an error getting a part of the current link, continuing with the next iteration.");
-            //         continue;
-            //     }
-            // };
             let current_link = link[0].to_string();
             if current_link.contains("https://duckduckgo")
                 || current_link.contains("https://www.duckduckgo")
@@ -199,7 +185,7 @@ impl DuckDuckGo {
             let link_parsed = match url::Url::parse(&link) {
                 Ok(parsed) => parsed,
                 Err(error) => {
-                    eprintln!("[531] There was an error parsing the url in the current loop iter, moving on to the next url, the given error is: {}", format!("{}", error).red());
+                    eprintln!("{} {}", "[501][Warning] There was an error parsing the url in the current loop iter, moving on to the next url, the given error is:".yellow(), format!("{}", error).red());
                     continue;
                 }
             };
@@ -221,14 +207,14 @@ impl DuckDuckGo {
             let link_parsed = match url::Url::parse(&link) {
                 Ok(parsed) => parsed,
                 Err(error) => {
-                    eprintln!("[531] There was an error parsing the url in the current loop iter, moving on to the next url, the given error is: {}", format!("{}", error).red());
+                    eprintln!("{} {}", "[502][Warning] There was an error parsing the url in the current loop iter, moving on to the next url, the given error is:".yellow(), format!("{}", error).red());
                     continue;
                 }
             };
             let link_host = match link_parsed.host_str() {
                 Some(host) => host.to_string() + " |" + link_parsed.path().replace('/', " ").as_ref(),
                 None => {
-                    eprintln!("[532] There was an error getting the host of the url in the current loop iter, moving on to the next url.");
+                    eprintln!("{}", "[503][Warning] There was an error getting the host of the url in the current loop iter, moving on to the next url.".yellow());
                     continue;
                 }
             };

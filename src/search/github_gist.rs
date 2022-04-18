@@ -18,7 +18,7 @@ impl GithubGist {
             Ok(page) => match page.text().await {
                 Ok(content) => content,
                 Err(error) => {
-                    eprintln!("[523] Warning! There was an error reading the recieved request from gist.github.com, the given error is: {}", format!("{}", error).red());
+                    eprintln!("{} {}", "[510][Warning] There was an error reading the recieved request from gist.github.com, the given error is:".yellow(), format!("{}", error).red());
                     return vec![String::from(
                         "Nothing in here, there was an error retireving content!",
                     )];
@@ -26,7 +26,7 @@ impl GithubGist {
             },
             Err(error) => {
                 eprintln!(
-                "[525] There was an error recieving the content of a gist page, the given error is: {}", format!("{}", error).red()
+                "{} {}", "[511][Warning] There was an error recieving the content of a gist page, the given error is:".yellow(), format!("{}", error).red()
                 );
                 return vec![String::from(
                     "Nothing in here, there was an error retireving content!",
@@ -62,7 +62,7 @@ impl GithubGist {
                     match value {
                         Ok(content) => content,
                         Err(error) => {
-                            eprintln!("[528] Warning! There was an error reading the content of a gist (debug: part 2), the given error is: {}", format!("{}", error).red());
+                            eprintln!("{} {}", "[512][Warning] There was an error reading the content of a gist (debug: part 2), the given error is:".yellow(), format!("{}", error).red());
                             return vec![String::from(
                                 "Nothing in here, there was an error retireving content!",
                             )];
@@ -70,7 +70,7 @@ impl GithubGist {
                     }
                 }
                 Err(error) => {
-                    eprintln!("[527] Warning! There was an error reading the content of a gist (debug: part 1), the given error is: {}", format!("{}", error).red());
+                    eprintln!("{} {}", "[513][Warning] There was an error reading the content of a gist (debug: part 1), the given error is:".yellow(), format!("{}", error).red());
                     return vec![String::from(
                         "Nothing in here, there was an error retireving content!",
                     )];
@@ -92,7 +92,7 @@ impl GithubGist {
                     match content {
                         Ok(content) => content,
                         Err(error) => {
-                            eprintln!("[530] Warning! There was an error reading the content of a recieved request from gist.github.com (debug: second_part), the given error is: {}", format!("{}", error).red());
+                            eprintln!("{} {}", "[514][Warning] There was an error reading the content of a recieved request from gist.github.com (debug: part 2), the given error is:".yellow(), format!("{}", error).red());
                             return vec![String::from(
                                 "Nothing in here, there was an error retireving content!",
                             )];
@@ -100,7 +100,7 @@ impl GithubGist {
                     }
                 }
                 Err(error) => {
-                    eprintln!("[531] Warning! There was an error reading the content of a recieved request from gist.github.com (debug: first part), the given error is: {}", format!("{}", error).red());
+                    eprintln!("{} {}", "[515][Warning] There was an error reading the content of a recieved request from gist.github.com (debug: part 1), the given error is:".yellow(), format!("{}", error).red());
                     return vec![String::from(
                         "Nothing in here, there was an error retireving content!",
                     )];

@@ -90,7 +90,7 @@ pub async fn get_key_map_with_vec(key: &str, results: &mut IndexMap<String, toki
         let current = match results.get_mut(key).unwrap().await {
             Ok(value) => value,
             Err(error) => {
-                eprintln!("[580] Warning! There was an error awaiting the value at the specified key, the key existed, the given error is: {}", format!("{}", error).red());
+                eprintln!("{} {}", "[535][Warning] There was an error awaiting the value at the specified key, the key existed, the given error is:".yellow(), format!("{}", error).red());
                 return None;
             }
         };
@@ -110,7 +110,7 @@ pub async fn get_key_map_with_string(key: &str, results: &mut IndexMap<String, t
         let current = match results.get_mut(key).unwrap().await {
             Ok(value) => value,
             Err(error) => {
-                eprintln!("[580] Warning! There was an error awaiting the value at the specified key, the key existed, the given error is: {}", format!("{}", error).red());
+                eprintln!("{} {}", "[536][Warning] There was an error awaiting the value at the specified key, the key existed, the given error is:".yellow(), format!("{}", error).red());
                 return None;
             }
         };
@@ -125,7 +125,7 @@ pub async fn get_key_map_with_string(key: &str, results: &mut IndexMap<String, t
 
 pub fn loop_prompt_stacks(content: &Vec<String>, stdout: &mut io::Stdout) {
     if content.is_empty() {
-        eprintln!("{}", "[590] Warning! The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".red());
+        eprintln!("{}", "[537][Warning] The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".yellow());
         println!("Press enter to continue!");
         let mut temp = String::from("");
         std::io::stdin().read_line(&mut temp);
@@ -151,7 +151,7 @@ pub fn loop_prompt_stacks(content: &Vec<String>, stdout: &mut io::Stdout) {
         let event_read = match event::read() {
             Ok(ev) => ev,
             Err(error) => {
-                eprintln!("[518] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is: {}", format!("{}", error).red());
+                eprintln!("{} {}", "[538][Warning] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is:".yellow(), format!("{}", error).red());
                 continue;
             }
         };
@@ -205,7 +205,7 @@ pub fn loop_prompt_stacks(content: &Vec<String>, stdout: &mut io::Stdout) {
 
 pub fn loop_prompt_gist(content: &Vec<String>, stdout: &mut io::Stdout) {
     if content.is_empty() {
-        eprintln!("{}", "[590] Warning! The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".red());
+        eprintln!("{}", "[539][Warning] The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".yellow());
         println!("Press enter to continue!");
         let mut temp = String::from("");
         std::io::stdin().read_line(&mut temp);
@@ -226,7 +226,7 @@ pub fn loop_prompt_gist(content: &Vec<String>, stdout: &mut io::Stdout) {
         let event_read = match event::read() {
             Ok(ev) => ev,
             Err(error) => {
-                eprintln!("[518] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is: {}", format!("{}", error).red());
+                eprintln!("{} {}", "[540][Warning] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is:".yellow(), format!("{}", error).red());
                 continue;
             }
         };
@@ -280,7 +280,7 @@ pub fn loop_prompt_gist(content: &Vec<String>, stdout: &mut io::Stdout) {
 
 pub fn loop_prompt_geeksforgeeks(content: &str, stdout: &mut io::Stdout) {
     if content.is_empty() {
-        eprintln!("{}", "[590] Warning! The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".red());
+        eprintln!("{}", "[541][Warning] The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".yellow());
         println!("Press enter to continue!");
         let mut temp = String::from("");
         std::io::stdin().read_line(&mut temp);
@@ -298,7 +298,7 @@ pub fn loop_prompt_geeksforgeeks(content: &str, stdout: &mut io::Stdout) {
         let event_read = match event::read() {
             Ok(ev) => ev,
             Err(error) => {
-                eprintln!("[518] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is: {}", format!("{}", error).red());
+                eprintln!("{} {}", "[542][Warning] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is:".yellow(), format!("{}", error).red());
                 continue;
             }
         };
@@ -334,7 +334,7 @@ pub fn loop_prompt_geeksforgeeks(content: &str, stdout: &mut io::Stdout) {
 
 pub fn loop_prompt_duckduckgo(content: &str, stdout: &mut io::Stdout) {
     if content.is_empty() {
-        eprintln!("{}", "[590] Warning! The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".red());
+        eprintln!("{}", "[543][Warning] The accessed resource did not have anything in it, it normally should at least have a text saying there was an error".yellow());
         println!("Press enter to continue!");
         let mut temp = String::from("");
         std::io::stdin().read_line(&mut temp);
@@ -352,7 +352,7 @@ pub fn loop_prompt_duckduckgo(content: &str, stdout: &mut io::Stdout) {
         let event_read = match event::read() {
             Ok(ev) => ev,
             Err(error) => {
-                eprintln!("[518] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is: {}", format!("{}", error).red());
+                eprintln!("{} {}", "[544][Warning] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is:".yellow(), format!("{}", error).red());
                 continue;
             }
         };

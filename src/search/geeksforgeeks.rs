@@ -21,12 +21,12 @@ impl GeeksForGeeks {
             Ok(content) => match content.text().await {
                 Ok(text) => text,
                 Err(error) => {
-                    eprintln!("[551] Warning! There was an error reading the content of the retrieved request from geeksforgeeks, the given error is: {}", format!("{}", error).red());
+                    eprintln!("{} {}", "[506][Warning] There was an error reading the content of the retrieved request from geeksforgeeks, the given error is:".yellow(), format!("{}", error).red());
                     return String::from("Nothing in here, there was an error retireving content!");
                 }
             },
             Err(error) => {
-                eprintln!("[550] Warning! There was an error retrieving the content of a geeksforgeeks page, the given error is: {}", format!("{}", error).red());
+                eprintln!("{} {}", "[507][Warning] There was an error retrieving the content of a geeksforgeeks page, the given error is:".yellow(), format!("{}", error).red());
                 return String::from("Nothing in here, there was an error retireving content!");
             }
         };
@@ -35,12 +35,12 @@ impl GeeksForGeeks {
             Some(article_start) => match article_start.1.split_once(content_sep_second) {
                 Some(article_end) => article_end.0,
                 None => {
-                    eprintln!("[553] Warning! There was an error getting the end of the article from the html recieved from geeksforgeeks.");
+                    eprintln!("{}", "[508][Warning] There was an error getting the end of the article from the html recieved from geeksforgeeks.".yellow());
                     return String::from("Nothing in here, there was an error retireving content!");
                 }
             },
             None => {
-                eprintln!("[552] Warning! There was an error getting the content from the recieved html from geeksforgeeks.");
+                eprintln!("{}", "[509][Warning] There was an error getting the content from the recieved html from geeksforgeeks.".yellow());
                 return String::from("Nothing in here, there was an error retireving content!");
             }
         };

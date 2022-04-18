@@ -19,8 +19,8 @@ async fn main() {
     let term_width = usize::from(match terminal::size() {
         Ok(size) => size.0,
         Err(error) => {
-            eprintln!("[520] Warning! There was a problem detecting the terminal width, using 1920 (could use 1milion), the terminal should take care of it, it's just not gonna be as nice, the given error is: {}", format!("{}", error).red());
-            1920
+            eprintln!("{} {}", "[532][Warning] There was a problem detecting the terminal width, using 50 (could use 1milion), the terminal should take care of it, it's just not gonna be as nice, the given error is:".yellow(), format!("{}", error).red());
+            50
         }
     });
     // getting stdout into var in order to manipulate the terminal
@@ -30,15 +30,15 @@ async fn main() {
     match terminal::disable_raw_mode() {
         Ok(_) => (),
         Err(error) => {
-            eprintln!("[512] Warning! There was an error disabling terminal raw mode, program may not run as expected! the given error is: {}", format!("{}", error).red());
+            eprintln!("{} {}", "[533][Warning] There was an error disabling terminal raw mode, program may not run as expected! the given error is:".yellow(), format!("{}", error).red());
         }
     }
 
     // getting args list and making a string from it
     let args = env::args().collect::<Vec<String>>();
     if args.len() < 2 {
-        eprintln!("[115] {}", "You have to provide a search querry, either surronded by \" or the querry as it is after the program's name.".to_string().red());
-        std::process::exit(115);
+        eprintln!("{}{}", "[113][Error] ".red(), "You have to provide a search querry, either surronded by \" or the querry as it is after the program's name.".to_string().red());
+        std::process::exit(113);
     }
     let mut search_text = args.join(" ");
     search_text = search_text.replace((args[0].to_string() + " ").as_str(), "");
@@ -112,7 +112,7 @@ async fn main() {
         let event_read = match event::read() {
             Ok(ev) => ev,
             Err(error) => {
-                eprintln!("[518] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is: {}", format!("{}", error).red());
+                eprintln!("{} {}", "[534][Warning] There was an error reading the input event, going to next iteration, if this continues please ctrl+c the program, the given error is:".yellow(), format!("{}", error).red());
                 continue;
             }
         };

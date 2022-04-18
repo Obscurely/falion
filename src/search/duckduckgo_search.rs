@@ -17,13 +17,13 @@ impl DuckSearch {
             Ok(page) => match page.text().await {
                 Ok(content) => content,
                 Err(error) => {
-                    eprintln!("[533] There was an error recieving the content of a page, the given error is: {}", format!("{}", error).red());
+                    eprintln!("{} {}", "[504][Warning] There was an error recieving the content of a page, the given error is:".yellow(), format!("{}", error).red());
                     String::from("Nothing in here, there was an error retireving content!")
                 }
             },
             Err(error) => {
                 eprintln!(
-                "[532] There was an error recieving the response of a page, the given error is: {}", format!("{}", error).red()
+                "{} {}", "[505][Warning] There was an error recieving the response of a page, the given error is:".yellow(), format!("{}", error).red()
                 );
                 String::from("Nothing in here, there was an error retireving content!")
             }

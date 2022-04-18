@@ -19,14 +19,14 @@ impl StackOverFlow {
             Ok(response) => match response.text().await {
                 Ok(body) => body,
                 Err(error) => {
-                    eprintln!("[545] Warning! There was an error reading the content of a stackoverflow.com question, the given error is: {}", format!("{}", error).red());
+                    eprintln!("{} {}", "[519][Warning] There was an error reading the content of a stackoverflow.com question, the given error is:".yellow(), format!("{}", error).red());
                     return vec![String::from(
                         "Nothing in here, there was an error retrieving content!",
                     )];
                 }
             },
             Err(error) => {
-                eprintln!("[546] Warning! There was an error getting a response from stackoverflow.com, the given error is: {}", format!("{}", error).red());
+                eprintln!("{} {}", "[520][Warning] There was an error getting a response from stackoverflow.com, the given error is:".yellow(), format!("{}", error).red());
                 return vec![String::from(
                     "Nothing in here, there was an error retrieving content!",
                 )];
@@ -46,7 +46,7 @@ impl StackOverFlow {
             let question_content = match question_content_split {
                 Some(value) => value.0,
                 None => {
-                    eprintln!("[522] Warning! There was an error getting a certain part of the html response from stackoverflow, continuing with next iteration.");
+                    eprintln!("{}", "[521][Warning] There was an error getting a certain part of the html response from stackoverflow, continuing with next iteration.".yellow());
                     continue;
                 }
             };
