@@ -53,7 +53,7 @@ impl GeeksForGeeks {
 
         let mut page_content = IndexMap::new();
         for link in links {
-            page_content.insert(link.0, tokio::task::spawn(GeeksForGeeks::get_page_content(link.1, term_width)));
+            page_content.insert(link.0.replace('-', " "), tokio::task::spawn(GeeksForGeeks::get_page_content(link.1, term_width)));
         }
 
         page_content

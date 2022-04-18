@@ -116,7 +116,7 @@ impl GithubGist {
 
         let mut page_content = IndexMap::new();
         for link in links {
-            page_content.insert(link.0, tokio::task::spawn(GithubGist::get_gist_content(link.1)));
+            page_content.insert(link.0.replace(' ', " | "), tokio::task::spawn(GithubGist::get_gist_content(link.1)));
         }
 
         page_content

@@ -226,7 +226,7 @@ impl DuckDuckGo {
                 }
             };
             let link_host = match link_parsed.host_str() {
-                Some(host) => host.to_string() + link_parsed.path().replace('/', " ").as_ref(),
+                Some(host) => host.to_string() + " |" + link_parsed.path().replace('/', " ").as_ref(),
                 None => {
                     eprintln!("[532] There was an error getting the host of the url in the current loop iter, moving on to the next url.");
                     continue;

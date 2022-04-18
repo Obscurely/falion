@@ -64,7 +64,8 @@ impl StackExchange {
 
         let mut page_content = IndexMap::new();
         for link in links {
-            page_content.insert(link.0.replacen("questions ", "", 1), tokio::task::spawn(StackExchange::get_question_content(link.1, term_width)));
+            // using unwrap here is ok since it's always gonna have a space
+            page_content.insert(link.0.replacen("questions ", "", 1).split_once(' ').unwrap().1.replace('-', " "), tokio::task::spawn(StackExchange::get_question_content(link.1, term_width)));
         }
 
         page_content

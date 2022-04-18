@@ -142,6 +142,11 @@ pub fn loop_prompt_stacks(content: &Vec<String>, stdout: &mut io::Stdout) {
         
         println!("{}", content[current_index]);
 
+        // inform use if it's end of the answers
+        if current_index + 1 == content.len() {
+            println!("\n{}", "End of answers! Can't go any further!".green());
+        }
+
         Util::enable_terminal_raw_mode();
         let event_read = match event::read() {
             Ok(ev) => ev,
@@ -212,6 +217,11 @@ pub fn loop_prompt_gist(content: &Vec<String>, stdout: &mut io::Stdout) {
         println!("{} {}{}", "File ".green(), (current_index + 1).to_string().green(), ":".green()); 
         println!("{}", content[current_index]);
 
+        // inform use if it's end of the gist's files
+        if current_index + 1 == content.len() {
+            println!("\n{}", "End of files in gist! Can't go any further!".green());
+        }
+
         Util::enable_terminal_raw_mode();
         let event_read = match event::read() {
             Ok(ev) => ev,
@@ -281,6 +291,9 @@ pub fn loop_prompt_geeksforgeeks(content: &str, stdout: &mut io::Stdout) {
         println!("{}", "GeeksForGeeks: ".green()); 
         println!("{}", content);
 
+        // inform use if it's only one page
+        println!("\n{}", "There is only one page! Can't go back or further!".green());
+
         Util::enable_terminal_raw_mode();
         let event_read = match event::read() {
             Ok(ev) => ev,
@@ -332,6 +345,9 @@ pub fn loop_prompt_duckduckgo(content: &str, stdout: &mut io::Stdout) {
         println!("{}", "DuckDuckGo: ".green()); 
         println!("{}", content);
 
+        // inform use if it's only one page
+        println!("\n{}", "There is only one page! Can't go back or further!".green());
+
         Util::enable_terminal_raw_mode();
         let event_read = match event::read() {
             Ok(ev) => ev,
@@ -369,3 +385,4 @@ pub fn loop_prompt_duckduckgo(content: &str, stdout: &mut io::Stdout) {
         Util::clear_terminal(stdout);
     }
 }
+
