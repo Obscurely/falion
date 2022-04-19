@@ -1,19 +1,23 @@
 use crate::search::duckduckgo::DuckDuckGo;
 use crate::search::util::Util;
 use colored::Colorize;
+use indexmap::IndexMap;
 use reqwest;
 use std::collections::HashMap;
-use indexmap::IndexMap;
 
 pub struct StackExchange {}
 
 impl StackExchange {
     async fn get_links(search: &str, enable_warnings: bool) -> HashMap<String, String> {
         let service_url = "stackexchange.com";
-        DuckDuckGo::get_links_formated(service_url, search, enable_warnings).await
+        DuckDuckGo::get_links_formatted(service_url, search, enable_warnings).await
     }
 
-    async fn get_question_content(question_url: String, term_width: usize, enable_warnings: bool) -> Vec<String> {
+    async fn get_question_content(
+        question_url: String,
+        term_width: usize,
+        enable_warnings: bool,
+    ) -> Vec<String> {
         // let start = std::time::Instant::now();
         let body = match reqwest::get(question_url).await {
             Ok(response) => match response.text().await {
@@ -37,7 +41,7 @@ impl StackExchange {
             }
         };
 
-        let question_sep = "<div class=\"s-prose js-post-body\" itemprop=\"text\">"; // we use this to split the response since it's unique and the start of the answear in the html.
+        let question_sep = "<div class=\"s-prose js-post-body\" itemprop=\"text\">"; // we use this to split the response since it's unique and the start of the answer in the html.
         let mut question_contents = vec![];
 
         let mut body_split: Vec<&str> = body.split(question_sep).collect();
@@ -65,13 +69,29 @@ impl StackExchange {
         question_contents
     }
 
-    pub async fn get_questions_and_content(querry: &str, term_width: usize, enable_warnings: bool) -> IndexMap<String, tokio::task::JoinHandle<Vec<String>>> {
-        let links = StackExchange::get_links(querry, enable_warnings).await;
+    pub async fn get_questions_and_content(
+        query: &str,
+        term_width: usize,
+        enable_warnings: bool,
+    ) -> IndexMap<String, tokio::task::JoinHandle<Vec<String>>> {
+        let links = StackExchange::get_links(query, enable_warnings).await;
 
         let mut page_content = IndexMap::new();
         for link in links {
             // using unwrap here is ok since it's always gonna have a space
-            page_content.insert(link.0.replacen("questions ", "", 1).split_once(' ').unwrap().1.replace('-', " "), tokio::task::spawn(StackExchange::get_question_content(link.1, term_width, enable_warnings)));
+            page_content.insert(
+                link.0
+                    .replacen("questions ", "", 1)
+                    .split_once(' ')
+                    .unwrap()
+                    .1
+                    .replace('-', " "),
+                tokio::task::spawn(StackExchange::get_question_content(
+                    link.1,
+                    term_width,
+                    enable_warnings,
+                )),
+            );
         }
 
         page_content

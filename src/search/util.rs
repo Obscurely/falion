@@ -43,60 +43,60 @@ impl Util {
         }
     }
 
-    pub fn move_cursor_beginning(out: &mut std::io::Stdout, enable_warnings: bool) {
-        match crossterm::execute!(out, crossterm::cursor::MoveTo(0, 0)) {
-            Ok(_) => (),
-            Err(error) => {
-                if enable_warnings {
-                    eprintln!("{} {}", "[525][Warning] There was an error moving the cursor of the terminal, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
-                }
-            }
-        }
-    }
+    // pub fn move_cursor_beginning(out: &mut std::io::Stdout, enable_warnings: bool) {
+    //     match crossterm::execute!(out, crossterm::cursor::MoveTo(0, 0)) {
+    //         Ok(_) => (),
+    //         Err(error) => {
+    //             if enable_warnings {
+    //                 eprintln!("{} {}", "[525][Warning] There was an error moving the cursor of the terminal, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
+    //             }
+    //         }
+    //     }
+    // }
 
-    pub fn move_cursor_down(out: &mut std::io::Stdout, enable_warnings: bool) {
-        match crossterm::execute!(out, terminal::ScrollDown(1)) {
-            Ok(_) => (),
-            Err(error) => {
-                if enable_warnings {
-                    eprintln!("{} {}", "[526][Warning] There was an error moving the cursor down, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
-                }
-            }
-        }
-    }
+    // pub fn move_cursor_down(out: &mut std::io::Stdout, enable_warnings: bool) {
+    //     match crossterm::execute!(out, terminal::ScrollDown(1)) {
+    //         Ok(_) => (),
+    //         Err(error) => {
+    //             if enable_warnings {
+    //                 eprintln!("{} {}", "[526][Warning] There was an error moving the cursor down, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
+    //             }
+    //         }
+    //     }
+    // }
 
-    pub fn move_cursor_up(out: &mut std::io::Stdout, enable_warnings: bool) {
-        match crossterm::execute!(out, terminal::ScrollUp(1)) {
-            Ok(_) => (),
-            Err(error) => {
-                if enable_warnings {
-                    eprintln!("{} {}", "[527][Warning] There was an error moving the cursor up, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
-                }
-            }
-        }
-    }
+    // pub fn move_cursor_up(out: &mut std::io::Stdout, enable_warnings: bool) {
+    //     match crossterm::execute!(out, terminal::ScrollUp(1)) {
+    //         Ok(_) => (),
+    //         Err(error) => {
+    //             if enable_warnings {
+    //                 eprintln!("{} {}", "[527][Warning] There was an error moving the cursor up, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
+    //             }
+    //         }
+    //     }
+    // }
 
-    pub fn move_cursor_down_5(out: &mut std::io::Stdout, enable_warnings: bool) {
-        match crossterm::execute!(out, terminal::ScrollDown(5)) {
-            Ok(_) => (),
-            Err(error) => {
-                if enable_warnings {
-                    eprintln!("{} {}", "[528][Warning] There was an error moving the cursor down 5 lines, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
-                }
-            }
-        }
-    }
+    // pub fn move_cursor_down_5(out: &mut std::io::Stdout, enable_warnings: bool) {
+    //     match crossterm::execute!(out, terminal::ScrollDown(5)) {
+    //         Ok(_) => (),
+    //         Err(error) => {
+    //             if enable_warnings {
+    //                 eprintln!("{} {}", "[528][Warning] There was an error moving the cursor down 5 lines, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
+    //             }
+    //         }
+    //     }
+    // }
 
-    pub fn move_cursor_up_5(out: &mut std::io::Stdout, enable_warnings: bool) {
-        match crossterm::execute!(out, terminal::ScrollUp(5)) {
-            Ok(_) => (),
-            Err(error) => {
-                if enable_warnings {
-                    eprintln!("{} {}", "[529][Warning] There was an error moving the cursor up 5 lines, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
-                }
-            }
-        }
-    }
+    // pub fn move_cursor_up_5(out: &mut std::io::Stdout, enable_warnings: bool) {
+    //     match crossterm::execute!(out, terminal::ScrollUp(5)) {
+    //         Ok(_) => (),
+    //         Err(error) => {
+    //             if enable_warnings {
+    //                 eprintln!("{} {}", "[529][Warning] There was an error moving the cursor up 5 lines, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
+    //             }
+    //         }
+    //     }
+    // }
 
     pub fn disable_terminal_raw_mode(enable_warnings: bool) {
         match terminal::disable_raw_mode() {

@@ -1,16 +1,16 @@
 use crate::search::duckduckgo::DuckDuckGo;
 use colored::Colorize;
+use indexmap::IndexMap;
 use regex::Regex;
 use reqwest;
 use std::collections::HashMap;
-use indexmap::IndexMap;
 
 pub struct GithubGist {}
 
 impl GithubGist {
     async fn get_links(search: &str, enable_warnings: bool) -> HashMap<String, String> {
         let service_url = "gist.github.com";
-        DuckDuckGo::get_links_formated(service_url, search, enable_warnings).await
+        DuckDuckGo::get_links_formatted(service_url, search, enable_warnings).await
     }
 
     async fn get_gist_content(gist_url: String, enable_warnings: bool) -> Vec<String> {
@@ -19,21 +19,21 @@ impl GithubGist {
                 Ok(content) => content,
                 Err(error) => {
                     if enable_warnings {
-                        eprintln!("{} {}", "[510][Warning] There was an error reading the recieved request from gist.github.com, the given error is:".yellow(), format!("{}", error).red());
+                        eprintln!("{} {}", "[510][Warning] There was an error reading the received request from gist.github.com, the given error is:".yellow(), format!("{}", error).red());
                     }
                     return vec![String::from(
-                        "Nothing in here, there was an error retireving content!",
+                        "Nothing in here, there was an error retrieving content!",
                     )];
                 }
             },
             Err(error) => {
                 if enable_warnings {
                     eprintln!(
-                    "{} {}", "[511][Warning] There was an error recieving the content of a gist page, the given error is:".yellow(), format!("{}", error).red()
+                    "{} {}", "[511][Warning] There was an error receiving the content of a gist page, the given error is:".yellow(), format!("{}", error).red()
                     );
                 }
                 return vec![String::from(
-                    "Nothing in here, there was an error retireving content!",
+                    "Nothing in here, there was an error retrieving content!",
                 )];
             }
         };
@@ -123,12 +123,18 @@ impl GithubGist {
         gist_files_content_awaited
     }
 
-    pub async fn get_name_and_content(querry: &str, enable_warnings: bool) -> IndexMap<String, tokio::task::JoinHandle<Vec<String>>> {
+    pub async fn get_name_and_content(
+        querry: &str,
+        enable_warnings: bool,
+    ) -> IndexMap<String, tokio::task::JoinHandle<Vec<String>>> {
         let links = GithubGist::get_links(querry, enable_warnings).await;
 
         let mut page_content = IndexMap::new();
         for link in links {
-            page_content.insert(link.0.replace(' ', " | "), tokio::task::spawn(GithubGist::get_gist_content(link.1, enable_warnings)));
+            page_content.insert(
+                link.0.replace(' ', " | "),
+                tokio::task::spawn(GithubGist::get_gist_content(link.1, enable_warnings)),
+            );
         }
 
         page_content

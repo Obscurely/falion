@@ -9,11 +9,11 @@ use regex::Regex;
 pub struct DuckDuckGo {}
 
 impl DuckDuckGo {
-    async fn get_vqd(querry: String, site: String) -> String {
+    async fn get_vqd(query: String, site: String) -> String {
         let base_addr = "https://www.duckduckgo.com/?q={querry}%20site%3A{site}";
         let body = match reqwest::get(
             base_addr
-                .replace("{querry}", &querry)
+                .replace("{query}", &query)
                 .replace("{site}", &site),
         )
         .await
@@ -26,7 +26,7 @@ impl DuckDuckGo {
                 }
             },
             Err(error) => {
-                eprintln!("{} {}", "[102][Error] There was an error getting a repsponse from duckduckgo for the vqd, the given error is:".red(), format!("{}", error).red());
+                eprintln!("{} {}", "[102][Error] There was an error getting a response from duckduckgo for the vqd, the given error is:".red(), format!("{}", error).red());
                 process::exit(102);
             }
         };
@@ -37,7 +37,11 @@ impl DuckDuckGo {
             Some(matches) => match matches.get(0) {
                 Some(matches) => matches.as_str(),
                 None => {
-                    eprintln!("{}", "[103][Error] There was an error reading the found matches with regex".red());
+                    eprintln!(
+                        "{}",
+                        "[103][Error] There was an error reading the found matches with regex"
+                            .red()
+                    );
                     process::exit(103);
                 }
             },
@@ -52,9 +56,9 @@ impl DuckDuckGo {
         vqd_match.to_string().replace('\'', "").replace("vqd=", "")
     }
 
-    async fn get_vqd_direct(querry: String) -> String {
-        let base_addr = "https://www.duckduckgo.com/?q={querry}";
-        let body = match reqwest::get(base_addr.replace("{querry}", &querry)).await {
+    async fn get_vqd_direct(query: String) -> String {
+        let base_addr = "https://www.duckduckgo.com/?q={query}";
+        let body = match reqwest::get(base_addr.replace("{query}", &query)).await {
             Ok(response) => match response.text().await {
                 Ok(content) => content,
                 Err(error) => {
@@ -63,7 +67,7 @@ impl DuckDuckGo {
                 }
             },
             Err(error) => {
-                eprintln!("{} {}", "[106][Error] There was an error getting a repsponse from duckduckgo for the vqd, the given error is:".red(), format!("{}", error).red());
+                eprintln!("{} {}", "[106][Error] There was an error getting a response from duckduckgo for the vqd, the given error is:".red(), format!("{}", error).red());
                 process::exit(106);
             }
         };
@@ -74,7 +78,11 @@ impl DuckDuckGo {
             Some(matches) => match matches.get(0) {
                 Some(matches) => matches.as_str(),
                 None => {
-                    eprintln!("{}", "[107][Error] There was an error reading the found matches with regex".red());
+                    eprintln!(
+                        "{}",
+                        "[107][Error] There was an error reading the found matches with regex"
+                            .red()
+                    );
                     process::exit(107);
                 }
             },
@@ -89,9 +97,9 @@ impl DuckDuckGo {
         vqd_match.to_string().replace('\'', "").replace("vqd=", "")
     }
 
-    async fn get_links(querry: &str, site: &str) -> Vec<String> {
+    async fn get_links(query: &str, site: &str) -> Vec<String> {
         // let start = std::time::Instant::now();
-        let vqd = DuckDuckGo::get_vqd(querry.to_owned(), site.to_owned()).await;
+        let vqd = DuckDuckGo::get_vqd(query.to_owned(), site.to_owned()).await;
         let base_addr = "https://links.duckduckgo.com/d.js?q={querry}%20site%3A{SITE}&l=us-en&dl=en&ss_mkt=us&vqd={vqd}";
         let base_addr = base_addr.replace("{SITE}", site);
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
@@ -99,21 +107,32 @@ impl DuckDuckGo {
         let re = Regex::new(re_base.replace("{SITE}", site).as_ref()).unwrap();
         let mut links = vec![];
 
-        let body = match reqwest::get(base_addr.replace("{querry}", querry).replace("{vqd}", &vqd))
-            .await
-        {
-            Ok(res) => match res.text().await {
-                Ok(body) => body,
+        let body =
+            match reqwest::get(base_addr.replace("{query}", query).replace("{vqd}", &vqd)).await {
+                Ok(res) => match res.text().await {
+                    Ok(body) => body,
+                    Err(error) => {
+                        eprintln!(
+                            "{} {} {} {}",
+                            "[109][Error] There was an error reading the response of the ".red(),
+                            site,
+                            "search, the given error is:".red(),
+                            format!("{}", error).red()
+                        );
+                        process::exit(109);
+                    }
+                },
                 Err(error) => {
-                    eprintln!("{} {} {} {}", "[109][Error] There was an error reading the response of the ".red(), site, "search, the given error is:".red(), format!("{}", error).red());
-                    process::exit(109);
+                    eprintln!(
+                        "{}{} {} {}",
+                        "[110][Error] There was an error requesting ".red(),
+                        site,
+                        "to give available threads on the given search, the given error is:".red(),
+                        format!("{}", error).red()
+                    );
+                    process::exit(110);
                 }
-            },
-            Err(error) => {
-                eprintln!("{}{} {} {}", "[110][Error] There was an error requesting ".red(), site, "to give available threads on the given search, the given error is:".red(), format!("{}", error).red());
-                process::exit(110);
-            }
-        };
+            };
 
         let links_match = re.captures_iter(body.as_str());
 
@@ -124,22 +143,22 @@ impl DuckDuckGo {
         // let dur = std::time::Instant::now() - start;
         // println!("The duration in ms for get links: {}", dur.as_millis());
 
-        // reversing the links vector because the way we recieve them is from the worst match to the greatest.
+        // reversing the links vector because the way we receive them is from the worst match to the greatest.
         links.reverse();
         links
     }
 
-    async fn get_links_direct(querry: &str) -> Vec<String> {
+    async fn get_links_direct(query: &str) -> Vec<String> {
         // let start = std::time::Instant::now();
-        let vqd = DuckDuckGo::get_vqd_direct(querry.to_owned()).await;
+        let vqd = DuckDuckGo::get_vqd_direct(query.to_owned()).await;
         let base_addr =
-            "https://links.duckduckgo.com/d.js?q={querry}&l=us-en&dl=en&ss_mkt=us&vqd={vqd}";
+            "https://links.duckduckgo.com/d.js?q={query}&l=us-en&dl=en&ss_mkt=us&vqd={vqd}";
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
         let re_base = "\"https://.*?\"";
         let re = Regex::new(re_base).unwrap();
         let mut links = vec![];
 
-        let body = match reqwest::get(base_addr.replace("{querry}", querry).replace("{vqd}", &vqd))
+        let body = match reqwest::get(base_addr.replace("{query}", query).replace("{vqd}", &vqd))
             .await
         {
             Ok(res) => match res.text().await {
@@ -170,15 +189,19 @@ impl DuckDuckGo {
         // let dur = std::time::Instant::now() - start;
         // println!("The duration in ms for get links: {}", dur.as_millis());
 
-        // reversing the links vector because the way we recieve them is from the worst match to the greatest.
+        // reversing the links vector because the way we receive them is from the worst match to the greatest.
         links.reverse();
         links
     }
 
-    pub async fn get_links_formated(service_url: &str, search: &str, enable_warnings: bool) -> HashMap<String, String> {
+    pub async fn get_links_formatted(
+        service_url: &str,
+        search: &str,
+        enable_warnings: bool,
+    ) -> HashMap<String, String> {
         // let start = std::time::Instant::now();
-        let querry = Util::get_url_compatible_string(String::from(search));
-        let links = DuckDuckGo::get_links(&querry, service_url).await;
+        let query = Util::get_url_compatible_string(String::from(search));
+        let links = DuckDuckGo::get_links(&query, service_url).await;
 
         let mut links_map = HashMap::new();
         for link in links {
@@ -192,7 +215,10 @@ impl DuckDuckGo {
                 }
             };
 
-            links_map.insert(link_parsed.path().replacen('/', "", 1).replace('/', " "), link);
+            links_map.insert(
+                link_parsed.path().replacen('/', "", 1).replace('/', " "),
+                link,
+            );
         }
         // let dur = std::time::Instant::now() - start;
         // println!("The duration in ms for get questions: {}", dur.as_millis());
@@ -200,9 +226,12 @@ impl DuckDuckGo {
         links_map
     }
 
-    pub async fn get_links_direct_formated(search: &str, enable_warnings: bool) -> HashMap<String, String> {
-        let querry = Util::get_url_compatible_string(String::from(search));
-        let links = DuckDuckGo::get_links_direct(&querry).await;
+    pub async fn get_links_direct_formatted(
+        search: &str,
+        enable_warnings: bool,
+    ) -> HashMap<String, String> {
+        let query = Util::get_url_compatible_string(String::from(search));
+        let links = DuckDuckGo::get_links_direct(&query).await;
 
         let mut links_map = HashMap::new();
         for link in links {
@@ -216,7 +245,9 @@ impl DuckDuckGo {
                 }
             };
             let link_host = match link_parsed.host_str() {
-                Some(host) => host.to_string() + " |" + link_parsed.path().replace('/', " ").as_ref(),
+                Some(host) => {
+                    host.to_string() + " |" + link_parsed.path().replace('/', " ").as_ref()
+                }
                 None => {
                     if enable_warnings {
                         eprintln!("{}", "[503][Warning] There was an error getting the host of the url in the current loop iter, moving on to the next url.".yellow());
