@@ -3,17 +3,14 @@ use colored::Colorize;
 use crossterm::terminal;
 use crossterm::event;
 use falion::search::util::Util;
-use std::borrow::Borrow;
-use std::io::Read;
 use std::process;
-use std::{env, io};
+use std::io;
 use indexmap::IndexMap;
 use search::stackoverflow::StackOverFlow;
 use search::stackexchange::StackExchange;
 use search::github_gist::GithubGist;
 use search::geeksforgeeks::GeeksForGeeks;
 use search::duckduckgo_search::DuckSearch;
-use argparse;
 
 #[tokio::main]
 async fn main() {
@@ -85,15 +82,6 @@ async fn main() {
             }
         }
     }
-
-    // getting args list and making a string from it
-    // let args = env::args().collect::<Vec<String>>();
-    // if args.len() < 2 {
-    //     eprintln!("{}{}", "[113][Error] ".red(), "You have to provide a search querry, either surronded by \" or the querry as it is after the program's name.".to_string().red());
-    //     std::process::exit(113);
-    // }
-    // let mut search_text = args.join(" ");
-    // search_text = search_text.replace((args[0].to_string() + " ").as_str(), "");
 
     // getting futures of the resources we want results from
     let stackoverflow_results = StackOverFlow::get_questions_and_content(&search_text, term_width, enable_warnings);
