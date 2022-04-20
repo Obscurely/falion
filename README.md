@@ -16,7 +16,8 @@
   <h3 align="center">Falion</h3>
 
   <p align="center">
-    
+    An open source, programmed in rust, privacy focused tool for reading programming resources (like stackoverflow) fast,
+efficient and asynchronous from the terminal.
     <br />
     <a href="https://github.com/Obscurely/falion/issues">Report Bug</a>
     |
@@ -30,66 +31,87 @@
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
     </li>
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#running-the-program">Running the Program</a></li>
         <li><a href="#compilation">Compilation</a></li>
+        <li><a href="#add-to-path">Add to Path</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <li>
+      <a href="#usage">Usage</a>
+      <ul>
+        <li><a href="#key-binds">Key Binds</a></li>
+      </ul>
+    </li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li>
-      <a href="#acknowledgments">Acknowledgments</a>
-      <ul>
-        <li><a href="#the-difference-between-the-2-startup-options">The difference between the 2 startup options</a></li>
-      </ul>
-    </li>
   </ol>
 </details>
 
 ## About The Project
 
-A ransomware type virus made for learning purposes and learning purposes only, any damage that this virus causes to your computer I don't take responsability for it.
-It sorts the files of the pc in order of importance and encrypts them using AES-128 (hasn't been cracked), the files classed as non important (such as program and games) get deleted making the encryption process quite fast.
-The ransomware also modifes the system making it more "locked down" by disabling features of windows such as control panel, run, etc.
-The ransomware injects it's self on startup using one of the methods (a. using alternate data streams | b.classic shortcut run, check [the difference between the two](#the-difference-between-the-2-startup-options) to find more) and resumes the process where it left off and encrypts any new file.
-The ransomware can be ran even without admin and will encrypt any file it can. (you need to modify the manifest for this to remove admin)
+An open source, programmed in rust, privacy focused tool for reading programming resources (like stackoverflow) fast,
+efficient and asynchronous from the terminal. By the time the results appear most of the pages are 
+fully loaded, meaning when going through them you don't have to await for the page to load like in a browser, it just loads instantly, and the pages are parsed in way to make it easier to view them from the terminal. All the searches are done through DuckDuckGO (only through https), and the requests to the respective pages are done only for getting the html of it and nothing else, making this tool a privacy focused one. For a demo just watch the gif under here !!!INSERT GIF!!!, and for informations about the keybinds go to !!!INSERT KEYBINDS HYPERLINK!!!.
+
+### Supported programming resources (for now, more to come):
+#### These are generic resources and work for most languages, in the future i may add language specific ones, but for now this is what I am focusing on.
+- [StackOverFlow](https://stackoverflow.com/) don't think I need to say anything about it.
+- [StackExchange](https://stackexchange.com/) a q&a forum like stackoverflow that grabs questions and answers from over 170 sources.
+- [Github Gists](https://gist.github.com/) here code snippets and guides are posted in form of like a file list.
+- [GeeksForGeeks](https://www.geeksforgeeks.org/) can find various good resources on programming and other computer related things.
+- [DuckDuckGo Results](https://duckduckgo.com/) as a last resort in case none of the above resources work for you (it's like 20+ of each on every search), you can get the basic sites you get on search and view them, tho it's not gonna be as nicely printed, but still readable so you don't have to leave the terminal
 
 ### Built with
 
-- [Rust 1.58.0](https://www.rust-lang.org/)
+- [Rust 1.60.0](https://www.rust-lang.org/)
 
 #### The stock libraries and these awesome 3rd party ones:
-- [aes-gcm-siv](https://lib.rs/crates/aes-gcm-siv) for encryption
-- [rand](https://lib.rs/crates/rand) for basic random number generation
-- [rand_hc](https://lib.rs/crates/rand_hc) for cryptographically secure random number generation
-- [fs_extra](https://lib.rs/crates/fs_extra) for extra file system operations
-- [dirs](https://lib.rs/crates/dirs) for getting common paths like Downloads folder
-- [walkdir](https://lib.rs/crates/walkdir) for recursively reading a dir
-- [mountpoints](https://lib.rs/crates/mountpoints) for getting a list of all mounted drives
-- [winreg](https://lib.rs/crates/winreg) for editing registry keys in windows
-- [mslnk](https://lib.rs/crates/mslnk) for creating windows shortcuts
-- [embed-manifest](https://lib.rs/crates/embed-manifest) for editing exe manifest automatically on compile in order for it to require admin by default.
+- [reqwest](https://lib.rs/crates/reqwest) for making all the https requests.
+- [tokio](https://lib.rs/crates/tokio) for making requests asynchronously.
+- [regex](https://lib.rs/crates/regex) for scraping information about pages, like getting urls etc.
+- [urlencoding](https://lib.rs/crates/urlencoding) for encoding the query in order to be url compliant.
+- [futures](https://lib.rs/crates/futures) for handling the asynchronous tasks.
+- [colored](https://lib.rs/crates/colored) for easily colorizing the terminal output.
+- [crossterm](https://lib.rs/crates/crossterm) for manipulating the terminal, like getting key inputs, clearing it and others.
+- [html2text](https://lib.rs/crates/html2text) for converting html to readable text in order to display pages in terminal better.
+- [url](https://lib.rs/crates/url) for parsing strings to an url object for easier and safer manipulation.
+- [indexmap](https://lib.rs/crates/indexmap) for having an object HashMap like that supports indexing.
+- [argparse](https://lib.rs/crates/argparse) to easily handle command line arguments.
 
 ## Getting Started
 
 ### Running The Program
 
-*I am not gonna give you precompiled binaries so any 7 year old can run this on their dad's computer.*
+1. There are prebuilt binaries in the [releases tab](https://github.com/Obscurely/falion/releases) so you can download those or [compile it yourself](#compilation). So either way get a binary.
+*For now there is no like installer to get it in your global path, but go to [add to path](#add-to-path) and follow the steps to manually add it.*
 
-1. After compling it (check [compilation](#compilation)) simply spin up a windows vm (or a real machine...), double click the exe say yes to admin and enjoy.
+2. Then from the terminal (regardless of the os) you can use it by running these commands. <div></div>
+For getting help about the program
+```
+falion -h
+```
+For getting a list of the keybinds, also available on this readme at [key binds](#key-binds)
+```
+falion -k
+```
+For doing a search
+```
+falion rust how to print
+```
+Or if you want to do a search and see all the warnings (like parsing problems of text etc) run it in verbose mode
+```
+falion -v rust how to print
+```
 
 ### Compilation
 
-This ransomware is made for windows only and will only compile for windows. The following steps require that you have rust installed, check their official [installation page](https://www.rust-lang.org/tools/install). Before going ahead and compiling I recommend that you at least look at the main.rs file in src folder and take a look at the 3 vars at the top and change them accordingly (also take a look at [the difference between the 2 startup options](#the-difference-between-the-2-startup-options). Also idealy you would want to check the source code for any folder names and other stuff to make the ransomware more foreign.
+This program only uses crossplatform libraries, but I have problems compiling it for windows from linux, when I have time I will spin up a VM to see if it compiles in windows. The following steps require that you have rust installed, check their official [installation page](https://www.rust-lang.org/tools/install).
 
 1.  Clone this repo on your pc, you can use "git clone", if you have git installed, like this:
 
@@ -108,25 +130,44 @@ cd the/path
 and you will get there.
 
 3.  From there run this compile command in the terminal:
-
-On Linux (this would require installing this specific toolchain, check [this](https://www.rust-lang.org/tools/install) out for more information):
-```
-cargo build --target x86_64-pc-windows-gnu --release
-```
-On windows:
 ```
 cargo build --release
 ```
+It will take a bit depending on your system because of executable size optimizations, but be patient.
 
-4.  Your build is gonna be in the target/x86_64-pc-windows-gnu/release in Linux and in windows in target/release. You only need the exe not all the files.
+4. Done, navigate to target/release and grabe only "falion" file from there.
+
+### Add to path
+1. Copy the falion executable to a location you want (it will have to stay there), usually in linux you would create a folder in /opt called falion and put the executable there, or you can place anywhere else in the home dir. As for windows wherever, it's bloated anyway.
+2. On linux modify your .zshrc / .bashrc / .fishrc , the hell you use, and add this line to it: (without quotation marks) "alias falion=your/path". On windows you will have to modify your path variable, here is a [guide](https://www.computerhope.com/issues/ch000549.htm).
+4. After you are done, you should be able to just type "falion" in cmd and you should see something pop up.
 
 ## Usage
 
-Education purposes only. If you don't know how to spin up a VM to test this, check out virtual box as is the easiest. If you use linux and already know your way around VMs and didn't ever use qemu/kvm I recommend you check it out.
+### Key binds
+
+#### Key Binds list for falion!
+**Note: where '..' is used it means from that to that like '1..5' would mean from 1 to 5.**
+
+#### Main menu:
+**[1..5]**         = Access that resource.<br />
+**SHIFT + [1..5]** = Go to the next element in the list of that resource.<br />
+**ALT + [1..5]**   = Go to the previous element in the list of that resource.<br />
+**CTRL + n**       = Move to the next element in the list of every resource.<br />
+**CTRL + b**       = Move back to the previous element in the list of every resource.<br />
+**CTRL + c**       = Clear terminal and exit.<br />
+
+#### Sub menus for the resources:
+**CTRL + n**       = Move to the next element in the content list (like questions & answers).<br />
+**CTRL + b**       = Move back to the previous element in the content list.<br />
+**CTRL + q**       = Go back to the main menu.<br />
+**CTRL + c**       = Clear terminal and exit.<br />
+
+#### These were all the key binds, enjoy using Falion!
 
 ## Roadmap
 
-Nothing really. Maybe if I think of anything else that can be improved I will add it, as for now bug fixes only.
+Adding more generic resources, but also maybe add lanaguage related one that get enabled based on the first word in the query. And also just improve it in general.
 
 ## Contributing
 
@@ -134,22 +175,11 @@ Edit a file you want, do a [pull request](https://docs.github.com/en/pull-reques
 
 ## License
 
-Is under [MIT license](https://mit-license.org/) and I ain't gonna care whatever anyone does with the code, so stick to the license conditions and have fun :)
+Is under [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html) so stick to the license conditions and have fun :)
 
 ## Contact
 
 Either post an issue in the [Issues Tab](https://github.com/Obscurely/falion/issues) or contact me at this email adddress if you have more to say: obscurely.social@protonmail.com
-
-## Acknowledgments
-### The difference between the 2 startup options
-The classic method simply creates a folder and shortcut of the exe in the appdata folder, and that shortcut is added to a reg key to be ran on boot.
-The other method uses alternate that streams if possible, if not it falls back to the classic method. The method for the startup can be selected by modifying the value of the boolean in the code, it's currently set to the alternate data stream method.
-
-An alternate data stream is a feature in windows that basically is used for compatibility purposes and directions for how smart screen should work, this data can be on a file or a folder. You can't see the data stored in an alternate data stream in file explorer even if you have show protected system files checked. We abuse this feature and copy the ransomware into a folder's alternate data stream called default_id for hidding purposes on a folder in appdata called Cache (of course you would change this if you plan to use this maliciously) and make a special startup command in registry to extract the ransomware from this folder and execute it.
-
-This method is way more hidden and harder to be detected by the user or an anti virus removal tool, but has it's drawbacks. First a command prompt will show on boot for a bare second which no matter how hard i tried I can't alt f4 it, but still it's a potential risk to not execute the ransomware on boot, tho I don't think it's possible to actually catch the window. The second draw back is that the run command in registry is limited to a number of characters and using the method it's using now to execute on boot (can be shortened but is the way it is in order for the command prompt the stay as little as possible on the screen) makes it so if the user uses the maximum number of chars for his username which is 20 then if the ransom file name is more than 20 chars it would break the startup command since it's too long. Now if you name your exe more than 20 chars by a bit you should still be ok since most people don't have 20 char usernames, but to be safe don't go above 20.
-
-Now onto when to use which method, it depends on the user you are attacking. If you are attacking a wider variety of people then use the classic method if you target a specific group of people use the alternate data stream method or this method regardless, but for now it's still in testing so who know what I may found out using this method.
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
