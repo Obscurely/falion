@@ -57,7 +57,7 @@ efficient and asynchronous from the terminal.
 
 An open source, programmed in rust, privacy focused tool for reading programming resources (like stackoverflow) fast,
 efficient and asynchronous from the terminal. By the time the results appear most of the pages are 
-fully loaded, meaning when going through them you don't have to await for the page to load like in a browser, it just loads instantly, and the pages are parsed in way to make it easier to view them from the terminal. All the searches are done through DuckDuckGO (only through https), and the requests to the respective pages are done only for getting the html of it and nothing else, making this tool a privacy focused one. For a demo just watch the gif under here !!!INSERT GIF!!!, and for informations about the keybinds go to !!!INSERT KEYBINDS HYPERLINK!!!.
+fully loaded, meaning when going through them you don't have to await for the page to load like in a browser, it just loads instantly, and the pages are parsed in way to make it easier to view them from the terminal. All the searches are done through DuckDuckGO (only through https), and the requests to the respective pages are done only for getting the html of it and nothing else, making this tool a privacy focused one. For a demo just watch the video under here, and for informations about the keybinds go to [key binds](#key-binds)
 
 ### Supported programming resources (for now, more to come):
 #### These are generic resources and work for most languages, in the future i may add language specific ones, but for now this is what I am focusing on.
@@ -66,6 +66,10 @@ fully loaded, meaning when going through them you don't have to await for the pa
 - [Github Gists](https://gist.github.com/) here code snippets and guides are posted in form of like a file list.
 - [GeeksForGeeks](https://www.geeksforgeeks.org/) can find various good resources on programming and other computer related things.
 - [DuckDuckGo Results](https://duckduckgo.com/) as a last resort in case none of the above resources work for you (it's like 20+ of each on every search), you can get the basic sites you get on search and view them, tho it's not gonna be as nicely printed, but still readable so you don't have to leave the terminal
+
+### Video showcase
+
+https://user-images.githubusercontent.com/59087558/164259195-416191d5-07c6-4b7d-8af6-aecb3ef53537.mp4
 
 ### Built with
 
