@@ -10,7 +10,7 @@ pub struct DuckDuckGo {}
 
 impl DuckDuckGo {
     async fn get_vqd(query: String, site: String) -> String {
-        let base_addr = "https://www.duckduckgo.com/?q={querry}%20site%3A{site}";
+        let base_addr = "https://www.duckduckgo.com/?q={query}%20site%3A{site}";
         let body = match reqwest::get(
             base_addr
                 .replace("{query}", &query)
@@ -100,7 +100,7 @@ impl DuckDuckGo {
     async fn get_links(query: &str, site: &str) -> Vec<String> {
         // let start = std::time::Instant::now();
         let vqd = DuckDuckGo::get_vqd(query.to_owned(), site.to_owned()).await;
-        let base_addr = "https://links.duckduckgo.com/d.js?q={querry}%20site%3A{SITE}&l=us-en&dl=en&ss_mkt=us&vqd={vqd}";
+        let base_addr = "https://links.duckduckgo.com/d.js?q={query}%20site%3A{SITE}&l=us-en&dl=en&ss_mkt=us&vqd={vqd}";
         let base_addr = base_addr.replace("{SITE}", site);
         // it's okay to leave the unwrap here since the pattern is pre checked to be valid and it's gonna 100% work!
         let re_base = "\"https://[a-z]*?.?{SITE}/.*?\"";
