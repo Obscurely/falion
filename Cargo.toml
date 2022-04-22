@@ -13,6 +13,19 @@ keywords = ["cli", "fast", "open-source", "asynchronous", "efficient"]
 readme = "README.md"
 license = "GPL-3.0-only"
 
+[package.metadata.deb]
+maintainer = "Obscurely <adrian.obscurely@protonmail.com>"
+copyright = "2022, 2022 <adrian.obscurely@protonmail.com>"
+license-file = ["LICENSE", "0"]
+extended-description = """\
+An open source, privacy focused tool for getting programming resources fast,
+efficient and asynchronous from the terminal. By the time you see the results
+most of the pages are fully loaded. All the searches are done through
+DuckDuckGO. For more information about the program and key binds, please read
+the README.md on github: insert link here.""""
+depends = "$auto"
+section = "utility"
+
 [profile.release]
 strip = true      # Automatically strip symbols from the binary.
 opt-level = 3     # Optimize for speed.
