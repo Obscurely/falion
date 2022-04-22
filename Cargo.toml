@@ -1,7 +1,7 @@
 [package]
 name = "falion"
 authors = ["Obscurely <adrian.obscurely@protonmail.com>"]
-version = "0.2.0"
+version = "v0.2.0"
 edition = "2021"
 rust-version = "1.60"                                                                            # Minimal rust version, should work with older versions, but for compatibility this is the one I used.
 description = "A fast, asynchronous tool for getting and reading various programming resources."
