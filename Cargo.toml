@@ -2,10 +2,10 @@
 name = "falion"
 version = "0.2.0"
 edition = "2021"
-rust-version = "1.60" # Minimal rust version, should work with older versions, but for compatibility this is the one I used.
+rust-version = "1.60"                                                                            # Minimal rust version, should work with older versions, but for compatibility this is the one I used.
 description = "A fast, asynchronous tool for getting and reading various programming resources."
 documentation = "https://github.com/Obscurely/falion"
-readme = "https://github.com/Obscurely/falion"
+readme = "README.md"
 license = "GPL-3.0-only"
 
 [profile.release]
