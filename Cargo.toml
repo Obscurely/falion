@@ -2,19 +2,12 @@
 name = "falion"
 version = "0.2.0"
 edition = "2021"
-rust-version = "1.60" # Minimal rust version, should work with older versions, but for compatibility this is the one I used.
+rust-version = "1.60"                                                                            # Minimal rust version, should work with older versions, but for compatibility this is the one I used.
 description = "A fast, asynchronous tool for getting and reading various programming resources."
 documentation = "https://github.com/Obscurely/falion"
 repository = "https://github.com/Obscurely/falion"
 categories = ["command-line-utilities"]
-keywords = [
-	"cli",
-	"fast",
-	"open-source",
-	"asynchronous",
-	"efficient",
-	"rust-lang",
-]
+keywords = ["cli", "fast", "open-source", "asynchronous", "efficient"]
 readme = "README.md"
 license = "GPL-3.0-only"
 
