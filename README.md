@@ -9,14 +9,12 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/Obscurely/falion">
-    <img src="resources//logo.png" alt="Logo" width="460" height="123">
-  </a>
+  <img src="https://user-images.githubusercontent.com/59087558/164895807-81b3df88-743c-4c38-96ef-d96d9eb0b4f6.png" alt="Logo" width="144" height="73">
 
-  <h3 align="center">Falion</h3>
+  <h3 align="center">Falion</h5>
 
   <p align="center">
-    An open source, programmed in rust, privacy focused tool for reading programming resources (like stackoverflow) fast,
+    An open source, programmed in rust, privacy focused tool for reading programming resources (like StackOverFlow) fast,
 efficient and asynchronous from the terminal.
     <br />
     <a href="https://github.com/Obscurely/falion/issues">Report Bug</a>
@@ -60,7 +58,7 @@ efficient and asynchronous from the terminal.
         <li><a href="#key-binds">Key Binds</a></li>
       </ul>
     </li>
-    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#road-map">Road Map</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -69,14 +67,14 @@ efficient and asynchronous from the terminal.
 
 ## About The Project
 
-An open source, programmed in rust, privacy focused tool for reading programming resources (like stackoverflow) fast,
+An open source, programmed in rust, privacy focused tool for reading programming resources (like StackOverFlow) fast,
 efficient and asynchronous from the terminal. By the time the results appear most of the pages are 
-fully loaded, meaning when going through them you don't have to await for the page to load like in a browser, it just loads instantly, and the pages are parsed in way to make it easier to view them from the terminal. All the searches are done through DuckDuckGO (only through https), and the requests to the respective pages are done only for getting the html of it and nothing else, making this tool a privacy focused one. For a demo just watch the video under here, and for informations about the keybinds go to [key binds](#key-binds)
+fully loaded, meaning when going through them you don't have to await for the page to load like in a browser, it just loads instantly, and the pages are parsed in way to make it easier to view them from the terminal. All the searches are done through DuckDuckGo (only through HTTPs), and the requests to the respective pages are done only for getting the html of it and nothing else, making this tool a privacy focused one. For a demo just watch the video under here, and for information about the key binds go to [key binds](#key-binds)
 
 ### Supported programming sources:
 **These are generic resources and work for most languages, in the future i may add language specific ones, but for now this is what I am focusing on. More will come.**
 - [StackOverFlow](https://stackoverflow.com/) don't think I need to say anything about it.
-- [StackExchange](https://stackexchange.com/) a q&a forum like stackoverflow that grabs questions and answers from over 170 sources.
+- [StackExchange](https://stackexchange.com/) a q&a forum like StackOverFlow that grabs questions and answers from over 170 sources.
 - [Github Gists](https://gist.github.com/) here code snippets and guides are posted in form of like a file list.
 - [GeeksForGeeks](https://www.geeksforgeeks.org/) can find various good resources on programming and other computer related things.
 - [DuckDuckGo Results](https://duckduckgo.com/) as a last resort in case none of the above resources work for you (it's like 20+ of each on every search), you can get the basic sites you get on search and view them, tho it's not gonna be as nicely printed, but still readable so you don't have to leave the terminal
@@ -90,16 +88,16 @@ https://user-images.githubusercontent.com/59087558/164259195-416191d5-07c6-4b7d-
 - [Rust 1.60.0](https://www.rust-lang.org/)
 
 #### The stock libraries and these awesome 3rd party ones:
-- [reqwest](https://lib.rs/crates/reqwest) for making all the https requests.
+- [reqwest](https://lib.rs/crates/reqwest) for making all the HTTPs requests.
 - [tokio](https://lib.rs/crates/tokio) for making requests asynchronously.
 - [regex](https://lib.rs/crates/regex) for scraping information about pages, like getting urls etc.
-- [urlencoding](https://lib.rs/crates/urlencoding) for encoding the query in order to be url compliant.
+- [urlencoding](https://lib.rs/crates/urlencoding) for encoding the query in order to be URL compliant.
 - [futures](https://lib.rs/crates/futures) for handling the asynchronous tasks.
 - [colored](https://lib.rs/crates/colored) for easily colorizing the terminal output.
 - [crossterm](https://lib.rs/crates/crossterm) for manipulating the terminal, like getting key inputs, clearing it and others.
 - [html2text](https://lib.rs/crates/html2text) for converting html to readable text in order to display pages in terminal better.
-- [url](https://lib.rs/crates/url) for parsing strings to an url object for easier and safer manipulation.
-- [indexmap](https://lib.rs/crates/indexmap) for having an object HashMap like that supports indexing.
+- [url](https://lib.rs/crates/url) for parsing strings to an URL object for easier and safer manipulation.
+- [indexmap](https://lib.rs/crates/indexmap) for having an object Hash Map like that supports indexing.
 - [argparse](https://lib.rs/crates/argparse) to easily handle command line arguments.
 
 ## Getting Started
@@ -107,14 +105,14 @@ https://user-images.githubusercontent.com/59087558/164259195-416191d5-07c6-4b7d-
 ### Running The Program
 
 #### Install with cargo
-This method will work across most (if not all) linux distributions supporting cargo, and other operating systems that support rust and cargo (I only tested on linux).
+This method will work across most (if not all) Linux distributions supporting cargo, and other operating systems that support rust and cargo (I only tested on Linux).
 1. Install rust, cargo and all it's things using the official [rustup installer](https://www.rust-lang.org/tools/install)
 2. Run the following command in your terminal of choice:
-```
+```shell
 cargo install falion
 ```
-3. Make sure you have .cargo/bin in path, you would need to add the following line in your terminal rc file (e.g $HOME/.zshrc)
-```
+3. Make sure you have .cargo/bin in path, you would need to add the following line in your terminal RC file (e.g $HOME/.zshrc)
+```shell
 export PATH=$HOME/.cargo/bin:$PATH
 ```
 On windows it should work automatically (restart if just installed), if not you can follow this [guide](https://www.computerhope.com/issues/ch000549.htm) for how to add something to path. The cargo bin folder will be {your-user-folder}\\.cargo\\bin
@@ -123,66 +121,66 @@ On windows it should work automatically (restart if just installed), if not you 
 
 #### Install from AUR
 a. Using yay or any other AUR helper
-```
+```shell
 yay -Sy falion-bin
 ```
 b. Manually cloning and building it from AUR
   1. First install the basic build dependencies, if you don't already have them:
-  ```
+  ```shell
   sudo pacman -Sy gcc base-devel --needed
   ```
   2. Then clone the build script
-  ```
+  ```shell
   git clone https://aur.archlinux.org/falion-bin.git
   ```
-  3. Cd into the new cloned repo and run the following to build the package
-  ```
+  3. Cd into the new cloned repository and run the following to build the package
+  ```shell
   makepkg
   ```
   4. In order to install the package run the following (where * is just an any other characters place holder)
-  ```
+  ```shell
   sudo pacman -U falion-bin-*.pkg.tar.zst
   ```
 
 #### Install from provided binaries
-a. For Arch Linux based distros (not recomended, use aur in order to have auto updates aswell)
+a. For Arch Linux based distros (not recommended, use AUR in order to have auto updates as well)
   1. Download from the [releases tab](https://github.com/Obscurely/falion/releases/) from the version you want (latest stable recommended), the file named like falion-bin-\*.pkg.tar.zst
   2. From where you downloaded it run the following command in your terminal of choice (where * is just an any other characters place holder):
-  ```
+  ```shell
   sudo pacman -U falion-bin-*.pkg.tar.zst
   ```
-b. For Debian based distros (I'm working on a ppa, for now I recomended you use the cargo version insted)
+b. For Debian based distros (I'm working on a PPA, for now I recommended you use the cargo version instead)
   1. Download from the [releases tab](https://github.com/Obscurely/falion/releases/) from the version you want (latest stable recommended), the file named like falion_\*\_debian_amd64.deb
   2. From where you downloaded it run the following command in your terminal of choice (where * is just an any other characters place holder):
-  ```
+  ```shell
   sudo dpkg -i falion_*_debian_amd64.deb
   ```
 
 #### Manually
-Placing the executable somewhere than adding it to path. (Not recomended, [installing it with cargo](#install-with-cargo) is better)
-1. Either follow [compilation](#compilation) and build it for the platform of your choice or download from the [releases tab](https://github.com/Obscurely/falion/releases/) the prebuilt linux binary, called "falion"
-2. Copy the falion executable to a location you want (it will have to stay there), usually in linux you would create a folder in /opt called falion and put the executable there, or you can place anywhere else in the home dir.
-3. On linux modify your .zshrc / .bashrc / .fishrc , the hell you use, and add this line to it: (without quotation marks) "alias falion=your/path". On windows you will have to modify your path variable, here is a [guide](https://www.computerhope.com/issues/ch000549.htm). And on Mac same as Linux.
+Placing the executable somewhere than adding it to path. (Not recommended, [installing it with cargo](#install-with-cargo) is better)
+1. Either follow [compilation](#compilation) and build it for the platform of your choice or download from the [releases tab](https://github.com/Obscurely/falion/releases/) the prebuilt Linux binary, called "falion"
+2. Copy the falion executable to a location you want (it will have to stay there), usually in Linux you would create a folder in /opt called falion and put the executable there, or you can place anywhere else in the home dir.
+3. On Linux modify your .zshrc / .bashrc / .fishrc , the hell you use, and add this line to it: (without quotation marks) "alias falion=your/path". On windows you will have to modify your path variable, here is a [guide](https://www.computerhope.com/issues/ch000549.htm). And on Mac same as Linux.
 4. After you are done, you should be able to just type "falion" in terminal and you should see something pop up, saying you didn't input any query and directing you to run falion -h.
 
 ### Compilation
 
-This program only uses crossplatform libraries, but I have problems compiling it for windows from Linux, when I have time I will spin up a VM to see if it compiles in windows (on macos it should like 99.99% compile without problems). The following steps require that you have rust installed, check their official [installation page](https://www.rust-lang.org/tools/install).
+This program only uses cross platform libraries, but I have problems compiling it for windows from Linux, when I have time I will spin up a VM to see if it compiles in windows (on MacOS it should like 99.99% compile without problems). The following steps require that you have rust installed, check their official [installation page](https://www.rust-lang.org/tools/install).
 
-1.  Clone this repo on your pc, you can use "git clone", if you have git installed, like this:
-```
+1.  Clone this repo on your PC, you can use "git clone", if you have git installed, like this:
+```shell
 git clone https://github.com/Obscurely/falion.git
 ```
 Otherwise in the right up side of the repo page you will see a download button, download the repo as zip and extract it in a folder
 
-2.  Open a new terminal/cmd window in the folder you extracted the repo in, if you can't rightclick on the folder and open it there do:
-```
+2.  Open a new terminal/cmd window in the folder you extracted the repo in, if you can't right click on the folder and open it there do:
+```shell
 cd the/path
 ```
 and you will get there.
 
 3.  From there run this compile command in the terminal:
-```
+```shell
 cargo build --release
 ```
 It will take a bit depending on your system because of executable size optimizations, but be patient.
@@ -195,19 +193,19 @@ It will take a bit depending on your system because of executable size optimizat
 1. First you would have to get it installed and in path, follow [this](#getting-started), after you can continue.
 2. Then from the terminal (regardless of the os) you can use it by running these commands. <div></div>
 For getting help about the program
-```
+```shell
 falion -h
 ```
-For getting a list of the keybinds, also available on this readme at [key binds](#key-binds)
-```
+For getting a list of the key binds, also available on this README at [key binds](#key-binds)
+```shell
 falion -k
 ```
 For doing a search
-```
+```shell
 falion rust how to print
 ```
 Or if you want to do a search and see all the warnings (like parsing problems of text etc) run it in verbose mode
-```
+```shell
 falion -v rust how to print
 ```
 
@@ -232,7 +230,7 @@ falion -v rust how to print
 
 #### These were all the key binds, enjoy using Falion!
 
-## Roadmap
+## Road Map
 
 Adding more generic resources, but also maybe add lanaguage related one that get enabled based on the first word in the query. And also just improve it in general.
 
