@@ -121,9 +121,19 @@ On windows it should work automatically (restart if just installed), if not you 
 
 #### Install from AUR
 a. Using yay or any other AUR helper
-```shell
-yay -Sy falion-bin
-```
+  - You can install it by building from source the latest stable release
+  ```shell
+  yay -Sy falion
+  ```
+  - Or you can install the bin version so you don't have to wait for it to compile
+  ```shell
+  yay -Sy falion-bin
+  ```
+  - Or you can install it by building from source the latest git commit (that compiles and runs)
+  ```shell
+  yay -Sy falion-git
+  ```
+  
 b. Manually cloning and building it from AUR
   1. First install the basic build dependencies, if you don't already have them:
   ```shell
