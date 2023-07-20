@@ -7,7 +7,7 @@ pkgs.mkShell {
     xorriso
     grub2
     llvmPackages_latest.lld
-    rustup
+    # rustup
     rustc
     cargo
     rustfmt
@@ -23,6 +23,8 @@ pkgs.mkShell {
     pkg-config
     python311
     python311Packages.pillow # this is for python repo script
+    # falion specific
+    openssl
   ];
 
   RUST_BACKTRACE = 1;
