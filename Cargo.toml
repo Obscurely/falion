@@ -1,47 +1,63 @@
 [package]
 name = "falion"
-authors = ["Obscurely <adrian.obscurely@protonmail.com>"]
-version = "0.2.0"
+authors = ["Obscurely <obscurely.adrian@protonmail.com>"]
+version = "0.1.0"
 edition = "2021"
-rust-version = "1.60"                                                                            # Minimal rust version, should work with older versions, but for compatibility this is the one I used.
-description = "A fast, asynchronous tool for getting and reading various programming resources."
-documentation = "https://github.com/Obscurely/falion"
+rust-version = "1.69"                                                              # Minimum rust version
+resolver = "2"
+description = "CHANGEME_DESC"
+documentation = "https://github.com/Obscurely/falion/blob/master/README.md"
 repository = "https://github.com/Obscurely/falion"
 homepage = "https://github.com/Obscurely/falion"
-categories = ["command-line-utilities"]
-keywords = ["cli", "fast", "open-source", "asynchronous", "efficient"]
+categories = []                                                                    # CHANGEME_MANUAL
+keywords = []                                                                      # CHANGEME_MANUAL
 readme = "README.md"
-license = "GPL-3.0-only"
+license = "MIT"
+build = "build.rs"
+
+#═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [package.metadata.deb]
-maintainer = "Obscurely <adrian.obscurely@protonmail.com>"
-copyright = "2022, 2022 <adrian.obscurely@protonmail.com>"
+maintainer = "Obscurely <obscurely.adrian@protonmail.com>"
+copyright = "2023, 2023 <obscurely.adrian@protonmail.com>"
 license-file = ["LICENSE", "0"]
 extended-description = """\
-An open source, privacy focused tool for getting programming resources fast,
-efficient and asynchronous from the terminal. By the time you see the results
-most of the pages are fully loaded. All the searches are done through
-DuckDuckGO. For more information about the program and key binds, please read
-the README.md on github: insert link here.""""
+CHANGEME_DESC""""
 depends = "$auto"
-section = "utility"
+section = "CHANGEME_MANUAL"
+
+#═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [profile.release]
 strip = true      # Automatically strip symbols from the binary.
 opt-level = 3     # Optimize for speed.
 lto = true        # instructs the linker to optimize at the link stage
 codegen-units = 1 # Default is 16, the higher the faster compile time, but it may produce slower code.
-panic = "abort"   # Since this falion is highly unlikely to panic and will handle all the errors, we don't need the need the extra code for panics and we can abort straight up.
+panic = "abort"   # Since all of the errors are  handled manually (should be), aborting and removing the panic code is nothing, but an improvement.
+
+#═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+[target.'cfg(windows)'.build-dependencies]
+embed-resource = "2.2.0"
+
+#═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [dependencies]
-reqwest = "0.11.10"
-tokio = { version = "1.18.5", features = ["macros", "rt-multi-thread"] }
-regex = "1.5.5"
-urlencoding = "2.1.0"
-futures = "0.3.21"
-colored = "2.0.0"
-crossterm = "0.23.2"
-html2text = "0.3.1"
-url = "2.2.2"
-indexmap = "1.8.1"
-argparse = "0.2.2"
+# Great examples include:
+#   - rand (togheter with rand_hc for cryptography)
+#   - serde and serde_json
+#   - reqwest
+#   - tokio
+#   - regex
+#   - clap (fully-featured args parsing), pico-args (minimal args parsing)
+#   - chrono (date and time)
+#   - tempfile
+#   - dirs
+#   - indexmap
+#   - thiserror and thiserror (for error handling)
+#   - tracing (logging)
+#   - walkdir (recursively read a directory)
+#   - rayon (using .par_iter() it makes iters run in parallel)
+#   - slint (ui framework)
+#   - sled (high performance, written in rust, db)
+#   - itertools (for when extra iterator methods are needed)

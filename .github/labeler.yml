@@ -1,0 +1,17 @@
+---
+assets:
+  - any: ["assets/**"]
+repo:
+  - "*"
+resources:
+  - any: ["resources/**"]
+source:
+  - any: ["src/**"]
+docs:
+  - any: ["docs/**"]
+fuzzer:
+  - any: ["fuzz/**"]
+scripts:
+  - any: ["scripts/**"]
+tests:
+  - any: ["tests/**"]
