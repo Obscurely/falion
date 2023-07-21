@@ -121,6 +121,7 @@ mod tests {
     use super::*;
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore)]
     async fn test_get_links() {
         let ddg = Ddg::new();
         let links = ddg
