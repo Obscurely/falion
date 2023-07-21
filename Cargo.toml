@@ -3,14 +3,14 @@ name = "falion"
 authors = ["Obscurely <obscurely.adrian@protonmail.com>"]
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.70"                                                              # Minimum rust version
+rust-version = "1.70"                                                       # Minimum rust version
 resolver = "2"
 description = "CHANGEME_DESC"
 documentation = "https://github.com/Obscurely/falion/blob/master/README.md"
 repository = "https://github.com/Obscurely/falion"
 homepage = "https://github.com/Obscurely/falion"
-categories = []                                                                    # CHANGEME_MANUAL
-keywords = []                                                                      # CHANGEME_MANUAL
+categories = []                                                             # CHANGEME_MANUAL
+keywords = []                                                               # CHANGEME_MANUAL
 readme = "README.md"
 license = "MIT"
 build = "build.rs"
@@ -43,6 +43,11 @@ embed-resource = "2.2.0"
 #═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [dependencies]
+rand = "0.8.5"
+reqwest = { version = "0.11.18", features = ["json"] }
+tokio = { version = "1.29.1", features = ["full"] }
+url = "2.4.0"
+urlencoding = "2.1.2"
 # Great examples include:
 #   - rand (togheter with rand_hc for cryptography)
 #   - serde and serde_json
