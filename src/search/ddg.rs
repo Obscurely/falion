@@ -37,6 +37,7 @@ impl Ddg {
         }
     }
 
+    #[allow(dead_code)]
     pub fn with_client(client: reqwest::Client) -> Ddg {
         Ddg { client }
     }

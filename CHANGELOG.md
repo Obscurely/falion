@@ -25,7 +25,7 @@
 
 - Bumped rust version to 1.70.0
 - Bumped all the crates to the latest version.
-- Results are now got through the html version of duckduckgo making it faster
+- Results are now got through the HTML version of duckduckgo making it faster
   and less prone to breaking over time.
 - Instead of the many different functions that handled the duckduckgo searches
   now there is one with half the code, way faster and more robust.
@@ -40,9 +40,9 @@ None
 
 ### Fixed
 
-- Switching to the html version of duckduckgo made it so the results we get are
+- Switching to the HTML version of duckduckgo made it so the results we get are
   in order of importance.
-- Compiling to windows & macos doesn't fail now.
+- Compiling to windows & macOS doesn't fail now.
 
 ### Security
 
