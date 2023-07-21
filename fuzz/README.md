@@ -1,6 +1,7 @@
 # Fuzzing
 
 <!--toc:start-->
+
 - [Fuzzing](#fuzzing)
   - [Usage](#usage)
     - [Debugging a crash](#debugging-a-crash)
@@ -8,6 +9,7 @@
   - [Each fuzzer harness in detail](#each-fuzzer-harness-in-detail)
     - [`fuzz_target_1`](#fuzztarget1)
   - [Acknowledgments](#acknowledgments)
+
 <!--toc:end-->
 
 [Fuzz testing](https://en.wikipedia.org/wiki/Fuzzing) is a software testing
@@ -70,9 +72,11 @@ of falion and tests them in different ways. While there is
 implementation-specific documentation in the source code itself, each harness is
 briefly described below.
 
-### `fuzz_target_1`
+### `fuzz_ddg_get_links`
 
-This fuzz harness... CHANGEME_MANUAL
+This fuzz harness checks to see if using random queries reqwest will fail over
+time because of either an error in the encoding or an error with it imposing I
+should add additional checks on the queries. None of this seems to happen!
 
 ## Acknowledgments
 

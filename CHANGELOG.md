@@ -20,6 +20,8 @@
 - All of the features present on the
   [features list](https://obscurely.github.io/RustTemplate/template/FEATURES.html)
   of [my rust template](https://github.com/Obscurely/RustTemplate).
+- Add cargo fuzz harness for the duckduckgo get_links function in order to make
+  sure it will not fail making requests over time.
 
 ### Changed
 
