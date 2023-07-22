@@ -10,7 +10,8 @@ const ALLOWED_CHARS_IN_SITE: &str = "abcdefghijklmnopqrstuvwxyz1234567890.-";
 /// * `QueryTooLong` - The query including the site is over 500 characters.
 /// * `InvalidRequest` - Reqwest could not process the request due to rate limiting, bad internet
 /// etc.
-/// * 'NoResults' - No results wore found for the provided query and site.
+/// * `NoResults` - No results wore found for the provided query and site.
+/// * `ErrorCode` - The search returned an error code.
 #[derive(Debug)]
 pub enum DdgError {
     InvalidSite,
@@ -18,6 +19,7 @@ pub enum DdgError {
     InvalidRequest(reqwest::Error),
     InvalidResponseBody(reqwest::Error),
     NoResults,
+    ErrorCode(reqwest::StatusCode),
 }
 
 /// Get search results from duckduckgo
@@ -109,6 +111,7 @@ impl Ddg {
     /// * `InvalidResponseBody` - The response content you got back is corrupted, usually bad
     /// internet.
     /// * `NoResults` - No results matched your query or site.
+    /// * `ErrorCode` - The search returned an error code
     pub async fn get_links(
         &self,
         query: &str,
@@ -142,9 +145,15 @@ impl Ddg {
 
         // get request ddg
         let response_body = match self.client.get(request_url).send().await {
-            Ok(res) => match res.text().await {
-                Ok(body) => body,
-                Err(error) => return Err(DdgError::InvalidResponseBody(error)),
+            Ok(res) => { 
+                if res.status() != reqwest::StatusCode::OK {
+                    return Err(DdgError::ErrorCode(res.status()))
+                }
+
+                match res.text().await {
+                    Ok(body) => body,
+                    Err(error) => return Err(DdgError::InvalidResponseBody(error)),
+                }
             },
             Err(error) => return Err(DdgError::InvalidRequest(error)),
         };
