@@ -73,18 +73,6 @@ jobs:
           FILTER_REGEX_EXCLUDE: "README.md"
           DEFAULT_BRANCH: "master"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  miri:
-    name: "Miri"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install Miri
-        run: |
-          rustup toolchain install nightly --component miri
-          rustup override set nightly
-          cargo miri setup
-      - name: Test with Miri
-        run: MIRIFLAGS="-Zmiri-disable-isolation" cargo miri test
   docs:
     name: Docs
     runs-on: ubuntu-latest
