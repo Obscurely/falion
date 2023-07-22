@@ -4,6 +4,13 @@ const BASE_ADDRESS: &str = "https://html.duckduckgo.com/html/?q={QUERY}%20site%3
 const BASE_ADDRESS_MINUS_SITE: &str = "https://html.duckduckgo.com/html/?q={QUERY}";
 const ALLOWED_CHARS_IN_SITE: &str = "abcdefghijklmnopqrstuvwxyz1234567890.-";
 
+/// The type of errors the ddg::get_links() function can return.
+///
+/// * `InvalidSite` - The given site is not in a domain scheme.
+/// * `QueryTooLong` - The query including the site is over 500 characters.
+/// * `InvalidRequest` - Reqwest could not process the request due to rate limiting, bad internet
+/// etc.
+/// * 'NoResults' - No results wore found for the provided query and site.
 #[derive(Debug)]
 pub enum DdgError {
     InvalidSite,
@@ -13,10 +20,18 @@ pub enum DdgError {
     NoResults,
 }
 
+/// Get search results from duckduckgo
 pub struct Ddg {
     client: reqwest::Client,
 }
 
+/// Checks if a site is valid.
+/// To get true it should contain at least one '.', be alphanumeric and have not have any other
+/// symbols besides '-'.
+///
+/// # Arguments
+///
+/// * `site` - The site the function should check.
 fn is_site_valid(site: &str) -> bool {
     if site.len() > 255 {
         return false;
@@ -31,17 +46,69 @@ fn is_site_valid(site: &str) -> bool {
 }
 
 impl Ddg {
+    /// Create a new Ddg instance with a custom client that generates a random UA (user-agent) in
+    /// order to avoid getting limited by duckduckgo.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use falion::search::ddg;
+    ///
+    /// let ddg = ddg::Ddg::new();
+    /// ```
     pub fn new() -> Ddg {
         Ddg {
             client: utils::client_with_random_ua(),
         }
     }
 
+    /// Create a new Ddg instance with your provided client.
+    /// Note: duckduckgo will limit you after a few requests if you don't provide a user-agent.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use falion::search::ddg;
+    ///
+    /// let ddg = ddg::Ddg::with_client(reqwest::Client::new());
+    /// ```
     #[allow(dead_code)]
     pub fn with_client(client: reqwest::Client) -> Ddg {
         Ddg { client }
     }
 
+    /// Using a provided query (and optional site specifier) returns duckduckgo results.
+    ///
+    /// # Arguments
+    ///
+    /// * `query` - What to search for.
+    /// * `site` - Optional, specific site to get results from.
+    /// * `limit` - Optional, limit the results to the first 10 for example.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use falion::search::ddg;
+    ///
+    /// # async fn run() -> Result<(), ddg::DdgError> {
+    /// let ddg = ddg::Ddg::new();
+    /// let links = ddg.get_links("Rust", None, None).await.unwrap();
+    /// # Ok(())
+    /// # }
+    ///
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// returns ddg::DdgError
+    ///
+    /// * `InvalidSite` - The provided site is not in a valid domain scheme.
+    /// * `QueryTooLong` - The query exceeds 500 characters (including the site)
+    /// * `InvalidRequest` - Reqwest returned an error when processing the request. This can be
+    /// due to rate limiting, bad internet etc.
+    /// * `InvalidResponseBody` - The response content you got back is corrupted, usually bad
+    /// internet.
+    /// * `NoResults` - No results matched your query or site.
     pub async fn get_links(
         &self,
         query: &str,
@@ -113,6 +180,12 @@ impl Ddg {
 
         // return got links
         Ok(links)
+    }
+}
+
+impl Default for Ddg {
+    fn default() -> Self {
+        Ddg::new()
     }
 }
 
