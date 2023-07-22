@@ -1,4 +1,5 @@
 use super::utils;
+use std::sync::Arc;
 
 const BASE_ADDRESS: &str = "https://html.duckduckgo.com/html/?q={QUERY}%20site%3{SITE}";
 const BASE_ADDRESS_MINUS_SITE: &str = "https://html.duckduckgo.com/html/?q={QUERY}";
@@ -24,7 +25,7 @@ pub enum DdgError {
 
 /// Get search results from duckduckgo
 pub struct Ddg {
-    client: reqwest::Client,
+    client: Arc<reqwest::Client>,
 }
 
 /// Checks if a site is valid.
@@ -60,7 +61,7 @@ impl Ddg {
     /// ```
     pub fn new() -> Ddg {
         Ddg {
-            client: utils::client_with_random_ua(),
+            client: Arc::new(utils::client_with_random_ua()),
         }
     }
 
@@ -71,11 +72,12 @@ impl Ddg {
     ///
     /// ```
     /// use falion::search::ddg;
+    /// use std::sync::Arc;
     ///
-    /// let ddg = ddg::Ddg::with_client(reqwest::Client::new());
+    /// let ddg = ddg::Ddg::with_client(Arc::new(reqwest::Client::new()));
     /// ```
     #[allow(dead_code)]
-    pub fn with_client(client: reqwest::Client) -> Ddg {
+    pub fn with_client(client: Arc<reqwest::Client>) -> Ddg {
         Ddg { client }
     }
 
@@ -145,16 +147,16 @@ impl Ddg {
 
         // get request ddg
         let response_body = match self.client.get(request_url).send().await {
-            Ok(res) => { 
+            Ok(res) => {
                 if res.status() != reqwest::StatusCode::OK {
-                    return Err(DdgError::ErrorCode(res.status()))
+                    return Err(DdgError::ErrorCode(res.status()));
                 }
 
                 match res.text().await {
                     Ok(body) => body,
                     Err(error) => return Err(DdgError::InvalidResponseBody(error)),
                 }
-            },
+            }
             Err(error) => return Err(DdgError::InvalidRequest(error)),
         };
 
@@ -203,7 +205,6 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    #[cfg_attr(miri, ignore)]
     async fn test_get_links() {
         let ddg = Ddg::new();
         let links = ddg

@@ -31,6 +31,8 @@
   and less prone to breaking over time.
 - Instead of the many different functions that handled the duckduckgo searches
   now there is one with half the code, way faster and more robust.
+- There is one global client that is used across all objects and threads using
+  Arc. This makes the program way faster than before.
 
 ### Deprecated
 
@@ -48,4 +50,4 @@ None
 
 ### Security
 
-- Fixed a bunch of security issues appeared over time in the last version.
+- Fixed a bunch of security issues that appeared over time in the last version.
