@@ -140,7 +140,7 @@ impl StackOverFlow {
             .filter_map(|q| {
                 q.split_once(QUESTION_END).map(|q_sep| {
                     let html = q_sep.0;
-                    html2text::from_read(html.as_bytes(), term_width)
+                    utils::html_to_text(html, term_width)
                 })
             })
             .collect::<Vec<String>>();
