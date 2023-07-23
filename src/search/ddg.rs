@@ -163,6 +163,7 @@ impl Ddg {
         // get response content
         let mut links = response_body
             .split("//duckduckgo.com/l/?uddg=")
+            .skip(1)
             .filter_map(|s| match s.split_once("\">") {
                 Some(s_split) => match urlencoding::decode(s_split.0) {
                     Ok(link) => Some(link.to_string()),
