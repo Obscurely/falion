@@ -33,6 +33,8 @@
   now there is one with half the code, way faster and more robust.
 - There is one global client that is used across all objects and threads using
   Arc. This makes the program way faster than before.
+- Rewrote stackoverflow.rs completly. Many performance improvements, using only
+  one global client, many checks in place.
 
 ### Deprecated
 

@@ -1,18 +1,30 @@
+use std::sync::Arc;
 mod search;
 
 #[tokio::main]
 async fn main() {
-    let ddg = search::ddg::Ddg::new();
+    let start = std::time::Instant::now();
+    let client = Arc::new(search::utils::client_with_random_ua());
+    let sof = search::stackoverflow::StackOverFlow::with_client(Arc::clone(&client));
 
-    for link in ddg
-        .get_links(
-            "c sharp multi threading",
-            Some("stackoverflow.com"),
-            Some(10),
-        )
+    let questions_content = sof
+        .get_multiple_questions_content("Rust threading", Some(10))
         .await
-        .unwrap()
-    {
-        println!("{link}");
+        .unwrap();
+
+    for q in questions_content {
+        let a = match q.1.await {
+            Ok(b) => match b {
+                Ok(c) => c,
+                Err(_) => continue,
+            },
+            Err(_) => continue,
+        };
+        println!("Question: {}\n\nContent: {}", q.0, a[0]);
     }
+
+    println!(
+        "Total execution time: {}ms",
+        (std::time::Instant::now() - start).as_millis()
+    );
 }
