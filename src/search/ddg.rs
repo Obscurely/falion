@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 const BASE_ADDRESS: &str = "https://html.duckduckgo.com/html/?q={QUERY}%20site%3{SITE}";
 const BASE_ADDRESS_MINUS_SITE: &str = "https://html.duckduckgo.com/html/?q={QUERY}";
-const ALLOWED_CHARS_IN_SITE: &str = "abcdefghijklmnopqrstuvwxyz1234567890.-";
+const ALLOWED_CHARS_IN_SITE: &str = "abcdefghijklmnopqrstuvwxyz1234567890.-/";
 
 /// The type of errors the ddg::get_links() function can return.
 ///
