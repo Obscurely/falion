@@ -4,6 +4,10 @@ use std::sync::Arc;
 
 const QUESTION_SEP: &str = "<div class=\"s-prose js-post-body\" itemprop=\"text\">";
 const QUESTION_END: &str = "</div>";
+const STACKOVERFLOW_QUESTION_URL: &str = "https://stackoverflow.com/questions/";
+const STACKOVERFLOW_SITE: &str = "stackoverflow.com/questions/";
+const STACKOVERFLOW_INVALID1: &str = "https://stackoverflow.com/questions/tagged";
+const STACKOVERFLOW_INVALID2: &str = "https://stackoverflow.com/questions/tagged";
 
 /// These are the erros the functions associated with StackOverFlow will return.
 ///
@@ -84,7 +88,7 @@ impl StackOverFlow {
     /// # async fn run() -> Result<(), stackoverflow::SofError> {
     /// let ddg = ddg::Ddg::new();
     /// let sof = stackoverflow::StackOverFlow::new();
-    /// let link = &ddg.get_links("Rust threading", Some("stackoverflow.com/questions/"), Some(1)).await.unwrap()[0];
+    /// let link = &ddg.get_links("Rust threading", Some("stackoverflow.com/questions/"), Some(false), Some(1)).await.unwrap()[0];
     ///
     /// let question_content = sof.get_question_content(&link).await.unwrap();
     /// # Ok(())
@@ -111,9 +115,9 @@ impl StackOverFlow {
         };
 
         // check if it's a valid stackoverflow question url
-        if question_url.contains("https://stackoverflow.com/questions/tagged")
-            || question_url.contains("https://stackoverflow.com/tag")
-            || !question_url.contains("https://stackoverflow.com/questions/")
+        if question_url.contains(STACKOVERFLOW_INVALID1)
+            || question_url.contains(STACKOVERFLOW_INVALID2)
+            || !question_url.contains(STACKOVERFLOW_QUESTION_URL)
         {
             return Err(SofError::NotSofQuestion);
         }
@@ -202,7 +206,7 @@ impl StackOverFlow {
         // get the links from duckduckgo
         let links = match self
             .ddg
-            .get_links(query, Some("stackoverflow.com/questions/"), limit)
+            .get_links(query, Some(STACKOVERFLOW_SITE), Some(false), limit)
             .await
         {
             Ok(res) => res,
@@ -217,7 +221,13 @@ impl StackOverFlow {
         // IndexMap
         for link in links {
             // unwrap is safe here since ddg does all the checks
-            let name = link.split('/').last().unwrap().replace('-', " ");
+            let mut name = link.split('/').last().unwrap().replace('-', " ");
+            // remove params if it's the case
+            let name_split = name.split("&amp").next();
+            if name_split.is_some() {
+                name = name_split.unwrap().to_string();
+            }
+            // insert content
             let client = Arc::clone(&self.client);
             questions_content.insert(
                 name,
@@ -245,10 +255,17 @@ mod tests {
     use super::*;
     use crate::search::ddg;
     use crate::search::utils;
+    use rand::Rng;
     use std::sync::Arc;
+    use std::thread;
+    use std::time::Duration;
 
     #[tokio::test]
     async fn test_get_sof_content() {
+        // random sleep time to prevent rate limiting when testing
+        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
+
+        // actual function
         let client = Arc::new(utils::client_with_random_ua());
         let sof = StackOverFlow::with_client(Arc::clone(&client));
         let ddg = ddg::Ddg::with_client(Arc::clone(&client));
@@ -256,7 +273,8 @@ mod tests {
         let link = &ddg
             .get_links(
                 "Rust threading",
-                Some("stackoverflow.com/questions/"),
+                Some(STACKOVERFLOW_SITE),
+                Some(false),
                 Some(1),
             )
             .await
@@ -269,6 +287,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_multiple_sof_content() {
+        // random sleep time to prevent rate limiting when testing
+        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
+
+        // actual function
         let client = Arc::new(utils::client_with_random_ua());
         let sof = StackOverFlow::with_client(Arc::clone(&client));
 
