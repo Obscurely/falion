@@ -272,7 +272,7 @@ mod tests {
 
         let link = &ddg
             .get_links(
-                "Rust threading",
+                "Rust index out of bounds",
                 Some(STACKEXCHANGE_QUESTION_URL),
                 Some(true),
                 Some(1),
@@ -294,7 +294,7 @@ mod tests {
         let se = StackExchange::with_client(Arc::clone(&Arc::new(utils::client_with_random_ua())));
 
         let question_content = se
-            .get_multiple_questions_content("Rust threading", Some(1))
+            .get_multiple_questions_content("Rust out lives static", Some(1))
             .await
             .unwrap();
 

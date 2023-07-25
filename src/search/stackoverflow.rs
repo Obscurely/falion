@@ -273,7 +273,7 @@ mod tests {
 
         let link = &ddg
             .get_links(
-                "Rust threading",
+                "Rust lifetime",
                 Some(STACKOVERFLOW_SITE),
                 Some(false),
                 Some(1),
@@ -296,7 +296,7 @@ mod tests {
         let sof = StackOverFlow::with_client(Arc::clone(&client));
 
         let question_content = sof
-            .get_multiple_questions_content("Rust threading", Some(1))
+            .get_multiple_questions_content("Rust value none", Some(1))
             .await
             .unwrap();
 

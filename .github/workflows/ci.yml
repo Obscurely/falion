@@ -24,7 +24,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Run tests
-        run: cargo test --all-features --workspace
+        run: cargo test --all-features --workspace -- --test-threads=1
   rustfmt:
     name: Rustfmt
     runs-on: ubuntu-latest
