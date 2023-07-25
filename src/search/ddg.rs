@@ -87,6 +87,8 @@ impl Ddg {
     ///
     /// * `query` - What to search for.
     /// * `site` - Optional, specific site to get results from.
+    /// * `allow_subdomain` - Optional, if you want to allow something before the site like
+    /// (something.site.com)
     /// * `limit` - Optional, limit the results to the first 10 for example.
     ///
     /// # Examples
@@ -96,7 +98,7 @@ impl Ddg {
     ///
     /// # async fn run() -> Result<(), ddg::DdgError> {
     /// let ddg = ddg::Ddg::new();
-    /// let links = ddg.get_links("Rust", None, None).await.unwrap();
+    /// let links = ddg.get_links("Rust", None, None, None).await.unwrap();
     /// # Ok(())
     /// # }
     ///
@@ -118,10 +120,14 @@ impl Ddg {
         &self,
         query: &str,
         site: Option<&str>,
+        allow_subdomain: Option<bool>,
         limit: Option<usize>,
     ) -> Result<Vec<String>, DdgError> {
         // set site
         let site = site.unwrap_or("");
+
+        // set allow_subdomain
+        let allow_subdomain = allow_subdomain.unwrap_or(false);
 
         // Check if site is valid
         if !site.is_empty() && !is_site_valid(site) {
@@ -176,14 +182,24 @@ impl Ddg {
         // remove possible consecutive duplicates
         links.dedup();
 
-        // filter links
-        let site_filter = "https://".to_owned() + site;
+        dbg!(&links);
 
-        let links: Vec<String> = links
-            .into_iter()
-            .filter(|s| s.contains(&site_filter))
-            .take(limit.unwrap_or(100))
-            .collect();
+        let links: Vec<String> = if allow_subdomain {
+            links
+                .into_iter()
+                .filter(|s| s.contains("https://") && s.contains(site))
+                .take(limit.unwrap_or(100))
+                .collect()
+        } else {
+            // filter links
+            let site_filter = "https://".to_owned() + site;
+
+            links
+                .into_iter()
+                .filter(|s| s.contains(&site_filter))
+                .take(limit.unwrap_or(100))
+                .collect()
+        };
 
         // check if we even have links
         if links.is_empty() {
@@ -209,7 +225,7 @@ mod tests {
     async fn test_get_links() {
         let ddg = Ddg::new();
         let links = ddg
-            .get_links("rust", Some("stackoverflow.com"), None)
+            .get_links("rust", Some("stackoverflow.com"), Some(false), None)
             .await
             .unwrap();
 
