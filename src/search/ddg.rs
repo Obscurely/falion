@@ -1,7 +1,7 @@
 use super::utils;
 use std::sync::Arc;
 
-const BASE_ADDRESS: &str = "https://html.duckduckgo.com/html/?q={QUERY}%20site%3{SITE}";
+const BASE_ADDRESS: &str = "https://html.duckduckgo.com/html/?q={QUERY}%20site%3A{SITE}";
 const BASE_ADDRESS_MINUS_SITE: &str = "https://html.duckduckgo.com/html/?q={QUERY}";
 const ALLOWED_CHARS_IN_SITE: &str = "abcdefghijklmnopqrstuvwxyz1234567890.-/";
 
@@ -181,8 +181,6 @@ impl Ddg {
 
         // remove possible consecutive duplicates
         links.dedup();
-
-        dbg!(&links);
 
         let links: Vec<String> = if allow_subdomain {
             links
