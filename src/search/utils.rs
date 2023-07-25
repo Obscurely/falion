@@ -37,11 +37,21 @@ pub fn client_with_special_settings() -> reqwest::Client {
         "Origin",
         header::HeaderValue::from_static("https://html.duckduckgo.com"),
     );
-    headers.insert("Accept", header::HeaderValue::from_static("*/*"));
+    headers.insert(
+        "Accept",
+        header::HeaderValue::from_static(
+            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        ),
+    );
+    headers.insert(
+        "Accept-Language",
+        header::HeaderValue::from_static("en-US,en;q=0.5"),
+    );
     headers.insert(
         "Accept-Encoding",
         header::HeaderValue::from_static("gzip, deflate, br"),
     );
+    headers.insert("DNT", header::HeaderValue::from_static("1"));
 
     reqwest::ClientBuilder::new()
         .user_agent(
@@ -52,6 +62,7 @@ pub fn client_with_special_settings() -> reqwest::Client {
         .brotli(true)
         .gzip(true)
         .deflate(true)
+        .https_only(true)
         .build()
         .unwrap()
 }
