@@ -104,7 +104,7 @@ If you've got any questions please give the [FAQ](#faq) a check.
 
 ### 💡 Features
 
-- [x] CHANGEME_MANUAL...
+- [x] doc.rust-lang.org as resource
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

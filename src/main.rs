@@ -5,9 +5,9 @@ mod search;
 async fn main() {
     let start = std::time::Instant::now();
     let client = Arc::new(search::utils::client_with_random_ua());
-    let sof = search::stackoverflow::StackOverFlow::with_client(Arc::clone(&client));
+    let se = search::stackexchange::StackExchange::with_client(Arc::clone(&client));
 
-    let questions_content = sof
+    let questions_content = se
         .get_multiple_questions_content("Rust threading", Some(10))
         .await
         .unwrap();
