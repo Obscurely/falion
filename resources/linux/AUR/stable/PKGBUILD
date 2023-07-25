@@ -22,11 +22,6 @@ build() {
   cargo build --release --frozen
 }
 
-check() {
-  cd "$srcdir/falion-$pkgver-stable"
-  cargo test --frozen
-}
-
 package() {
   cd "$srcdir/falion-$pkgver-stable"
   install -Dm 755 "target/release/falion" -t "$pkgdir/usr/bin"

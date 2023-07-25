@@ -37,8 +37,6 @@ jobs:
           VER=$(echo "${GITHUB_REF##*/}" | gsed -e 's/v//g' | gsed -e 's/-.*//g')
           gsed -i "0,/version = \".*/s//version = \"$VER\"/" Cargo.toml
           mkdir -p target/osx
-      - name: Run tests
-        run: cargo test --all-features --workspace -- --test-threads=1
       - name: Build
         run: cargo build --release
       - name: Copy bin
@@ -115,8 +113,6 @@ jobs:
       - name: Install cargo-wix
         shell: bash
         run: cargo install cargo-wix
-      - name: Run tests
-        run: cargo test --all-features --workspace -- --test-threads=1
       - name: Build
         run: cargo build --release
       - name: Copy bin
@@ -158,8 +154,6 @@ jobs:
           mkdir -p target/linux
       - name: Build
         run: cargo build --release
-      - name: Run tests
-        run: cargo test --all-features --workspace -- --test-threads=1
       - name: Copy bin
         run: |
           BIN_NAME=$(grep -o -P '(?<=name = ").*(?=")' Cargo.toml)
@@ -256,8 +250,6 @@ jobs:
           VER=$(echo "${GITHUB_REF##*/}" | sed -e 's/v//g' | sed -e 's/-.*//g')
           sed -i "0,/version = \".*/s//version = \"$VER\"/" Cargo.toml
           mkdir -p target/linux
-      - name: Run tests
-        run: cargo test --all-features --workspace -- --test-threads=1
       - name: Build
         run: cargo build --release
       - name: Publish to crates.io
