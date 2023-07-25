@@ -10,9 +10,9 @@ use reqwest::header;
 /// ```
 /// use falion::search::utils;
 ///
-/// let client = utils::client_with_random_ua();
+/// let client = utils::client_with_special_settings();
 /// ```
-pub fn client_with_random_ua() -> reqwest::Client {
+pub fn client_with_special_settings() -> reqwest::Client {
     let mut rng = rand::thread_rng();
 
     // specific headers to avoid rate limiting
@@ -37,10 +37,21 @@ pub fn client_with_random_ua() -> reqwest::Client {
         "Origin",
         header::HeaderValue::from_static("https://html.duckduckgo.com"),
     );
+    headers.insert("Accept", header::HeaderValue::from_static("*/*"));
+    headers.insert(
+        "Accept-Encoding",
+        header::HeaderValue::from_static("gzip, deflate, br"),
+    );
 
     reqwest::ClientBuilder::new()
-        .user_agent(rand::distributions::Alphanumeric.sample_string(&mut rng, 16))
+        .user_agent(
+            String::from("Mozilla/5.0")
+                + &rand::distributions::Alphanumeric.sample_string(&mut rng, 16),
+        )
         .default_headers(headers)
+        .brotli(true)
+        .gzip(true)
+        .deflate(true)
         .build()
         .unwrap()
 }
@@ -62,4 +73,22 @@ pub fn client_with_random_ua() -> reqwest::Client {
 /// ```
 pub fn html_to_text(html: &str, term_width: usize) -> String {
     html2text::from_read(html.as_bytes(), term_width)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_html_to_text() {
+        let text = "<p>Hello World!</p>";
+        assert_eq!(html_to_text(text, 50), "Hello World!\n");
+    }
+
+    #[tokio::test]
+    async fn test_create_client() {
+        let client = client_with_special_settings();
+
+        client.get("https://google.com").send().await.unwrap();
+    }
 }

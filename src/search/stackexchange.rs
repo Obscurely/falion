@@ -49,7 +49,7 @@ impl StackExchange {
     /// ```
     pub fn new() -> StackExchange {
         StackExchange {
-            client: Arc::new(utils::client_with_random_ua()),
+            client: Arc::new(utils::client_with_special_settings()),
             ddg: ddg::Ddg::new(),
         }
     }
@@ -266,7 +266,7 @@ mod tests {
         thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
 
         // actual function
-        let client = Arc::new(utils::client_with_random_ua());
+        let client = Arc::new(utils::client_with_special_settings());
         let se = StackExchange::with_client(Arc::clone(&client));
         let ddg = ddg::Ddg::with_client(Arc::clone(&client));
 
@@ -285,21 +285,24 @@ mod tests {
         assert!(!question_content.is_empty())
     }
 
-    #[tokio::test]
-    async fn test_get_multiple_se_content() {
-        // random sleep time to prevent rate limiting when testing
-        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
-
-        // actual function
-        let se = StackExchange::with_client(Arc::clone(&Arc::new(utils::client_with_random_ua())));
-
-        let question_content = se
-            .get_multiple_questions_content("Rust out lives static", Some(1))
-            .await
-            .unwrap();
-
-        for q in question_content {
-            assert!(!q.1.await.unwrap().unwrap().is_empty())
-        }
-    }
+    // NOTE: Enable this test only when really needed in order to prevent rate limit with the other
+    // tests
+    //
+    // #[tokio::test]
+    // async fn test_get_multiple_se_content() {
+    //     // random sleep time to prevent rate limiting when testing
+    //     thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
+    //
+    //     // actual function
+    //     let se = StackExchange::with_client(Arc::clone(&Arc::new(utils::client_with_special_settings())));
+    //
+    //     let question_content = se
+    //         .get_multiple_questions_content("Rust out lives static", Some(1))
+    //         .await
+    //         .unwrap();
+    //
+    //     for q in question_content {
+    //         assert!(!q.1.await.unwrap().unwrap().is_empty())
+    //     }
+    // }
 }

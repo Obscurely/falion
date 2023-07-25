@@ -4,7 +4,7 @@ mod search;
 #[tokio::main]
 async fn main() {
     let start = std::time::Instant::now();
-    let client = Arc::new(search::utils::client_with_random_ua());
+    let client = Arc::new(search::utils::client_with_special_settings());
     let se = search::stackexchange::StackExchange::with_client(Arc::clone(&client));
 
     let questions_content = se
