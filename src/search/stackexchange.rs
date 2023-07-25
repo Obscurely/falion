@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use super::{ddg, utils};
 use indexmap::IndexMap;
 use std::sync::Arc;
@@ -290,8 +291,7 @@ mod tests {
         thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
 
         // actual function
-        let client = Arc::new(utils::client_with_random_ua());
-        let se = StackExchange::with_client(Arc::clone(&client));
+        let se = StackExchange::with_client(Arc::clone(&Arc::new(utils::client_with_random_ua())));
 
         let question_content = se
             .get_multiple_questions_content("Rust threading", Some(1))

@@ -35,7 +35,7 @@
   Arc. This makes the program way faster than before.
 - Rewrote stackoverflow.rs completly. Many performance improvements, using only
   one global client, many checks in place.
-- Rewrote stackexchange.rs completly. Same as stackoverflow, many performance
+- Rewrote stackexchange.rs completly. Same as Stack Overflow, many performance
   improvements, one global client and multiple checks in place.
 
 ### Deprecated

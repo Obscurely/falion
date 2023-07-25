@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use rand::{distributions::DistString, Rng};
 use reqwest::header;
 

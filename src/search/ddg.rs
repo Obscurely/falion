@@ -1,7 +1,8 @@
+#![allow(dead_code)]
 use super::utils;
 use std::sync::Arc;
 
-const BASE_ADDRESS: &str = "https://html.duckduckgo.com/html/?q={QUERY}%20site:{SITE}";
+const BASE_ADDRESS: &str = "https://html.duckduckgo.com/html/?q={QUERY}%20site%3A{SITE}";
 const BASE_ADDRESS_MINUS_SITE: &str = "https://html.duckduckgo.com/html/?q={QUERY}";
 const ALLOWED_CHARS_IN_SITE: &str = "abcdefghijklmnopqrstuvwxyz1234567890.-/";
 
@@ -230,7 +231,7 @@ mod tests {
         // actual function
         let ddg = Ddg::new();
         let links = ddg
-            .get_links("rust", Some("stackoverflow.com"), Some(false), None)
+            .get_links("Rust threading", Some("stackoverflow.com"), Some(false), None)
             .await
             .unwrap();
 

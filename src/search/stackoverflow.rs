@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use super::{ddg, utils};
 use indexmap::IndexMap;
 use std::sync::Arc;
