@@ -1,7 +1,7 @@
 use super::utils;
 use std::sync::Arc;
 
-const BASE_ADDRESS: &str = "https://html.duckduckgo.com/html/?q={QUERY}%20site%3A{SITE}";
+const BASE_ADDRESS: &str = "https://html.duckduckgo.com/html/?q={QUERY}%20site:{SITE}";
 const BASE_ADDRESS_MINUS_SITE: &str = "https://html.duckduckgo.com/html/?q={QUERY}";
 const ALLOWED_CHARS_IN_SITE: &str = "abcdefghijklmnopqrstuvwxyz1234567890.-/";
 
@@ -218,9 +218,16 @@ impl Default for Ddg {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rand::Rng;
+    use std::thread;
+    use std::time::Duration;
 
     #[tokio::test]
     async fn test_get_links() {
+        // random sleep time to prevent rate limiting when testing
+        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
+
+        // actual function
         let ddg = Ddg::new();
         let links = ddg
             .get_links("rust", Some("stackoverflow.com"), Some(false), None)
