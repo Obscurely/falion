@@ -173,7 +173,10 @@ impl Ddg {
             .skip(1)
             .filter_map(|s| match s.split_once("\">") {
                 Some(s_split) => match urlencoding::decode(s_split.0) {
-                    Ok(link) => Some(link.to_string()),
+                    Ok(link) => match link.split_once("&amp") {
+                        Some(link_split) => Some(link_split.0.to_string()),
+                        None => Some(link.to_string()),
+                    },
                     Err(_) => None,
                 },
                 None => None,
