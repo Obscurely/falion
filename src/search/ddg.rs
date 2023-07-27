@@ -60,8 +60,8 @@ impl Ddg {
     ///
     /// let ddg = ddg::Ddg::new();
     /// ```
-    pub fn new() -> Ddg {
-        Ddg {
+    pub fn new() -> Self {
+        Self {
             client: Arc::new(utils::client_with_special_settings()),
         }
     }
@@ -78,8 +78,8 @@ impl Ddg {
     /// let ddg = ddg::Ddg::with_client(Arc::new(reqwest::Client::new()));
     /// ```
     #[allow(dead_code)]
-    pub fn with_client(client: Arc<reqwest::Client>) -> Ddg {
-        Ddg { client }
+    pub fn with_client(client: Arc<reqwest::Client>) -> Self {
+        Self { client }
     }
 
     /// Using a provided query (and optional site specifier) returns duckduckgo results.
@@ -212,7 +212,7 @@ impl Ddg {
 
 impl Default for Ddg {
     fn default() -> Self {
-        Ddg::new()
+        Self::new()
     }
 }
 

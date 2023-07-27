@@ -10,9 +10,9 @@ const STACKOVERFLOW_SITE: &str = "stackoverflow.com/questions/";
 const STACKOVERFLOW_INVALID1: &str = "https://stackoverflow.com/questions/tagged";
 const STACKOVERFLOW_INVALID2: &str = "https://stackoverflow.com/questions/tagged";
 
-/// These are the erros the functions associated with StackOverFlow will return.
+/// These are the erros the functions associated with StackOverflow will return.
 ///
-/// * `NotSofQuestion` - The given url does not correspond to a StackOverFlow question.
+/// * `NotSofQuestion` - The given url does not correspond to a StackOverflow question.
 /// * `InvalidRequest` - Reqwest returned an error when processing the request. This can be
 /// due to rate limiting, bad internet etc.
 /// * `InvalidResponseBody` - The response content you got back is corrupted, usually bad
@@ -31,14 +31,14 @@ pub enum SofError {
     DdgError(ddg::DdgError),
 }
 
-/// Scrape questions from StackOverFlow
-pub struct StackOverFlow {
+/// Scrape questions from StackOverflow
+pub struct StackOverflow {
     client: Arc<reqwest::Client>,
     ddg: ddg::Ddg,
 }
 
-impl StackOverFlow {
-    /// Create a new StackOverFlow instance with a custom client that generates UA (user-agent in
+impl StackOverflow {
+    /// Create a new StackOverflow instance with a custom client that generates UA (user-agent in
     /// order to avoid getting rate limited by DuckDuckGO).
     ///
     /// # Examples
@@ -46,38 +46,38 @@ impl StackOverFlow {
     /// ```
     /// use falion::search::stackoverflow;
     ///
-    /// let sof = stackoverflow::StackOverFlow::new();
+    /// let sof = stackoverflow::StackOverflow::new();
     /// ```
-    pub fn new() -> StackOverFlow {
-        StackOverFlow {
+    pub fn new() -> Self {
+        Self {
             client: Arc::new(utils::client_with_special_settings()),
             ddg: ddg::Ddg::new(),
         }
     }
 
-    /// Create a new StackOverFlow instance with a provided client.
+    /// Create a new StackOverflow instance with a provided client.
     /// Note: DuckDuckGO will limit your requests if you don't provide a user-agent.
     ///
     /// ```
     /// use falion::search::stackoverflow;
     /// use std::sync::Arc;
     ///
-    /// let sof = stackoverflow::StackOverFlow::with_client(Arc::new(reqwest::Client::new()));
+    /// let sof = stackoverflow::StackOverflow::with_client(Arc::new(reqwest::Client::new()));
     /// ```
     #[allow(dead_code)]
-    pub fn with_client(client: Arc<reqwest::Client>) -> StackOverFlow {
-        StackOverFlow {
+    pub fn with_client(client: Arc<reqwest::Client>) -> Self {
+        Self {
             client: Arc::clone(&client),
             ddg: ddg::Ddg::with_client(Arc::clone(&client)),
         }
     }
 
-    /// Get the contents of a StackOverFlow question inside a vector, the first item being the
+    /// Get the contents of a StackOverflow question inside a vector, the first item being the
     /// question itself and the rest the answers.
     ///
     /// # Arguments
     ///
-    /// * `question_url` - The StackOverFlow absolute url, specifically like this
+    /// * `question_url` - The StackOverflow absolute url, specifically like this
     /// https://stackoverflow.com/questions/[0-9]*/the-question, to the question
     ///
     /// # Examples
@@ -88,7 +88,7 @@ impl StackOverFlow {
     ///
     /// # async fn run() -> Result<(), stackoverflow::SofError> {
     /// let ddg = ddg::Ddg::new();
-    /// let sof = stackoverflow::StackOverFlow::new();
+    /// let sof = stackoverflow::StackOverflow::new();
     /// let link = &ddg.get_links("Rust threading", Some("stackoverflow.com/questions/"), Some(false), Some(1)).await.unwrap()[0];
     ///
     /// let question_content = sof.get_question_content(&link).await.unwrap();
@@ -100,7 +100,7 @@ impl StackOverFlow {
     ///
     /// returns stackoverflow::SofError
     ///
-    /// * `NotSofQuestion` - The given url does not correspond to a StackOverFlow question.
+    /// * `NotSofQuestion` - The given url does not correspond to a StackOverflow question.
     /// * `InvalidRequest` - Reqwest returned an error when processing the request. This can be
     /// due to rate limiting, bad internet etc.
     /// * `InvalidResponseBody` - The response content you got back is corrupted, usually bad
@@ -164,13 +164,13 @@ impl StackOverFlow {
     /// the content asynchronously for ALL of them. Each of this is Futures is associated with the
     /// title of the question and returned inside a IndexMap for preserved order.
     ///
-    /// PLEASE READ: While setting a limit is optional, doing 100 requests to StackOverFlow at once
+    /// PLEASE READ: While setting a limit is optional, doing 100 requests to StackOverflow at once
     /// will probably get you rate limited.
     ///
     /// # Arguments
     ///
     /// * `query` - The query to search for.
-    /// * `limit` - Optional, but doing 100 requests to StackOverFlow at once will probably get you
+    /// * `limit` - Optional, but doing 100 requests to StackOverflow at once will probably get you
     /// rate limited. A recommended value is something like 10 for enough results and still good
     /// results.
     ///
@@ -180,7 +180,7 @@ impl StackOverFlow {
     /// use falion::search::stackoverflow;
     ///
     /// # async fn run() -> Result<(), stackoverflow::SofError> {
-    /// let sof = stackoverflow::StackOverFlow::new();
+    /// let sof = stackoverflow::StackOverflow::new();
     /// let question_content = sof
     ///     .get_multiple_questions_content("Rust threading", Some(1))
     ///     .await
@@ -233,7 +233,7 @@ impl StackOverFlow {
             questions_content.insert(
                 name,
                 tokio::task::spawn(async move {
-                    StackOverFlow::with_client(client)
+                    Self::with_client(client)
                         .get_question_content(&link)
                         .await
                 }),
@@ -245,9 +245,9 @@ impl StackOverFlow {
     }
 }
 
-impl Default for StackOverFlow {
-    fn default() -> StackOverFlow {
-        StackOverFlow::new()
+impl Default for StackOverflow {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -268,7 +268,7 @@ mod tests {
 
         // actual function
         let client = Arc::new(utils::client_with_special_settings());
-        let sof = StackOverFlow::with_client(Arc::clone(&client));
+        let sof = StackOverflow::with_client(Arc::clone(&client));
         let ddg = ddg::Ddg::with_client(Arc::clone(&client));
 
         let link = &ddg
@@ -295,7 +295,7 @@ mod tests {
     //
     //     // actual function
     //     let client = Arc::new(utils::client_with_special_settings());
-    //     let sof = StackOverFlow::with_client(Arc::clone(&client));
+    //     let sof = StackOverflow::with_client(Arc::clone(&client));
     //
     //     let question_content = sof
     //         .get_multiple_questions_content("Rust value none", Some(1))

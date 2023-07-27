@@ -47,8 +47,8 @@ impl StackExchange {
     ///
     /// let se = stackexchange::StackExchange::new();
     /// ```
-    pub fn new() -> StackExchange {
-        StackExchange {
+    pub fn new() -> Self {
+        Self {
             client: Arc::new(utils::client_with_special_settings()),
             ddg: ddg::Ddg::new(),
         }
@@ -64,8 +64,8 @@ impl StackExchange {
     /// let se = stackexchange::StackExchange::with_client(Arc::new(reqwest::Client::new()));
     /// ```
     #[allow(dead_code)]
-    pub fn with_client(client: Arc<reqwest::Client>) -> StackExchange {
-        StackExchange {
+    pub fn with_client(client: Arc<reqwest::Client>) -> Self {
+        Self {
             client: Arc::clone(&client),
             ddg: ddg::Ddg::with_client(Arc::clone(&client)),
         }
@@ -232,7 +232,7 @@ impl StackExchange {
             questions_content.insert(
                 name,
                 tokio::task::spawn(async move {
-                    StackExchange::with_client(client)
+                    Self::with_client(client)
                         .get_question_content(&link)
                         .await
                 }),
@@ -245,8 +245,8 @@ impl StackExchange {
 }
 
 impl Default for StackExchange {
-    fn default() -> StackExchange {
-        StackExchange::new()
+    fn default() -> Self {
+        Self::new()
     }
 }
 
