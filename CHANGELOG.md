@@ -37,6 +37,9 @@
   one global client, many checks in place.
 - Rewrote stackexchange.rs completly. Same as Stack Overflow, many performance
   improvements, one global client and multiple checks in place.
+- Rewrote geeksforgeeks.rs completly. Same as Stack Overflow, performance
+  improvements, one global client, multiple checks in place and the page is
+  rendered better.
 
 ### Deprecated
 
@@ -51,6 +54,7 @@ None
 - Switching to the HTML version of duckduckgo made it so the results we get are
   in order of importance.
 - Compiling to windows & macOS doesn't fail now.
+- GeeksForGeeks pages don't contain the extra crap now.
 
 ### Security
 

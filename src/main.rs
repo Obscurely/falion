@@ -5,26 +5,15 @@ mod search;
 async fn main() {
     let start = std::time::Instant::now();
     let client = Arc::new(search::utils::client_with_special_settings());
-    let se = search::stackexchange::StackExchange::with_client(Arc::clone(&client));
+    let gfg = search::geeksforgeeks::GeeksForGeeks::with_client(Arc::clone(&client));
+    let ddg = search::ddg::Ddg::with_client(Arc::clone(&client));
 
-    let questions_content = se
-        .get_multiple_questions_content("Rust threading", Some(10))
-        .await
-        .unwrap();
+    let link = ddg.get_links("Rust basics", Some("www.geeksforgeeks.org"), None, Some(1)).await.unwrap();
+    let link = &link[0];
 
-    for q in questions_content {
-        let a = match q.1.await {
-            Ok(b) => match b {
-                Ok(c) => c,
-                Err(_) => continue,
-            },
-            Err(_) => continue,
-        };
-        println!("Question: {}\n\nContent: {}", q.0, a[0]);
-    }
+    let page_content = gfg.get_page_content(link).await.unwrap();
 
-    println!(
-        "Total execution time: {}ms",
-        (std::time::Instant::now() - start).as_millis()
-    );
+    println!("Page:\n{}", page_content);
+
+    println!("Total execution time: {}ms", (std::time::Instant::now() - start).as_millis());
 }

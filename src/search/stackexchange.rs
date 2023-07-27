@@ -160,8 +160,8 @@ impl StackExchange {
 
     /// Search for stackexchange results using duckduckgo and a provided query. This function will
     /// go through ALL of those results and crate a future for each one which will start getting
-    /// the content asynchronously for ALL of them. Each of this is Futures is associated with the
-    /// title of the question and returned inside a IndexMap for preserved order.
+    /// the content asynchronously for ALL of them. Each of this Futures is associated with the
+    /// title of the question and returned inside an IndexMap for preserved order.
     ///
     /// PLEASE READ: While setting a limit is optional, doing 100 requests to StackExchange at once
     /// will probably get you rate limited.
