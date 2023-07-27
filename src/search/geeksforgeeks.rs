@@ -198,7 +198,7 @@ impl GeeksForGeeks {
     /// * `DdgError` - error with getting results from DuckDuckGO. (ddg::DdgError)
     ///
     /// First error is for duckduckgo, second is for the future hanle, third is for the actual
-    /// question content
+    /// page content
     pub async fn get_multiple_pages_content(
         &self,
         query: &str,
