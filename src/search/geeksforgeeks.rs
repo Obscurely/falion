@@ -96,7 +96,7 @@ impl GeeksForGeeks {
     /// # async fn run() -> Result<(), geeksforgeeks::GfgError> {
     /// let ddg = ddg::Ddg::new();
     /// let gfg = geeksforgeeks::GeeksForGeeks::new();
-    /// let link = &ddg.get_links("Rust basics", Some("www.geeksforgeeks.org"), Some(true), Some(1)).await.unwrap()[0];
+    /// let link = &ddg.get_links("Rust basics", Some("www.geeksforgeeks.org"), None, Some(1)).await.unwrap()[0];
     ///
     /// let page_content = gfg.get_page_content(&link).await.unwrap();
     /// # Ok(())
