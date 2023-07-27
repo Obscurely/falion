@@ -83,7 +83,15 @@ pub fn client_with_special_settings() -> reqwest::Client {
 /// assert_eq!(utils::html_to_text(text, 50), "Hello World!\n");
 /// ```
 pub fn html_to_text(html: &str, term_width: usize) -> String {
-    html2text::from_read(html.as_bytes(), term_width)
+    let mut text = html2text::from_read(html.as_bytes(), term_width);
+
+    // remove any chunks of more than 2 new lines
+    while text.contains("\n\n\n") {
+        text = text.replace("\n\n\n", "\n\n");
+    }
+
+    // return text
+    text
 }
 
 #[cfg(test)]
