@@ -198,6 +198,9 @@ impl StackOverflow {
     /// returns stackoverflow::SofError;
     ///
     /// * `DdgError` - error with getting results from DuckDuckGO. (ddg::DdgError)
+    ///
+    /// First error is for duckduckgo, second is for the future hanle, third is for the actual
+    /// question content
     pub async fn get_multiple_questions_content(
         &self,
         query: &str,
