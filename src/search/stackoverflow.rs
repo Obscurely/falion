@@ -10,7 +10,7 @@ const STACKOVERFLOW_SITE: &str = "stackoverflow.com/questions/";
 const STACKOVERFLOW_INVALID1: &str = "https://stackoverflow.com/questions/tagged";
 const STACKOVERFLOW_INVALID2: &str = "https://stackoverflow.com/questions/tagged";
 
-/// These are the erros the functions associated with StackOverflow will return.
+/// These are the errors the functions associated with StackOverflow will return.
 ///
 /// * `NotSofQuestion` - The given url does not correspond to a StackOverflow question.
 /// * `InvalidRequest` - Reqwest returned an error when processing the request. This can be

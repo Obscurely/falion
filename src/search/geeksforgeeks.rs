@@ -18,7 +18,7 @@ const GEEKSFORGEEKS_INVALID: [&str; 7] = [
     "https://www.geeksforgeeks.org/expert/",
 ];
 
-/// These are the erros the functions associated with GeeksForGeeks will return.
+/// These are the errors the functions associated with GeeksForGeeks will return.
 ///
 /// * `NotGfgPage` - The given url does not correspond to a GeeksForGeeks page.
 /// * `InvalidRequest` - Reqwest returned an error when processing the request. This can be

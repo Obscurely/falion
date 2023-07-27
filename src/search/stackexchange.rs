@@ -9,7 +9,7 @@ const STACKEXCHANGE_QUESTION_URL: &str = "stackexchange.com/questions/";
 const STACKEXCHANGE_INVALID1: &str = "stackexchange.com/questions/tagged";
 const STACKEXCHANGE_INVALID2: &str = "stackexchange.com/tag";
 
-/// These are the erros the functions associated with StackExchange will return.
+/// These are the errors the functions associated with StackExchange will return.
 ///
 /// * `NotSeQuestion` - The given url does not correspond to a StackExchange question.
 /// * `InvalidRequest` - Reqwest returned an error when processing the request. This can be
