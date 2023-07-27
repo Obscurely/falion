@@ -221,12 +221,7 @@ impl StackExchange {
         // IndexMap
         for link in links {
             // unwrap is safe here since ddg does all the checks
-            let mut name = link.split('/').last().unwrap().replace('-', " ");
-            // remove params if it's the case
-            let name_split = name.split("&amp").next();
-            if name_split.is_some() {
-                name = name_split.unwrap().to_string();
-            }
+            let name = link.split('/').last().unwrap().replace('-', " ");
             // insert question content
             let client = Arc::clone(&self.client);
             questions_content.insert(
