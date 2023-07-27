@@ -40,6 +40,9 @@
 - Rewrote geeksforgeeks.rs completly. Same as Stack Overflow, performance
   improvements, one global client, multiple checks in place and the page is
   rendered better.
+- Rewrote ddg_search.rs completly. Same as Stack Overflow, performance
+  improvements, one global client, multiple checks in place and the pages are
+  rendered better.
 
 ### Deprecated
 

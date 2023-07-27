@@ -231,9 +231,7 @@ impl StackOverflow {
             questions_content.insert(
                 name,
                 tokio::task::spawn(async move {
-                    Self::with_client(client)
-                        .get_question_content(&link)
-                        .await
+                    Self::with_client(client).get_question_content(&link).await
                 }),
             );
         }
