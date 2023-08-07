@@ -4,7 +4,7 @@ use super::utils;
 use indexmap::IndexMap;
 use std::sync::Arc;
 
-/// These are the errors the functions associated with GeeksForGeeks will return.
+/// These are the errors the functions associated with DdgSearch will return.
 ///
 /// * `InvalidRequest` - Reqwest returned an error when processing the request. This can be
 /// due to rate limiting, bad internet etc.
