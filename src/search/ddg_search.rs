@@ -184,11 +184,16 @@ impl DdgSearch {
         // IndexMap
         for link in links {
             // unwrap is safe here since ddg does all the checks
+            let domain = link.split_once("https://").unwrap().1.split_once('/').unwrap().0;
             let name = link.split('/').last().unwrap().replace('-', " ");
+            let mut full_name = String::with_capacity(domain.len() + name.len() + 3);
+            full_name.push_str(domain);
+            full_name.push_str(" | ");
+            full_name.push_str(&name);
             // insert page content
             let client = Arc::clone(&self.client);
             pages_content.insert(
-                name,
+                full_name,
                 tokio::task::spawn(async move {
                     Self::with_client(client).get_page_content(&link).await
                 }),
