@@ -33,16 +33,21 @@
   now there is one with half the code, way faster and more robust.
 - There is one global client that is used across all objects and threads using
   Arc. This makes the program way faster than before.
-- Rewrote stackoverflow.rs completly. Many performance improvements, using only
+- Regex is not used anymore since all that look back crap is slow. Switched to
+  plain splitting the content. This improves the performance by quite a bit.
+- Rewrote stackoverflow.rs completely. Many performance improvements, using only
   one global client, many checks in place.
-- Rewrote stackexchange.rs completly. Same as Stack Overflow, many performance
+- Rewrote stackexchange.rs completely. Same as Stack Overflow, many performance
   improvements, one global client and multiple checks in place.
-- Rewrote geeksforgeeks.rs completly. Same as Stack Overflow, performance
+- Rewrote geeksforgeeks.rs completely. Same as Stack Overflow, performance
   improvements, one global client, multiple checks in place and the page is
   rendered better.
-- Rewrote ddg_search.rs completly. Same as Stack Overflow, performance
+- Rewrote ddg_search.rs completely. Same as Stack Overflow, performance
   improvements, one global client, multiple checks in place and the pages are
   rendered better.
+- Rewrote github_gist.rs completely. Same as Stack Overflow, performance
+  improvements, one global client, multiple checks in place + actual parallel
+  requesting the gist files instead of concurent and simplified process.
 
 ### Deprecated
 
