@@ -62,7 +62,6 @@ impl GithubGist {
     ///
     /// ```
     /// use falion::search::github_gist;
-    /// use std::sync::Arc;
     ///
     /// let github_gist = github_gist::GithubGist::with_client(reqwest::Client::new());
     /// ```
@@ -70,7 +69,7 @@ impl GithubGist {
     pub fn with_client(client: reqwest::Client) -> Self {
         Self {
             client: client.clone(),
-            ddg: ddg::Ddg::with_client(client.into()),
+            ddg: ddg::Ddg::with_client(client),
         }
     }
 
@@ -319,7 +318,7 @@ mod tests {
         thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
 
         let client = search::utils::client_with_special_settings();
-        let ddg = search::ddg::Ddg::with_client(client.clone().into());
+        let ddg = search::ddg::Ddg::with_client(client.clone());
         let github_gist = GithubGist::with_client(client);
 
         let link = ddg

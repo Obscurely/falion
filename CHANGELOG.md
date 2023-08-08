@@ -31,8 +31,8 @@
   and less prone to breaking over time.
 - Instead of the many different functions that handled the duckduckgo searches
   now there is one with half the code, way faster and more robust.
-- There is one global client that is used across all objects and threads using
-  Arc. This makes the program way faster than before.
+- There is one global client that is used across all objects and threads .This
+  makes the program way faster than before.
 - Regex is not used anymore since all that look back crap is slow. Switched to
   plain splitting the content. This improves the performance by quite a bit.
 - Rewrote stackoverflow.rs completely. Many performance improvements, using only

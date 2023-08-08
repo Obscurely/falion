@@ -2,7 +2,6 @@
 use super::ddg;
 use super::utils;
 use indexmap::IndexMap;
-use std::sync::Arc;
 
 /// These are the errors the functions associated with DdgSearch will return.
 ///
@@ -22,7 +21,7 @@ pub enum DdgSearchError {
 
 /// Scrape pages returned by ddg
 pub struct DdgSearch {
-    client: Arc<reqwest::Client>,
+    client: reqwest::Client,
     ddg: ddg::Ddg,
 }
 
@@ -39,7 +38,7 @@ impl DdgSearch {
     /// ```
     pub fn new() -> Self {
         Self {
-            client: Arc::new(utils::client_with_special_settings()),
+            client: utils::client_with_special_settings(),
             ddg: ddg::Ddg::new(),
         }
     }
@@ -49,15 +48,14 @@ impl DdgSearch {
     ///
     /// ```
     /// use falion::search::ddg_search;
-    /// use std::sync::Arc;
     ///
-    /// let ddg_search = ddg_search::DdgSearch::with_client(Arc::new(reqwest::Client::new()));
+    /// let ddg_search = ddg_search::DdgSearch::with_client(reqwest::Client::new());
     /// ```
     #[allow(dead_code)]
-    pub fn with_client(client: Arc<reqwest::Client>) -> Self {
+    pub fn with_client(client: reqwest::Client) -> Self {
         Self {
-            client: Arc::clone(&client),
-            ddg: ddg::Ddg::with_client(Arc::clone(&client)),
+            client: client.clone(),
+            ddg: ddg::Ddg::with_client(client),
         }
     }
 
@@ -197,7 +195,7 @@ impl DdgSearch {
             full_name.push_str(" | ");
             full_name.push_str(&name);
             // insert page content
-            let client = Arc::clone(&self.client);
+            let client = self.client.clone();
             pages_content.insert(
                 full_name,
                 tokio::task::spawn(async move {
@@ -222,7 +220,6 @@ mod tests {
     use super::*;
     use crate::search;
     use rand::Rng;
-    use std::sync::Arc;
     use std::thread;
     use std::time::Duration;
 
@@ -231,9 +228,9 @@ mod tests {
         // random sleep time to prevent rate limiting when testing
         thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
 
-        let client = Arc::new(search::utils::client_with_special_settings());
-        let ddg = search::ddg::Ddg::with_client(Arc::clone(&client));
-        let ddg_search = DdgSearch::with_client(Arc::clone(&client));
+        let client = search::utils::client_with_special_settings();
+        let ddg = search::ddg::Ddg::with_client(client.clone());
+        let ddg_search = DdgSearch::with_client(client);
 
         let link = ddg
             .get_links("Rust basics", None, Some(true), Some(1))
@@ -256,8 +253,8 @@ mod tests {
     //     thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
     //
     //     // actual function
-    //     let client = Arc::new(utils::client_with_special_settings());
-    //     let ddg_search = DdgSearch::with_client(Arc::clone(&client));
+    //     let client = utils::client_with_special_settings();
+    //     let ddg_search = DdgSearch::with_client(client);
     //
     //     let page_content = ddg_search
     //         .get_multiple_pages_content("Rust basics", Some(1))

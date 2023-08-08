@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 use super::{ddg, utils};
 use indexmap::IndexMap;
-use std::sync::Arc;
 
 const QUESTION_SEP: &str = "<div class=\"s-prose js-post-body\" itemprop=\"text\">";
 const QUESTION_END: &str = "</div>";
@@ -33,7 +32,7 @@ pub enum SofError {
 
 /// Scrape questions from StackOverflow
 pub struct StackOverflow {
-    client: Arc<reqwest::Client>,
+    client: reqwest::Client,
     ddg: ddg::Ddg,
 }
 
@@ -50,7 +49,7 @@ impl StackOverflow {
     /// ```
     pub fn new() -> Self {
         Self {
-            client: Arc::new(utils::client_with_special_settings()),
+            client: utils::client_with_special_settings(),
             ddg: ddg::Ddg::new(),
         }
     }
@@ -60,15 +59,14 @@ impl StackOverflow {
     ///
     /// ```
     /// use falion::search::stackoverflow;
-    /// use std::sync::Arc;
     ///
-    /// let sof = stackoverflow::StackOverflow::with_client(Arc::new(reqwest::Client::new()));
+    /// let sof = stackoverflow::StackOverflow::with_client(reqwest::Client::new());
     /// ```
     #[allow(dead_code)]
-    pub fn with_client(client: Arc<reqwest::Client>) -> Self {
+    pub fn with_client(client: reqwest::Client) -> Self {
         Self {
-            client: Arc::clone(&client),
-            ddg: ddg::Ddg::with_client(Arc::clone(&client)),
+            client: client.clone(),
+            ddg: ddg::Ddg::with_client(client),
         }
     }
 
@@ -227,7 +225,7 @@ impl StackOverflow {
             // unwrap is safe here since ddg does all the checks
             let name = link.split('/').last().unwrap().replace('-', " ");
             // insert content
-            let client = Arc::clone(&self.client);
+            let client = self.client.clone();
             questions_content.insert(
                 name,
                 tokio::task::spawn(async move {
@@ -253,7 +251,6 @@ mod tests {
     use crate::search::ddg;
     use crate::search::utils;
     use rand::Rng;
-    use std::sync::Arc;
     use std::thread;
     use std::time::Duration;
 
@@ -263,9 +260,9 @@ mod tests {
         thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
 
         // actual function
-        let client = Arc::new(utils::client_with_special_settings());
-        let sof = StackOverflow::with_client(Arc::clone(&client));
-        let ddg = ddg::Ddg::with_client(Arc::clone(&client));
+        let client = utils::client_with_special_settings();
+        let sof = StackOverflow::with_client(client.clone());
+        let ddg = ddg::Ddg::with_client(client);
 
         let link = &ddg
             .get_links(
@@ -290,8 +287,8 @@ mod tests {
     //     thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
     //
     //     // actual function
-    //     let client = Arc::new(utils::client_with_special_settings());
-    //     let sof = StackOverflow::with_client(Arc::clone(&client));
+    //     let client = utils::client_with_special_settings();
+    //     let sof = StackOverflow::with_client(client);
     //
     //     let question_content = sof
     //         .get_multiple_questions_content("Rust value none", Some(1))
@@ -303,3 +300,4 @@ mod tests {
     //     }
     // }
 }
+

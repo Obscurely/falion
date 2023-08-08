@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 use super::utils;
-use std::sync::Arc;
 
 const BASE_ADDRESS: &str = "https://html.duckduckgo.com/html/?q={QUERY}%20site%3A{SITE}";
 const BASE_ADDRESS_MINUS_SITE: &str = "https://html.duckduckgo.com/html/?q={QUERY}";
@@ -26,7 +25,7 @@ pub enum DdgError {
 
 /// Get search results from duckduckgo
 pub struct Ddg {
-    client: Arc<reqwest::Client>,
+    client: reqwest::Client,
 }
 
 /// Checks if a site is valid.
@@ -62,7 +61,7 @@ impl Ddg {
     /// ```
     pub fn new() -> Self {
         Self {
-            client: Arc::new(utils::client_with_special_settings()),
+            client: utils::client_with_special_settings(),
         }
     }
 
@@ -73,12 +72,10 @@ impl Ddg {
     ///
     /// ```
     /// use falion::search::ddg;
-    /// use std::sync::Arc;
     ///
-    /// let ddg = ddg::Ddg::with_client(Arc::new(reqwest::Client::new()));
+    /// let ddg = ddg::Ddg::with_client(reqwest::Client::new());
     /// ```
-    #[allow(dead_code)]
-    pub fn with_client(client: Arc<reqwest::Client>) -> Self {
+    pub fn with_client(client: reqwest::Client) -> Self {
         Self { client }
     }
 

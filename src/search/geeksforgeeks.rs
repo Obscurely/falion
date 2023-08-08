@@ -2,7 +2,6 @@
 use super::ddg;
 use super::utils;
 use indexmap::IndexMap;
-use std::sync::Arc;
 
 const CONTENT_SEP_FIRST: &str = "<div class=text>";
 const CONTENT_SEP_FINAL: &str = "<div class=article-bottom";
@@ -41,7 +40,7 @@ pub enum GfgError {
 
 /// Scrape articles from GeeksForGeeks
 pub struct GeeksForGeeks {
-    client: Arc<reqwest::Client>,
+    client: reqwest::Client,
     ddg: ddg::Ddg,
 }
 
@@ -58,7 +57,7 @@ impl GeeksForGeeks {
     /// ```
     pub fn new() -> Self {
         Self {
-            client: Arc::new(utils::client_with_special_settings()),
+            client: utils::client_with_special_settings(),
             ddg: ddg::Ddg::new(),
         }
     }
@@ -68,15 +67,14 @@ impl GeeksForGeeks {
     ///
     /// ```
     /// use falion::search::geeksforgeeks;
-    /// use std::sync::Arc;
     ///
-    /// let se = geeksforgeeks::GeeksForGeeks::with_client(Arc::new(reqwest::Client::new()));
+    /// let se = geeksforgeeks::GeeksForGeeks::with_client(reqwest::Client::new());
     /// ```
     #[allow(dead_code)]
-    pub fn with_client(client: Arc<reqwest::Client>) -> Self {
+    pub fn with_client(client: reqwest::Client) -> Self {
         Self {
-            client: Arc::clone(&client),
-            ddg: ddg::Ddg::with_client(Arc::clone(&client)),
+            client: client.clone(),
+            ddg: ddg::Ddg::with_client(client),
         }
     }
 
@@ -224,7 +222,7 @@ impl GeeksForGeeks {
             // unwrap is safe here since ddg does all the checks
             let name = link.split('/').last().unwrap().replace('-', " ");
             // insert page content
-            let client = Arc::clone(&self.client);
+            let client = self.client.clone();
             pages_content.insert(
                 name,
                 tokio::task::spawn(async move {
@@ -249,7 +247,6 @@ mod tests {
     use super::*;
     use crate::search;
     use rand::Rng;
-    use std::sync::Arc;
     use std::thread;
     use std::time::Duration;
 
@@ -258,9 +255,9 @@ mod tests {
         // random sleep time to prevent rate limiting when testing
         thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
 
-        let client = Arc::new(search::utils::client_with_special_settings());
-        let ddg = search::ddg::Ddg::with_client(Arc::clone(&client));
-        let gfg = GeeksForGeeks::with_client(Arc::clone(&client));
+        let client = search::utils::client_with_special_settings();
+        let ddg = search::ddg::Ddg::with_client(client.clone());
+        let gfg = GeeksForGeeks::with_client(client);
 
         let link = ddg
             .get_links(
@@ -285,8 +282,8 @@ mod tests {
     //     thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
     //
     //     // actual function
-    //     let client = Arc::new(utils::client_with_special_settings());
-    //     let gfg = GeeksForGeeks::with_client(Arc::clone(&client));
+    //     let client = utils::client_with_special_settings();
+    //     let gfg = GeeksForGeeks::with_client(client);
     //
     //     let page_content = gfg
     //         .get_multiple_pages_content("Rust basics", Some(1))
