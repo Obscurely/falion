@@ -1,6 +1,6 @@
 [package]
 name = "falion"
-authors = ["Obscurely <obscurely.adrian@protonmail.com>"]
+authors = ["Obscurely <adrian.obscurely@protonmail.com"]
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.70"                                                       # Minimum rust version
@@ -18,8 +18,8 @@ build = "build.rs"
 #═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [package.metadata.deb]
-maintainer = "Obscurely <obscurely.adrian@protonmail.com>"
-copyright = "2023, 2023 <obscurely.adrian@protonmail.com>"
+maintainer = "Obscurely <adrian.obscurely@protonmail.com>"
+copyright = "2023, 2023 <adrian.obscurely@protonmail.com>"
 license-file = ["LICENSE", "0"]
 extended-description = """\
 CHANGEME_DESC""""

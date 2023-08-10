@@ -77,10 +77,10 @@
    python3 scripts/repo.py init
    ```
 
-   This will initialize the repository by replacing falion, falion,
-   Obscurely, obscurely.adrian@protonmail.com, obscurely.message@protonmail.com placeholders in every file with
-   the according values and rename all the folders & files that have a CHANGEME
-   tag as well as converting and copying the default logo.png where needed.
+   This will initialize the repository by replacing falion, falion, Obscurely,
+   PMAIL, SMAIL placeholders in every file with the according values and rename
+   all the folders & files that have a CHANGEME tag as well as converting and
+   copying the default logo.png where needed.
 
 1. Finish by pushing your changes
 
