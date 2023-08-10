@@ -225,44 +225,32 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_ddg_page() {
-        // random sleep time to prevent rate limiting when testing
-        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
-
         let client = search::utils::client_with_special_settings();
-        let ddg = search::ddg::Ddg::with_client(client.clone());
         let ddg_search = DdgSearch::with_client(client);
 
-        let link = ddg
-            .get_links("Rust basics", None, Some(true), Some(1))
-            .await
-            .unwrap();
+        let link = "https://www.rust-lang.org/learn";
 
-        let page_content = ddg_search
-            .get_page_content(link.first().unwrap())
-            .await
-            .unwrap();
+        let page_content = ddg_search.get_page_content(link).await.unwrap();
 
         assert!(!page_content.is_empty())
     }
 
-    // NOTE: Enable this test only when really needed in order to prevent rate limit with the other
-    // tests
-    // #[tokio::test]
-    // async fn test_get_multiple_ddg_pages_content() {
-    //     // random sleep time to prevent rate limiting when testing
-    //     thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
-    //
-    //     // actual function
-    //     let client = utils::client_with_special_settings();
-    //     let ddg_search = DdgSearch::with_client(client);
-    //
-    //     let page_content = ddg_search
-    //         .get_multiple_pages_content("Rust basics", Some(1))
-    //         .await
-    //         .unwrap();
-    //
-    //     for p in page_content {
-    //         assert!(!p.1.await.unwrap().unwrap().is_empty())
-    //     }
-    // }
+    #[tokio::test]
+    async fn test_get_multiple_ddg_pages_content() {
+        // random sleep time to prevent rate limiting when testing
+        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
+
+        // actual function
+        let client = utils::client_with_special_settings();
+        let ddg_search = DdgSearch::with_client(client);
+
+        let page_content = ddg_search
+            .get_multiple_pages_content("Rust basics", Some(2))
+            .await
+            .unwrap();
+
+        for p in page_content {
+            assert!(!p.1.await.unwrap().unwrap().is_empty())
+        }
+    }
 }

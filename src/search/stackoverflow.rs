@@ -248,7 +248,6 @@ impl Default for StackOverflow {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::search::ddg;
     use crate::search::utils;
     use rand::Rng;
     use std::thread;
@@ -256,48 +255,33 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_sof_content() {
-        // random sleep time to prevent rate limiting when testing
-        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
-
         // actual function
         let client = utils::client_with_special_settings();
         let sof = StackOverflow::with_client(client.clone());
-        let ddg = ddg::Ddg::with_client(client);
 
-        let link = &ddg
-            .get_links(
-                "Rust lifetime",
-                Some(STACKOVERFLOW_SITE),
-                Some(false),
-                Some(1),
-            )
-            .await
-            .unwrap()[0];
+        let link = "https://stackoverflow.com/questions/17490716/lifetimes-in-rust";
 
         let question_content = &sof.get_question_content(link).await.unwrap()[0];
 
         assert!(!question_content.is_empty())
     }
 
-    // NOTE: Enable this test only when really needed in order to prevent rate limit with the other
-    // tests
-    // #[tokio::test]
-    // async fn test_get_multiple_sof_content() {
-    //     // random sleep time to prevent rate limiting when testing
-    //     thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
-    //
-    //     // actual function
-    //     let client = utils::client_with_special_settings();
-    //     let sof = StackOverflow::with_client(client);
-    //
-    //     let question_content = sof
-    //         .get_multiple_questions_content("Rust value none", Some(1))
-    //         .await
-    //         .unwrap();
-    //
-    //     for q in question_content {
-    //         assert!(!q.1.await.unwrap().unwrap().is_empty())
-    //     }
-    // }
-}
+    #[tokio::test]
+    async fn test_get_multiple_sof_content() {
+        // random sleep time to prevent rate limiting when testing
+        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
 
+        // actual function
+        let client = utils::client_with_special_settings();
+        let sof = StackOverflow::with_client(client);
+
+        let question_content = sof
+            .get_multiple_questions_content("Rust value none", Some(1))
+            .await
+            .unwrap();
+
+        for q in question_content {
+            assert!(!q.1.await.unwrap().unwrap().is_empty())
+        }
+    }
+}

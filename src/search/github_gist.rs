@@ -314,44 +314,32 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_gist() {
-        // random sleep time to prevent rate limiting when testing
-        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
-
         let client = search::utils::client_with_special_settings();
-        let ddg = search::ddg::Ddg::with_client(client.clone());
         let github_gist = GithubGist::with_client(client);
 
-        let link = ddg
-            .get_links("Rust basics", Some("gist.github.com"), Some(true), Some(1))
-            .await
-            .unwrap();
+        let link = "https://gist.github.com/noxasaxon/7bf5ebf930e281529161e51cd221cf8a";
 
-        let gist_content = github_gist
-            .get_gist_content(link.first().unwrap())
-            .await
-            .unwrap();
+        let gist_content = github_gist.get_gist_content(link).await.unwrap();
 
         assert!(!gist_content.is_empty())
     }
 
-    // NOTE: Enable this test only when really needed in order to prevent rate limit with the other
-    // tests
-    // #[tokio::test]
-    // async fn test_get_multiple_gists_content() {
-    //     // random sleep time to prevent rate limiting when testing
-    //     thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
-    //
-    //     // actual function
-    //     let client = utils::client_with_special_settings();
-    //     let github_gist = GithubGist::with_client(client);
-    //
-    //     let gist_content = github_gist
-    //         .get_multiple_gists_content("Rust basics", Some(1))
-    //         .await
-    //         .unwrap();
-    //
-    //     for p in gist_content {
-    //         assert!(!p.1.await.unwrap().unwrap().is_empty())
-    //     }
-    // }
+    #[tokio::test]
+    async fn test_get_multiple_gists_content() {
+        // random sleep time to prevent rate limiting when testing
+        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
+
+        // actual function
+        let client = utils::client_with_special_settings();
+        let github_gist = GithubGist::with_client(client);
+
+        let gist_content = github_gist
+            .get_multiple_gists_content("Rust basics", Some(1))
+            .await
+            .unwrap();
+
+        for p in gist_content {
+            assert!(!p.1.await.unwrap().unwrap().is_empty())
+        }
+    }
 }

@@ -247,7 +247,6 @@ impl Default for StackExchange {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::search::ddg;
     use crate::search::utils;
     use rand::Rng;
     use std::thread;
@@ -255,47 +254,33 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_se_content() {
-        // random sleep time to prevent rate limiting when testing
-        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
-
         // actual function
         let client = utils::client_with_special_settings();
         let se = StackExchange::with_client(client.clone());
-        let ddg = ddg::Ddg::with_client(client);
 
-        let link = &ddg
-            .get_links(
-                "Rust index out of bounds",
-                Some(STACKEXCHANGE_QUESTION_URL),
-                Some(true),
-                Some(1),
-            )
-            .await
-            .unwrap()[0];
+        let link =
+            "https://codereview.stackexchange.com/questions/256345/n-dimensional-array-in-rust";
 
         let question_content = &se.get_question_content(link).await.unwrap()[0];
 
         assert!(!question_content.is_empty())
     }
 
-    // NOTE: Enable this test only when really needed in order to prevent rate limit with the other
-    // tests
-    //
-    // #[tokio::test]
-    // async fn test_get_multiple_se_content() {
-    //     // random sleep time to prevent rate limiting when testing
-    //     thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
-    //
-    //     // actual function
-    //     let se = StackExchange::with_client(utils::client_with_special_settings());
-    //
-    //     let question_content = se
-    //         .get_multiple_questions_content("Rust out lives static", Some(1))
-    //         .await
-    //         .unwrap();
-    //
-    //     for q in question_content {
-    //         assert!(!q.1.await.unwrap().unwrap().is_empty())
-    //     }
-    // }
+    #[tokio::test]
+    async fn test_get_multiple_se_content() {
+        // random sleep time to prevent rate limiting when testing
+        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
+
+        // actual function
+        let se = StackExchange::with_client(utils::client_with_special_settings());
+
+        let question_content = se
+            .get_multiple_questions_content("Rust out lives static", Some(1))
+            .await
+            .unwrap();
+
+        for q in question_content {
+            assert!(!q.1.await.unwrap().unwrap().is_empty())
+        }
+    }
 }

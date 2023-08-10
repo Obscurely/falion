@@ -252,46 +252,32 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_gfg_page() {
-        // random sleep time to prevent rate limiting when testing
-        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
-
         let client = search::utils::client_with_special_settings();
-        let ddg = search::ddg::Ddg::with_client(client.clone());
         let gfg = GeeksForGeeks::with_client(client);
 
-        let link = ddg
-            .get_links(
-                "Rust basics",
-                Some("www.geeksforgeeks.org"),
-                Some(false),
-                Some(1),
-            )
-            .await
-            .unwrap();
+        let link = "https://www.geeksforgeeks.org/rust-basics/";
 
-        let page_content = gfg.get_page_content(link.first().unwrap()).await.unwrap();
+        let page_content = gfg.get_page_content(link).await.unwrap();
 
         assert!(!page_content.is_empty())
     }
 
-    // NOTE: Enable this test only when really needed in order to prevent rate limit with the other
-    // tests
-    // #[tokio::test]
-    // async fn test_get_multiple_gfg_pages_content() {
-    //     // random sleep time to prevent rate limiting when testing
-    //     thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
-    //
-    //     // actual function
-    //     let client = utils::client_with_special_settings();
-    //     let gfg = GeeksForGeeks::with_client(client);
-    //
-    //     let page_content = gfg
-    //         .get_multiple_pages_content("Rust basics", Some(1))
-    //         .await
-    //         .unwrap();
-    //
-    //     for p in page_content {
-    //         assert!(!p.1.await.unwrap().unwrap().is_empty())
-    //     }
-    // }
+    #[tokio::test]
+    async fn test_get_multiple_gfg_pages_content() {
+        // random sleep time to prevent rate limiting when testing
+        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
+
+        // actual function
+        let client = utils::client_with_special_settings();
+        let gfg = GeeksForGeeks::with_client(client);
+
+        let page_content = gfg
+            .get_multiple_pages_content("Rust basics", Some(1))
+            .await
+            .unwrap();
+
+        for p in page_content {
+            assert!(!p.1.await.unwrap().unwrap().is_empty())
+        }
+    }
 }

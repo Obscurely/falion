@@ -192,7 +192,7 @@ impl Ddg {
                 .collect()
         } else {
             // filter links
-            let mut  site_filter = String::with_capacity(8  + site.len());
+            let mut site_filter = String::with_capacity(8 + site.len());
             site_filter.push_str("https://");
             site_filter.push_str(site);
 
@@ -222,32 +222,34 @@ impl Default for Ddg {
 #[cfg(test)]
 mod tests {
     use super::*;
-    // use rand::Rng;
-    // use std::thread;
-    // use std::time::Duration;
+    use rand::Rng;
+    use std::thread;
+    use std::time::Duration;
 
-    // NOTE: Enable this test only when really needed in order to prevent rate limit with the other
-    // tests
-    //
-    // #[tokio::test]
-    // async fn test_get_links() {
-    //     // random sleep time to prevent rate limiting when testing
-    //     thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
-    //
-    //     // actual function
-    //     let ddg = Ddg::new();
-    //     let links = ddg
-    //         .get_links("Rust threading", Some("stackoverflow.com"), Some(false), None)
-    //         .await
-    //         .unwrap();
-    //
-    //     for link in links {
-    //         if !link.contains("https://stackoverflow.com") {
-    //             panic!("Got link: {link}\nIt doesn't contain https://stackoverflow.com")
-    //         }
-    //         assert!(url::Url::parse(&link).is_ok());
-    //     }
-    // }
+    #[tokio::test]
+    async fn test_get_links() {
+        // random sleep time to prevent rate limiting when testing
+        thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
+
+        // actual function
+        let ddg = Ddg::new();
+        let links = ddg
+            .get_links(
+                "Rust threading",
+                Some("stackoverflow.com"),
+                Some(false),
+                None,
+            )
+            .await
+            .unwrap();
+
+        for link in links {
+            if !link.contains("https://stackoverflow.com") {
+                panic!("Got link: {link}\nIt doesn't contain https://stackoverflow.com")
+            }
+            assert!(url::Url::parse(&link).is_ok());
+        }
+    }
 
     #[test]
     fn test_is_site_valid() {
