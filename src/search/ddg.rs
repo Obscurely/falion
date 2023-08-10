@@ -4,6 +4,7 @@ use super::utils;
 const BASE_ADDRESS: &str = "https://html.duckduckgo.com/html/?q={QUERY}%20site%3A{SITE}";
 const BASE_ADDRESS_MINUS_SITE: &str = "https://html.duckduckgo.com/html/?q={QUERY}";
 const ALLOWED_CHARS_IN_SITE: &str = "abcdefghijklmnopqrstuvwxyz1234567890.-/";
+const LINK_SPLIT: &str = "//duckduckgo.com/l/?uddg=";
 
 /// The type of errors the ddg::get_links() function can return.
 ///
@@ -166,7 +167,7 @@ impl Ddg {
 
         // get response content
         let mut links = response_body
-            .split("//duckduckgo.com/l/?uddg=")
+            .split(LINK_SPLIT)
             .skip(1)
             .filter_map(|s| match s.split_once("\">") {
                 Some(s_split) => match urlencoding::decode(s_split.0) {

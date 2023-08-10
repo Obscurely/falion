@@ -272,7 +272,7 @@ impl GithubGist {
         for link in links {
             // unwrap is safe here since ddg & GithubGist do all the checks
             let name = link
-                .split_once("https://gist.github.com/")
+                .split_once(GIST_URL)
                 .unwrap()
                 .1
                 .split_once('/')
