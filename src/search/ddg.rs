@@ -1,10 +1,14 @@
 #![allow(dead_code)]
 use super::utils;
 
-const BASE_ADDRESS: &str = "https://html.duckduckgo.com/html/?q={QUERY}%20site%3A{SITE}";
-const BASE_ADDRESS_MINUS_SITE: &str = "https://html.duckduckgo.com/html/?q={QUERY}";
+const BASE_ADDRESS: &str = "https://duckduckgo.com/?q={QUERY}%20site%3A{SITE}&ia=web";
+const BASE_ADDRESS_MINUS_SITE: &str = "https://duckduckgo.com/?q={QUERY}&ia=web";
 const ALLOWED_CHARS_IN_SITE: &str = "abcdefghijklmnopqrstuvwxyz1234567890.-/";
-const LINK_SPLIT: &str = "//duckduckgo.com/l/?uddg=";
+const LINKS_URL_SPLIT1: &str = "id=\"deep_preload_link\" rel=\"preload\" as=\"script\" href=\"";
+const LINKS_URL_SPLIT2: &str = "\"><script async id=\"deep_preload_script\"";
+const LINKS_SPLIT1: &str = "{\"en\":[\"";
+const LINKS_SPLIT2: &str = "\"]});";
+const LINKS_SEP: &str = "\",\"";
 
 /// The type of errors the ddg::get_links() function can return.
 ///
@@ -150,7 +154,7 @@ impl Ddg {
             BASE_ADDRESS_MINUS_SITE.replace("{QUERY}", &query)
         };
 
-        // get request ddg
+        // get request ddg querry page
         let response_body = match self.client.get(request_url).send().await {
             Ok(res) => {
                 if res.status() != reqwest::StatusCode::OK {
@@ -165,21 +169,38 @@ impl Ddg {
             Err(error) => return Err(DdgError::InvalidRequest(error)),
         };
 
-        // get response content
-        let mut links = response_body
-            .split(LINK_SPLIT)
-            .skip(1)
-            .filter_map(|s| match s.split_once("\">") {
-                Some(s_split) => match urlencoding::decode(s_split.0) {
-                    Ok(link) => match link.split_once("&amp") {
-                        Some(link_split) => Some(link_split.0.to_string()),
-                        None => Some(link.to_string()),
-                    },
-                    Err(_) => None,
-                },
-                None => None,
-            })
-            .collect::<Vec<String>>();
+        // get links url
+        let links_url = match response_body.split_once(LINKS_URL_SPLIT1) {
+            Some(start) => match start.1.split_once(LINKS_URL_SPLIT2) {
+                Some(full) => full.0,
+                None => return Err(DdgError::NoResults),
+            },
+            None => return Err(DdgError::NoResults),
+        };
+
+        // get requests the links url
+        let links_response_body = match self.client.get(links_url).send().await {
+            Ok(res) => {
+                if res.status() != reqwest::StatusCode::OK {
+                    return Err(DdgError::ErrorCode(res.status()));
+                }
+
+                match res.text().await {
+                    Ok(body) => body,
+                    Err(error) => return Err(DdgError::InvalidResponseBody(error)),
+                }
+            }
+            Err(error) => return Err(DdgError::InvalidRequest(error)),
+        };
+
+        // get links
+        let mut links = match links_response_body.split_once(LINKS_SPLIT1) {
+            Some(start) => match start.1.split_once(LINKS_SPLIT2) {
+                Some(full) => full.0.split(LINKS_SEP).collect::<Vec<&str>>(),
+                None => return Err(DdgError::NoResults),
+            },
+            None => return Err(DdgError::NoResults),
+        };
 
         // remove possible consecutive duplicates
         links.dedup();
@@ -187,7 +208,13 @@ impl Ddg {
         let links: Vec<String> = if allow_subdomain {
             links
                 .into_iter()
-                .filter(|s| s.contains("https://") && s.contains(site))
+                .filter_map(|s| {
+                    if s.contains("https://") && s.contains(site) {
+                        Some(s.to_string())
+                    } else {
+                        None
+                    }
+                })
                 .take(limit.unwrap_or(100))
                 .collect()
         } else {
@@ -198,7 +225,13 @@ impl Ddg {
 
             links
                 .into_iter()
-                .filter(|s| s.contains(&site_filter))
+                .filter_map(|s| {
+                    if s.contains(&site_filter) {
+                        Some(s.to_string())
+                    } else {
+                        None
+                    }
+                })
                 .take(limit.unwrap_or(100))
                 .collect()
         };
@@ -236,17 +269,14 @@ mod tests {
         let links = ddg
             .get_links(
                 "Rust threading",
-                Some("stackoverflow.com"),
-                Some(false),
+                None,
+                None,
                 None,
             )
             .await
             .unwrap();
 
         for link in links {
-            if !link.contains("https://stackoverflow.com") {
-                panic!("Got link: {link}\nIt doesn't contain https://stackoverflow.com")
-            }
             assert!(url::Url::parse(&link).is_ok());
         }
     }

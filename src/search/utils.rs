@@ -19,7 +19,7 @@ pub fn client_with_special_settings() -> reqwest::Client {
     let mut headers = header::HeaderMap::new();
     headers.insert(
         "X-Forwarded-Host",
-        header::HeaderValue::from_static("html.duckduckgo.com"),
+        header::HeaderValue::from_static("duckduckgo.com"),
     );
     let ip = format!(
         "{}.{}.{}.{}",
@@ -35,7 +35,7 @@ pub fn client_with_special_settings() -> reqwest::Client {
     headers.insert("X-Client-IP", header::HeaderValue::from_str(&ip).unwrap());
     headers.insert(
         "Origin",
-        header::HeaderValue::from_static("https://html.duckduckgo.com"),
+        header::HeaderValue::from_static("https://duckduckgo.com"),
     );
     headers.insert(
         "Accept",
@@ -52,6 +52,10 @@ pub fn client_with_special_settings() -> reqwest::Client {
         header::HeaderValue::from_static("gzip, deflate, br"),
     );
     headers.insert("DNT", header::HeaderValue::from_static("1"));
+    headers.insert(
+        "Upgrade-Insecure-Requests",
+        header::HeaderValue::from_static("1"),
+    );
 
     let mut ua = String::with_capacity(27);
     ua.push_str("Mozilla/5.0");

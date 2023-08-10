@@ -272,7 +272,7 @@ mod tests {
         let gfg = GeeksForGeeks::with_client(client);
 
         let page_content = gfg
-            .get_multiple_pages_content("Rust basics", Some(1))
+            .get_multiple_pages_content("Rust vectors", Some(1))
             .await
             .unwrap();
 

@@ -28,14 +28,13 @@
 
 - Bumped rust version to 1.70.0
 - Bumped all the crates to the latest version.
-- Results are now got through the HTML version of duckduckgo making it faster
-  and less prone to breaking over time.
 - Instead of the many different functions that handled the duckduckgo searches
   now there is one with half the code, way faster and more robust.
 - There is one global client that is used across all objects and threads .This
   makes the program way faster than before.
 - Regex is not used anymore since all that look back crap is slow. Switched to
   plain splitting the content. This improves the performance by quite a bit.
+- Rewrote ddg.rs completely. Performance improvements and way better results.
 - Rewrote stackoverflow.rs completely. Many performance improvements, using only
   one global client, many checks in place.
 - Rewrote stackexchange.rs completely. Same as Stack Overflow, many performance
@@ -60,8 +59,7 @@ None
 
 ### Fixed
 
-- Switching to the HTML version of duckduckgo made it so the results we get are
-  in order of importance.
+- Fix duckduckgo results, now they are actually good.
 - Compiling to windows & macOS doesn't fail now.
 - GeeksForGeeks pages don't contain the extra crap now.
 
