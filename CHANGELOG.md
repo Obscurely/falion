@@ -22,6 +22,7 @@
   of [my rust template](https://github.com/Obscurely/RustTemplate).
 - Add cargo fuzz harness for the duckduckgo get_links function in order to make
   sure it will not fail making requests over time.
+- General performance improvements.
 
 ### Changed
 

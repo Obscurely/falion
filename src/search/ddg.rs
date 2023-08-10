@@ -191,7 +191,9 @@ impl Ddg {
                 .collect()
         } else {
             // filter links
-            let site_filter = "https://".to_owned() + site;
+            let mut  site_filter = String::with_capacity(8  + site.len());
+            site_filter.push_str("https://");
+            site_filter.push_str(site);
 
             links
                 .into_iter()

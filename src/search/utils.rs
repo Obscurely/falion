@@ -53,11 +53,12 @@ pub fn client_with_special_settings() -> reqwest::Client {
     );
     headers.insert("DNT", header::HeaderValue::from_static("1"));
 
+    let mut ua = String::with_capacity(27);
+    ua.push_str("Mozilla/5.0");
+    ua.push_str(&rand::distributions::Alphanumeric.sample_string(&mut rng, 16));
+
     reqwest::ClientBuilder::new()
-        .user_agent(
-            String::from("Mozilla/5.0")
-                + &rand::distributions::Alphanumeric.sample_string(&mut rng, 16),
-        )
+        .user_agent(ua)
         .default_headers(headers)
         .brotli(true)
         .gzip(true)

@@ -216,7 +216,7 @@ impl StackOverflow {
         };
 
         // create a new IndexMap
-        let mut questions_content = IndexMap::new();
+        let mut questions_content = IndexMap::with_capacity(links.len());
 
         // start looping through the links associating the question title and the joinhandle for
         // the future the scrapes the content of the question by inserting them togheter in the

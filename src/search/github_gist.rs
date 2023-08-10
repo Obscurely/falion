@@ -264,7 +264,7 @@ impl GithubGist {
         };
 
         // create a new IndexMap
-        let mut gists_content = IndexMap::new();
+        let mut gists_content = IndexMap::with_capacity(links.len());
 
         // start looping through the links associating the page title and the joinhandle for
         // the future the scrapes the content of the page by inserting them togheter in the
