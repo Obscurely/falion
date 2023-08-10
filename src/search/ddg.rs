@@ -267,12 +267,7 @@ mod tests {
         // actual function
         let ddg = Ddg::new();
         let links = ddg
-            .get_links(
-                "Rust threading",
-                None,
-                None,
-                None,
-            )
+            .get_links("Rust threading", None, None, None)
             .await
             .unwrap();
 
