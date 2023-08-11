@@ -338,7 +338,7 @@ mod tests {
         let github_gist = GithubGist::with_client(client);
 
         let gist_content = github_gist
-            .get_multiple_gists_content("Rust arrays", Some(1))
+            .get_multiple_gists_content("Rust threading", Some(1))
             .await
             .unwrap();
 
