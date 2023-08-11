@@ -3,6 +3,7 @@ use super::ddg;
 use super::utils;
 use futures::StreamExt;
 use indexmap::IndexMap;
+use thiserror::Error;
 
 const GIST_URL: &str = "https://gist.github.com/";
 const GIST_SITE: &str = "gist.github.com";
@@ -22,14 +23,21 @@ const GIST_RAW_URL: &str = "https://gist.github.com/{GIST_LOCATION}/raw/{FILE_UR
 /// of them.
 /// * `ErrorCode` - The website returned an error code
 /// * `DdgError` - error with getting results from DuckDuckGO. (ddg::DdgError)
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum GithubGistError {
-    NotGist,
+    #[error("The given page: {0} is not a valid Github Gist page this function can scrape.")]
+    NotGist(String),
+    #[error("Failed to make a request with the provided query/url: {0}")]
     InvalidRequest(reqwest::Error),
+    #[error("A request has been successfully made, but there was an error getting the response body: {0}")]
     InvalidReponseBody(reqwest::Error),
+    #[error("Couldn't format the content of the page even though the content was successfully retrieved with 200 OK.")]
     InvalidPageContent,
+    #[error("None of the gist's files could be retrieved.")]
     NoGistFileGot,
+    #[error("The request was successful, but the response wasn't 200 OK, it was: {0}")]
     ErrorCode(reqwest::StatusCode),
+    #[error("There was an error retrieving search results from duckduckgo: {0}")]
     DdgError(ddg::DdgError),
 }
 
@@ -116,10 +124,10 @@ impl GithubGist {
         match gist_url.split_once(GIST_URL) {
             Some(split) => {
                 if !split.0.is_empty() {
-                    return Err(GithubGistError::NotGist);
+                    return Err(GithubGistError::NotGist(gist_url.to_string()));
                 }
             }
-            None => return Err(GithubGistError::NotGist),
+            None => return Err(GithubGistError::NotGist(gist_url.to_string())),
         }
 
         // get gist

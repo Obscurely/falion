@@ -2,6 +2,7 @@
 use super::ddg;
 use super::utils;
 use indexmap::IndexMap;
+use thiserror::Error;
 
 /// These are the errors the functions associated with DdgSearch will return.
 ///
@@ -11,11 +12,15 @@ use indexmap::IndexMap;
 /// internet.
 /// * `ErrorCode` - The website returned an error code
 /// * `DdgError` - error with getting results from DuckDuckGO. (ddg::DdgError)
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum DdgSearchError {
+    #[error("Failed to make a request with the provided query/url: {0}")]
     InvalidRequest(reqwest::Error),
+    #[error("A request has been successfully made, but there was an error getting the response body: {0}")]
     InvalidReponseBody(reqwest::Error),
+    #[error("The request was successful, but the response wasn't 200 OK, it was: {0}")]
     ErrorCode(reqwest::StatusCode),
+    #[error("There was an error retrieving search results from duckduckgo: {0}")]
     DdgError(ddg::DdgError),
 }
 

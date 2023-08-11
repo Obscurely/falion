@@ -69,7 +69,7 @@ urlencoding = "2.1.2"
 #   - tempfile
 #   - dirs
 #   - indexmap
-#   - thiserror and thiserror (for error handling)
+#   - thiserror and anyerror (for error handling)
 #   - tracing (logging)
 #   - walkdir (recursively read a directory)
 #   - rayon (using .par_iter() it makes iters run in parallel)

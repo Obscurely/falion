@@ -27,9 +27,7 @@ pub enum DdgError {
         "The given query of size {0} is bigger than the maximum allowed size of: 494 - site length"
     )]
     QueryTooLong(usize),
-    #[error(
-        "Failed to make a request with the provided query (and site), the given error is: {0}"
-    )]
+    #[error("Failed to make a request with the provided query (and site): {0}")]
     InvalidRequest(reqwest::Error),
     #[error("A request has been successfully made, but there was an error getting the response body: {0}")]
     InvalidResponseBody(reqwest::Error),

@@ -2,6 +2,7 @@
 use super::ddg;
 use super::utils;
 use indexmap::IndexMap;
+use thiserror::Error;
 
 const CONTENT_SEP_FIRST: &str = "<div class=text>";
 const CONTENT_SEP_FINAL: &str = "<div class=article-bottom";
@@ -28,13 +29,19 @@ const GEEKSFORGEEKS_INVALID: [&str; 7] = [
 /// corrupted because it did return 200 OK.
 /// * `ErrorCode` - The website returned an error code
 /// * `DdgError` - error with getting results from DuckDuckGO. (ddg::DdgError)
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum GfgError {
-    NotGfgPage,
+    #[error("The given page: {0} is not a valid GeeksForGeeks page this function can scrape.")]
+    NotGfgPage(String),
+    #[error("Failed to make a request with the provided query/url: {0}")]
     InvalidRequest(reqwest::Error),
+    #[error("A request has been successfully made, but there was an error getting the response body: {0}")]
     InvalidReponseBody(reqwest::Error),
+    #[error("Couldn't format the content of the page even though the content was successfully retrieved with 200 OK.")]
     InvalidPageContent,
+    #[error("The request was successful, but the response wasn't 200 OK, it was: {0}")]
     ErrorCode(reqwest::StatusCode),
+    #[error("There was an error retrieving search results from duckduckgo: {0}")]
     DdgError(ddg::DdgError),
 }
 
@@ -123,7 +130,7 @@ impl GeeksForGeeks {
         // check if page URL is valid
         for invalid in GEEKSFORGEEKS_INVALID {
             if page_url.contains(invalid) {
-                return Err(GfgError::NotGfgPage);
+                return Err(GfgError::NotGfgPage(page_url.to_string()));
             }
         }
 
