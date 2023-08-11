@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 use super::utils;
+use thiserror::Error;
 
 const BASE_ADDRESS: &str = "https://duckduckgo.com/?q={QUERY}%20site%3A{SITE}&ia=web";
 const BASE_ADDRESS_MINUS_SITE: &str = "https://duckduckgo.com/?q={QUERY}&ia=web";
@@ -18,13 +19,23 @@ const LINKS_SEP: &str = "\",\"";
 /// etc.
 /// * `NoResults` - No results wore found for the provided query and site.
 /// * `ErrorCode` - The search returned an error code.
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum DdgError {
-    InvalidSite,
-    QueryTooLong,
+    #[error("The given site: {0} it's not valid.")]
+    InvalidSite(String),
+    #[error(
+        "The given query of size {0} is bigger than the maximum allowed size of: 494 - site length"
+    )]
+    QueryTooLong(usize),
+    #[error(
+        "Failed to make a request with the provided query (and site), the given error is: {0}"
+    )]
     InvalidRequest(reqwest::Error),
+    #[error("A request has been successfully made, but there was an error getting the response body: {0}")]
     InvalidResponseBody(reqwest::Error),
-    NoResults,
+    #[error("Failed to get any results for the provided query (and site). Error at: {at} | with index: {index}")]
+    NoResults { at: String, index: usize },
+    #[error("The request was successful, but the response wasn't 200 OK, it was: {0}")]
     ErrorCode(reqwest::StatusCode),
 }
 
@@ -134,12 +145,12 @@ impl Ddg {
 
         // Check if site is valid
         if !site.is_empty() && !is_site_valid(site) {
-            return Err(DdgError::InvalidSite);
+            return Err(DdgError::InvalidSite(site.to_string()));
         }
 
         // Check if query is too long
         if query.len() > 494 - site.len() {
-            return Err(DdgError::QueryTooLong);
+            return Err(DdgError::QueryTooLong(query.len()));
         }
 
         // encode query
@@ -173,9 +184,19 @@ impl Ddg {
         let links_url = match response_body.split_once(LINKS_URL_SPLIT1) {
             Some(start) => match start.1.split_once(LINKS_URL_SPLIT2) {
                 Some(full) => full.0,
-                None => return Err(DdgError::NoResults),
+                None => {
+                    return Err(DdgError::NoResults {
+                        at: String::from("Second split of the response body for the links url."),
+                        index: 0,
+                    })
+                }
             },
-            None => return Err(DdgError::NoResults),
+            None => {
+                return Err(DdgError::NoResults {
+                    at: String::from("First split of the response body for the links url."),
+                    index: 1,
+                })
+            }
         };
 
         // get requests the links url
@@ -197,9 +218,19 @@ impl Ddg {
         let mut links = match links_response_body.split_once(LINKS_SPLIT1) {
             Some(start) => match start.1.split_once(LINKS_SPLIT2) {
                 Some(full) => full.0.split(LINKS_SEP).collect::<Vec<&str>>(),
-                None => return Err(DdgError::NoResults),
+                None => {
+                    return Err(DdgError::NoResults {
+                        at: String::from("Second split of the response body for search results"),
+                        index: 2,
+                    })
+                }
             },
-            None => return Err(DdgError::NoResults),
+            None => {
+                return Err(DdgError::NoResults {
+                    at: String::from("First split of the response body for search results"),
+                    index: 3,
+                })
+            }
         };
 
         // remove possible consecutive duplicates
@@ -238,7 +269,10 @@ impl Ddg {
 
         // check if we even have links
         if links.is_empty() {
-            return Err(DdgError::NoResults);
+            return Err(DdgError::NoResults {
+                at: String::from("Checking if we got any search results"),
+                index: 4,
+            });
         }
 
         // return got links
