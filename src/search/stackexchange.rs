@@ -115,9 +115,18 @@ impl StackExchange {
         // check if it's a valid stackexchange question url
         if question_url.contains(STACKEXCHANGE_INVALID1)
             || question_url.contains(STACKEXCHANGE_INVALID2)
-            || !question_url.contains(STACKEXCHANGE_QUESTION_URL)
+        // || !question_url.contains(STACKEXCHANGE_QUESTION_URL)
         {
             return Err(SeError::NotSeQuestion);
+        }
+
+        match question_url.split_once(STACKEXCHANGE_QUESTION_URL) {
+            Some(split) => {
+                if split.0.is_empty() {
+                    return Err(SeError::NotSeQuestion);
+                }
+            }
+            None => return Err(SeError::NotSeQuestion),
         }
 
         // get stackexchange page

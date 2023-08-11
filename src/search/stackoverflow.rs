@@ -116,9 +116,17 @@ impl StackOverflow {
         // check if it's a valid stackoverflow question url
         if question_url.contains(STACKOVERFLOW_INVALID1)
             || question_url.contains(STACKOVERFLOW_INVALID2)
-            || !question_url.contains(STACKOVERFLOW_QUESTION_URL)
         {
             return Err(SofError::NotSofQuestion);
+        }
+
+        match question_url.split_once(STACKOVERFLOW_QUESTION_URL) {
+            Some(split) => {
+                if !split.0.is_empty() {
+                    return Err(SofError::NotSofQuestion);
+                }
+            }
+            None => return Err(SofError::NotSofQuestion),
         }
 
         // get stackoverflow page

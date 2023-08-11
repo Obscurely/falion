@@ -113,9 +113,13 @@ impl GithubGist {
     /// of them.
     /// * `ErrorCode` - The website returned an error code
     pub async fn get_gist_content(&self, gist_url: &str) -> Result<Vec<String>, GithubGistError> {
-        // check if gist url is valid
-        if !gist_url.contains(GIST_URL) {
-            return Err(GithubGistError::NotGist);
+        match gist_url.split_once(GIST_URL) {
+            Some(split) => {
+                if !split.0.is_empty() {
+                    return Err(GithubGistError::NotGist);
+                }
+            }
+            None => return Err(GithubGistError::NotGist),
         }
 
         // get gist
