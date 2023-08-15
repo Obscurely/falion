@@ -3,6 +3,7 @@ use super::ddg;
 use super::utils;
 use futures::StreamExt;
 use indexmap::IndexMap;
+use rayon::prelude::*;
 use thiserror::Error;
 
 const GIST_URL: &str = "https://gist.github.com/";
@@ -198,7 +199,7 @@ impl GithubGist {
 
         // filter out the files we failed to get
         let gist_files = gist_files
-            .into_iter()
+            .into_par_iter()
             .filter_map(|file| match file {
                 Ok(Ok(file)) => Some(file),
                 Ok(Err(_)) => None,

@@ -48,6 +48,7 @@ futures = "0.3.28"
 html2text = "0.6.0"
 indexmap = "2.0.0"
 rand = "0.8.5"
+rayon = "1.7.0"
 reqwest = { version = "0.11.18", features = [
   "json",
   "gzip",
