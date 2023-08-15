@@ -46,6 +46,7 @@ pub enum GfgError {
 }
 
 /// Scrape articles from GeeksForGeeks
+#[derive(std::fmt::Debug)]
 pub struct GeeksForGeeks {
     client: reqwest::Client,
     ddg: ddg::Ddg,
@@ -120,7 +121,12 @@ impl GeeksForGeeks {
     /// * `InvalidPageContent` - Usually this means the content returned by the website is
     /// corrupted because it did return 200 OK.
     /// * `ErrorCode` - The website returned an error code
+    #[tracing::instrument]
     pub async fn get_page_content(&self, page_url: &str) -> Result<String, GfgError> {
+        tracing::info!(
+            "Get the content for the following geeksforgeeks page: {}",
+            &page_url
+        );
         // set term width
         let term_width: usize = match crossterm::terminal::size() {
             Ok(size) => size.0.into(),
@@ -130,6 +136,11 @@ impl GeeksForGeeks {
         // check if page URL is valid
         for invalid in GEEKSFORGEEKS_INVALID {
             if page_url.contains(invalid) {
+                tracing::error!(
+                    "The given geeksforgeeks page is invalid: {}. Failed at check: contains {}",
+                    &page_url,
+                    &invalid
+                );
                 return Err(GfgError::NotGfgPage(page_url.to_string()));
             }
         }
@@ -138,24 +149,53 @@ impl GeeksForGeeks {
         let response_body = match self.client.get(page_url).send().await {
             Ok(res) => {
                 if res.status() != reqwest::StatusCode::OK {
+                    tracing::error!(
+                        "Get request to {} return status code: {}",
+                        &page_url,
+                        &res.status()
+                    );
                     return Err(GfgError::ErrorCode(res.status()));
                 }
 
                 match res.text().await {
                     Ok(body) => body,
-                    Err(err) => return Err(GfgError::InvalidReponseBody(err)),
+                    Err(err) => {
+                        tracing::error!(
+                            "The response body recieved from {} is invalid. Error: {}",
+                            &page_url,
+                            &err
+                        );
+                        return Err(GfgError::InvalidReponseBody(err));
+                    }
                 }
             }
-            Err(err) => return Err(GfgError::InvalidRequest(err)),
+            Err(err) => {
+                tracing::error!(
+                    "Failed to make a get request to {}. Error: {}",
+                    &page_url,
+                    &err
+                );
+                return Err(GfgError::InvalidRequest(err));
+            }
         };
 
         // get the article part
         let article = match response_body.split_once(CONTENT_SEP_FIRST) {
             Some(res_split) => match res_split.1.split_once(CONTENT_SEP_FINAL) {
                 Some(art) => art.0,
-                None => return Err(GfgError::InvalidPageContent),
+                None => {
+                    tracing::error!("Failed to second split the geeksforgeeks article located at {}. Article: {}", &page_url, &response_body);
+                    return Err(GfgError::InvalidPageContent);
+                }
             },
-            None => return Err(GfgError::InvalidPageContent),
+            None => {
+                tracing::error!(
+                    "Failed to first split the geeksforgeeks article located at {}. Article: {}",
+                    &page_url,
+                    &response_body
+                );
+                return Err(GfgError::InvalidPageContent);
+            }
         };
 
         // return article
@@ -209,6 +249,7 @@ impl GeeksForGeeks {
         query: &str,
         limit: Option<usize>,
     ) -> Result<IndexMap<String, tokio::task::JoinHandle<Result<String, GfgError>>>, GfgError> {
+        tracing::info!("Get multiple geeksforgeeks pages and their content for search query: {} with a results limit of: {:#?}", &query, &limit);
         // get the links from duckduckgo
         let links = match self
             .ddg
