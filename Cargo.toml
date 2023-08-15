@@ -1,7 +1,7 @@
 [package]
 name = "falion"
 authors = ["Obscurely <adrian.obscurely@protonmail.com"]
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
 rust-version = "1.71.1"                                                       # Minimum rust version
 resolver = "2"
@@ -33,7 +33,7 @@ strip = true      # Automatically strip symbols from the binary.
 opt-level = 3     # Optimize for speed.
 lto = true        # instructs the linker to optimize at the link stage
 codegen-units = 1 # Default is 16, the higher the faster compile time, but it may produce slower code.
-panic = "abort"   # Since all of the errors are  handled manually (should be), aborting and removing the panic code is nothing, but an improvement.
+panic = "unwind"   # Since all of the errors are  handled manually (should be), aborting and removing the panic code is nothing, but an improvement.
 
 #═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
@@ -43,6 +43,7 @@ embed-resource = "2.2.0"
 #═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [dependencies]
+clap = { version = "4.3.21", features = ["derive"] }
 crossterm = "0.27.0"
 futures = "0.3.28"
 html2text = "0.6.0"
