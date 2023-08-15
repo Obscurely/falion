@@ -25,6 +25,7 @@ pub enum DdgSearchError {
 }
 
 /// Scrape pages returned by ddg
+#[derive(std::fmt::Debug)]
 pub struct DdgSearch {
     client: reqwest::Client,
     ddg: ddg::Ddg,
@@ -97,7 +98,9 @@ impl DdgSearch {
     /// * `InvalidPageContent` - Usually this means the content returned by the website is
     /// corrupted because it did return 200 OK.
     /// * `ErrorCode` - The website returned an error code
+    #[tracing::instrument]
     pub async fn get_page_content(&self, page_url: &str) -> Result<String, DdgSearchError> {
+        tracing::info!("Get page content for: {}", &page_url);
         // set term width
         let term_width: usize = match crossterm::terminal::size() {
             Ok(size) => size.0.into(),
@@ -108,15 +111,34 @@ impl DdgSearch {
         let response_body = match self.client.get(page_url).send().await {
             Ok(res) => {
                 if res.status() != reqwest::StatusCode::OK {
+                    tracing::error!(
+                        "Get request to {} returned status code: {}",
+                        &page_url,
+                        &res.status()
+                    );
                     return Err(DdgSearchError::ErrorCode(res.status()));
                 }
 
                 match res.text().await {
                     Ok(body) => body,
-                    Err(err) => return Err(DdgSearchError::InvalidReponseBody(err)),
+                    Err(err) => {
+                        tracing::error!(
+                            "The response body recieved from {} is invalid. Error: {}",
+                            &page_url,
+                            &err
+                        );
+                        return Err(DdgSearchError::InvalidReponseBody(err));
+                    }
                 }
             }
-            Err(err) => return Err(DdgSearchError::InvalidRequest(err)),
+            Err(err) => {
+                tracing::error!(
+                    "Failed to make a get request to {}. Error {}",
+                    &page_url,
+                    &err
+                );
+                return Err(DdgSearchError::InvalidRequest(err));
+            }
         };
 
         // return page
@@ -165,6 +187,7 @@ impl DdgSearch {
     ///
     /// First error is for duckduckgo, second is for the future hanle, third is for the actual
     /// page content
+    #[tracing::instrument]
     pub async fn get_multiple_pages_content(
         &self,
         query: &str,
@@ -173,6 +196,7 @@ impl DdgSearch {
         IndexMap<String, tokio::task::JoinHandle<Result<String, DdgSearchError>>>,
         DdgSearchError,
     > {
+        tracing::info!("Get multiple pages and their content for search query: {} with a results limit of: {:#?}", &query, &limit);
         // get the links from duckduckgo
         let links = match self.ddg.get_links(query, None, Some(true), limit).await {
             Ok(res) => res,
