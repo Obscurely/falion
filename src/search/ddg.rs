@@ -38,6 +38,7 @@ pub enum DdgError {
 }
 
 /// Get search results from duckduckgo
+#[derive(std::fmt::Debug)]
 pub struct Ddg {
     client: reqwest::Client,
 }
@@ -128,6 +129,7 @@ impl Ddg {
     /// internet.
     /// * `NoResults` - No results matched your query or site.
     /// * `ErrorCode` - The search returned an error code
+    #[tracing::instrument]
     pub async fn get_links(
         &self,
         query: &str,
@@ -135,6 +137,10 @@ impl Ddg {
         allow_subdomain: Option<bool>,
         limit: Option<usize>,
     ) -> Result<Vec<String>, DdgError> {
+        tracing::info!(
+            "Get search results for query {}, on site: {:#?}, with flag allow_subdomain: {:#?} and limit: {:#?}", 
+            &query, &site, &allow_subdomain, &limit
+        );
         // set site
         let site = site.unwrap_or("");
 
@@ -143,11 +149,13 @@ impl Ddg {
 
         // Check if site is valid
         if !site.is_empty() && !is_site_valid(site) {
+            tracing::error!("Site: {} is not valid", &site);
             return Err(DdgError::InvalidSite(site.to_string()));
         }
 
         // Check if query is too long
         if query.len() > 494 - site.len() {
+            tracing::error!("Query: {} is too long.", &query);
             return Err(DdgError::QueryTooLong(query.len()));
         }
 
@@ -163,19 +171,42 @@ impl Ddg {
             BASE_ADDRESS_MINUS_SITE.replace("{QUERY}", &query)
         };
 
+        tracing::debug!(
+            "Making get request to: {} in order to get ddg links url.",
+            &request_url
+        );
         // get request ddg querry page
-        let response_body = match self.client.get(request_url).send().await {
+        let response_body = match self.client.get(&request_url).send().await {
             Ok(res) => {
                 if res.status() != reqwest::StatusCode::OK {
+                    tracing::error!(
+                        "Get request to {} returned status code: {}",
+                        &request_url,
+                        &res.status()
+                    );
                     return Err(DdgError::ErrorCode(res.status()));
                 }
 
                 match res.text().await {
                     Ok(body) => body,
-                    Err(error) => return Err(DdgError::InvalidResponseBody(error)),
+                    Err(error) => {
+                        tracing::error!(
+                            "The response body recieved from {} is invalid. Error: {}",
+                            &request_url,
+                            &error
+                        );
+                        return Err(DdgError::InvalidResponseBody(error));
+                    }
                 }
             }
-            Err(error) => return Err(DdgError::InvalidRequest(error)),
+            Err(error) => {
+                tracing::error!(
+                    "Failed to make a get request to {}. Error: {}",
+                    &request_url,
+                    &error
+                );
+                return Err(DdgError::InvalidRequest(error));
+            }
         };
 
         // get links url
@@ -183,33 +214,61 @@ impl Ddg {
             Some(start) => match start.1.split_once(LINKS_URL_SPLIT2) {
                 Some(full) => full.0,
                 None => {
+                    tracing::error!("Failed to second split the response body from ddg search. Response body: {}", &response_body);
                     return Err(DdgError::NoResults {
                         at: String::from("Second split of the response body for the links url."),
                         index: 0,
-                    })
+                    });
                 }
             },
             None => {
+                tracing::error!(
+                    "Failed to first split the response body from ddg search. Response body: {}",
+                    &response_body
+                );
                 return Err(DdgError::NoResults {
                     at: String::from("First split of the response body for the links url."),
                     index: 1,
-                })
+                });
             }
         };
 
+        tracing::debug!(
+            "Making get request to ddg links url: {} in order to get results.",
+            &links_url
+        );
         // get requests the links url
         let links_response_body = match self.client.get(links_url).send().await {
             Ok(res) => {
                 if res.status() != reqwest::StatusCode::OK {
+                    tracing::error!(
+                        "Get request to {} returned status code: {}",
+                        &links_url,
+                        &res.status()
+                    );
                     return Err(DdgError::ErrorCode(res.status()));
                 }
 
                 match res.text().await {
                     Ok(body) => body,
-                    Err(error) => return Err(DdgError::InvalidResponseBody(error)),
+                    Err(error) => {
+                        tracing::error!(
+                            "The resposne body recieved from {} is invalid. Error: {}",
+                            &links_url,
+                            &error
+                        );
+                        return Err(DdgError::InvalidResponseBody(error));
+                    }
                 }
             }
-            Err(error) => return Err(DdgError::InvalidRequest(error)),
+            Err(error) => {
+                tracing::error!(
+                    "Failed to make a request to {}. Error: {}",
+                    &links_url,
+                    &error
+                );
+                return Err(DdgError::InvalidRequest(error));
+            }
         };
 
         // get links
@@ -217,22 +276,32 @@ impl Ddg {
             Some(start) => match start.1.split_once(LINKS_SPLIT2) {
                 Some(full) => full.0.split(LINKS_SEP).collect::<Vec<&str>>(),
                 None => {
+                    tracing::error!(
+                        "Failed to second split response body from ddg links. Response body: {}",
+                        &links_response_body
+                    );
                     return Err(DdgError::NoResults {
                         at: String::from("Second split of the response body for search results"),
                         index: 2,
-                    })
+                    });
                 }
             },
             None => {
+                tracing::error!(
+                    "Failed to first split response body from ddg links. Response body: {}",
+                    &links_response_body
+                );
                 return Err(DdgError::NoResults {
                     at: String::from("First split of the response body for search results"),
                     index: 3,
-                })
+                });
             }
         };
 
         // remove possible consecutive duplicates
         links.dedup();
+
+        tracing::debug!("Links before filtering: {:#?}", &links);
 
         let links: Vec<String> = if allow_subdomain {
             links
@@ -267,6 +336,7 @@ impl Ddg {
 
         // check if we even have links
         if links.is_empty() {
+            tracing::error!("After filtering the links there were no more left.");
             return Err(DdgError::NoResults {
                 at: String::from("Checking if we got any search results"),
                 index: 4,
