@@ -212,8 +212,6 @@ impl Ddg {
             Err(error) => return Err(DdgError::InvalidRequest(error)),
         };
 
-        dbg!(&links_response_body);
-
         // get links
         let mut links = match links_response_body.split_once(LINKS_SPLIT1) {
             Some(start) => match start.1.split_once(LINKS_SPLIT2) {

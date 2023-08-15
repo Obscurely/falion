@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use rand::{distributions::DistString, Rng};
+use rand::distributions::DistString;
 use reqwest::header;
 
 /// Create a new reqwest client using a randomly generated user-agent.
@@ -21,18 +21,6 @@ pub fn client_with_special_settings() -> reqwest::Client {
         "X-Forwarded-Host",
         header::HeaderValue::from_static("duckduckgo.com"),
     );
-    let ip = format!(
-        "{}.{}.{}.{}",
-        rng.gen_range(70..120),
-        rng.gen_range(70..120),
-        rng.gen_range(70..120),
-        rng.gen_range(70..120)
-    );
-    headers.insert(
-        "X-Forwarded-For",
-        header::HeaderValue::from_str(&ip).unwrap(),
-    );
-    headers.insert("X-Client-IP", header::HeaderValue::from_str(&ip).unwrap());
     headers.insert(
         "Origin",
         header::HeaderValue::from_static("https://duckduckgo.com"),
