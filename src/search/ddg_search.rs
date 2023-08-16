@@ -4,6 +4,8 @@ use super::utils;
 use indexmap::IndexMap;
 use thiserror::Error;
 
+type DdgPage = Result<String, DdgSearchError>;
+
 /// These are the errors the functions associated with DdgSearch will return.
 ///
 /// * `InvalidRequest` - Reqwest returned an error when processing the request. This can be
@@ -99,7 +101,7 @@ impl DdgSearch {
     /// corrupted because it did return 200 OK.
     /// * `ErrorCode` - The website returned an error code
     #[tracing::instrument]
-    pub async fn get_page_content(&self, page_url: &str) -> Result<String, DdgSearchError> {
+    pub async fn get_page_content(&self, page_url: &str) -> DdgPage {
         tracing::info!("Get page content for: {}", &page_url);
         // set term width
         let term_width: usize = match crossterm::terminal::size() {
@@ -192,10 +194,7 @@ impl DdgSearch {
         &self,
         query: &str,
         limit: Option<usize>,
-    ) -> Result<
-        IndexMap<String, tokio::task::JoinHandle<Result<String, DdgSearchError>>>,
-        DdgSearchError,
-    > {
+    ) -> Result<IndexMap<String, tokio::task::JoinHandle<DdgPage>>, DdgSearchError> {
         tracing::info!("Get multiple pages and their content for search query: {} with a results limit of: {:#?}", &query, &limit);
         // get the links from duckduckgo
         let links = match self.ddg.get_links(query, None, Some(true), limit).await {

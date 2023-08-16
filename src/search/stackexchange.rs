@@ -9,6 +9,8 @@ const STACKEXCHANGE_QUESTION_URL: &str = "stackexchange.com/questions/";
 const STACKEXCHANGE_INVALID1: &str = "stackexchange.com/questions/tagged";
 const STACKEXCHANGE_INVALID2: &str = "stackexchange.com/tag";
 
+type SeQuestion = Result<Vec<String>, SeError>;
+
 /// These are the errors the functions associated with StackExchange will return.
 ///
 /// * `NotSeQuestion` - The given url does not correspond to a StackExchange question.
@@ -112,7 +114,7 @@ impl StackExchange {
     /// * `InvalidQuestionContent` - Usually this means the content returned by the website is
     /// corrupted because it did return 200 OK.
     /// * `ErrorCode` - The website returned an error code
-    pub async fn get_question_content(&self, question_url: &str) -> Result<Vec<String>, SeError> {
+    pub async fn get_question_content(&self, question_url: &str) -> SeQuestion {
         // set term width
         let term_width: usize = match crossterm::terminal::size() {
             Ok(size) => size.0.into(),
@@ -217,8 +219,7 @@ impl StackExchange {
         &self,
         query: &str,
         limit: Option<usize>,
-    ) -> Result<IndexMap<String, tokio::task::JoinHandle<Result<Vec<String>, SeError>>>, SeError>
-    {
+    ) -> Result<IndexMap<String, tokio::task::JoinHandle<SeQuestion>>, SeError> {
         // get the links from duckduckgo
         let links = match self
             .ddg

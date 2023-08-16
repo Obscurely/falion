@@ -18,6 +18,8 @@ const GEEKSFORGEEKS_INVALID: [&str; 7] = [
     "https://www.geeksforgeeks.org/expert/",
 ];
 
+type GfgPage = Result<String, GfgError>;
+
 /// These are the errors the functions associated with GeeksForGeeks will return.
 ///
 /// * `NotGfgPage` - The given url does not correspond to a GeeksForGeeks page.
@@ -122,7 +124,7 @@ impl GeeksForGeeks {
     /// corrupted because it did return 200 OK.
     /// * `ErrorCode` - The website returned an error code
     #[tracing::instrument]
-    pub async fn get_page_content(&self, page_url: &str) -> Result<String, GfgError> {
+    pub async fn get_page_content(&self, page_url: &str) -> GfgPage {
         tracing::info!(
             "Get the content for the following geeksforgeeks page: {}",
             &page_url
@@ -249,7 +251,7 @@ impl GeeksForGeeks {
         &self,
         query: &str,
         limit: Option<usize>,
-    ) -> Result<IndexMap<String, tokio::task::JoinHandle<Result<String, GfgError>>>, GfgError> {
+    ) -> Result<IndexMap<String, tokio::task::JoinHandle<GfgPage>>, GfgError> {
         tracing::info!("Get multiple geeksforgeeks pages and their content for search query: {} with a results limit of: {:#?}", &query, &limit);
         // get the links from duckduckgo
         let links = match self

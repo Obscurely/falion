@@ -10,6 +10,8 @@ const STACKOVERFLOW_SITE: &str = "stackoverflow.com/questions/";
 const STACKOVERFLOW_INVALID1: &str = "https://stackoverflow.com/questions/tagged";
 const STACKOVERFLOW_INVALID2: &str = "https://stackoverflow.com/questions/tagged";
 
+type SofQuestion = Result<Vec<String>, SofError>;
+
 /// These are the errors the functions associated with StackOverflow will return.
 ///
 /// * `NotSofQuestion` - The given url does not correspond to a StackOverflow question.
@@ -113,7 +115,7 @@ impl StackOverflow {
     /// * `InvalidQuestionContent` - Usually this means the content returned by the website is
     /// corrupted because it did return 200 OK.
     /// * `ErrorCode` - The website returned an error code
-    pub async fn get_question_content(&self, question_url: &str) -> Result<Vec<String>, SofError> {
+    pub async fn get_question_content(&self, question_url: &str) -> SofQuestion {
         // set term width
         let term_width: usize = match crossterm::terminal::size() {
             Ok(size) => size.0.into(),
@@ -218,8 +220,7 @@ impl StackOverflow {
         &self,
         query: &str,
         limit: Option<usize>,
-    ) -> Result<IndexMap<String, tokio::task::JoinHandle<Result<Vec<String>, SofError>>>, SofError>
-    {
+    ) -> Result<IndexMap<String, tokio::task::JoinHandle<SofQuestion>>, SofError> {
         // get the links from duckduckgo
         let links = match self
             .ddg
