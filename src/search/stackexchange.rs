@@ -115,7 +115,7 @@ impl StackExchange {
     /// * `InvalidQuestionContent` - Usually this means the content returned by the website is
     /// corrupted because it did return 200 OK.
     /// * `ErrorCode` - The website returned an error code
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     pub async fn get_question_content(&self, question_url: &str) -> SeQuestion {
         tracing::info!(
             "Get the content for the following stackexchange question: {}",
@@ -259,7 +259,7 @@ impl StackExchange {
     ///
     /// First error is for duckduckgo, second is for the future hanle, third is for the actual
     /// question content
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     pub async fn get_multiple_questions_content(
         &self,
         query: &str,

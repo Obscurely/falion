@@ -80,6 +80,9 @@ pub fn setup_logs(stdout: &mut std::io::Stdout, verbose: bool) {
 
     // register the layers
     if !verbose {
+        let filter_debug_log = filter::Targets::new()
+            .with_target("falion", filter::LevelFilter::DEBUG)
+            .with_target("hyper", filter::LevelFilter::WARN);
         tracing_subscriber::registry()
             .with(
                 stdout_log
@@ -87,20 +90,26 @@ pub fn setup_logs(stdout: &mut std::io::Stdout, verbose: bool) {
                     .with_filter(filter::LevelFilter::ERROR)
                     // Combine the filtered `stdout_log` layer with the
                     // `debug_log` layer, producing a new `Layered` layer.
-                    .and_then(debug_log), // Add a filter to *both* layers that rejects spans and
-                                          // events whose targets start with `metrics`.
+                    .and_then(debug_log.with_filter(filter_debug_log)), // Add a filter to *both* layers that rejects spans and
+                                                                        // events whose targets start with `metrics`.
             )
             .init();
     } else {
+        let filter_debug_log = filter::Targets::new()
+            .with_target("falion", filter::LevelFilter::DEBUG)
+            .with_target("hyper", filter::LevelFilter::DEBUG);
+        let filter_stdout_log = filter::Targets::new()
+            .with_target("falion", filter::LevelFilter::DEBUG)
+            .with_target("hyper", filter::LevelFilter::WARN);
         tracing_subscriber::registry()
             .with(
                 stdout_log
                     // Add an `INFO` filter to the stdout logging layer
-                    .with_filter(filter::LevelFilter::DEBUG)
+                    .with_filter(filter_stdout_log)
                     // Combine the filtered `stdout_log` layer with the
                     // `debug_log` layer, producing a new `Layered` layer.
-                    .and_then(debug_log), // Add a filter to *both* layers that rejects spans and
-                                          // events whose targets start with `metrics`.
+                    .and_then(debug_log.with_filter(filter_debug_log)), // Add a filter to *both* layers that rejects spans and
+                                                                        // events whose targets start with `metrics`.
             )
             .init();
     }

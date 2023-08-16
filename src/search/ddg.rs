@@ -129,7 +129,7 @@ impl Ddg {
     /// internet.
     /// * `NoResults` - No results matched your query or site.
     /// * `ErrorCode` - The search returned an error code
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     pub async fn get_links(
         &self,
         query: &str,

@@ -124,7 +124,7 @@ impl GithubGist {
     /// * `NoGistFileGot` - This means the gist might contain files, but the function couldn't get any
     /// of them.
     /// * `ErrorCode` - The website returned an error code
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     pub async fn get_gist_content(&self, gist_url: &str) -> GistContent {
         tracing::info!(
             "Get the content for the following github gist: {}",
@@ -332,7 +332,7 @@ impl GithubGist {
     ///
     /// First error is for duckduckgo, second is for the future hanle, third is for the actual
     /// page content
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     pub async fn get_multiple_gists_content(
         &self,
         query: &str,
@@ -357,13 +357,14 @@ impl GithubGist {
         // IndexMap
         for link in links {
             // unwrap is safe here since ddg & GithubGist do all the checks
-            let name = link
+            let name = match link
                 .split_once(GIST_URL)
                 .unwrap()
                 .1
-                .split_once('/')
-                .unwrap()
-                .0;
+                .split_once('/') {
+                    Some(s) => s.0,
+                    None => continue,
+                };
             let id = link.split('/').last().unwrap().replace('-', " ");
             let mut full_name = String::with_capacity(name.len() + id.len() + 3);
             full_name.push_str(name);

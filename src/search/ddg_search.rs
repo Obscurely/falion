@@ -100,7 +100,7 @@ impl DdgSearch {
     /// * `InvalidPageContent` - Usually this means the content returned by the website is
     /// corrupted because it did return 200 OK.
     /// * `ErrorCode` - The website returned an error code
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     pub async fn get_page_content(&self, page_url: &str) -> DdgPage {
         tracing::info!("Get page content for: {}", &page_url);
         // set term width
@@ -189,7 +189,7 @@ impl DdgSearch {
     ///
     /// First error is for duckduckgo, second is for the future hanle, third is for the actual
     /// page content
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     pub async fn get_multiple_pages_content(
         &self,
         query: &str,
