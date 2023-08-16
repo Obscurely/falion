@@ -244,6 +244,7 @@ impl GeeksForGeeks {
     ///
     /// First error is for duckduckgo, second is for the future hanle, third is for the actual
     /// page content
+    #[tracing::instrument]
     pub async fn get_multiple_pages_content(
         &self,
         query: &str,

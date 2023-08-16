@@ -11,8 +11,8 @@ async fn main() {
     let mut stdout = std::io::stdout();
 
     // get values
-    let query = cli.query.join(" ");
-    let verbose = cli.verbose;
+    let _query = cli.query.join(" ");
+    let _verbose = cli.verbose;
 
     // Pre-setup
     match terminal::disable_raw_mode() {

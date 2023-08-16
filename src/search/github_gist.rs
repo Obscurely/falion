@@ -11,6 +11,8 @@ const GIST_SITE: &str = "gist.github.com";
 const GIST_RAW_URL_SPLIT: &str = "<a href=\"/{GIST_LOCATION}/raw/";
 const GIST_RAW_URL: &str = "https://gist.github.com/{GIST_LOCATION}/raw/{FILE_URL}";
 
+type GistContent = Result<Vec<String>, GithubGistError>;
+
 /// These are the errors the functions associated with GithubGist will return.
 ///
 /// * `NotGist` - The given url does not correspond to a GitHub gist.
@@ -43,6 +45,7 @@ pub enum GithubGistError {
 }
 
 /// Scrape pages returned by ddg
+#[derive(std::fmt::Debug)]
 pub struct GithubGist {
     client: reqwest::Client,
     ddg: ddg::Ddg,
@@ -121,29 +124,63 @@ impl GithubGist {
     /// * `NoGistFileGot` - This means the gist might contain files, but the function couldn't get any
     /// of them.
     /// * `ErrorCode` - The website returned an error code
-    pub async fn get_gist_content(&self, gist_url: &str) -> Result<Vec<String>, GithubGistError> {
+    #[tracing::instrument]
+    pub async fn get_gist_content(&self, gist_url: &str) -> GistContent {
+        tracing::info!(
+            "Get the content for the following github gist: {}",
+            &gist_url
+        );
         match gist_url.split_once(GIST_URL) {
             Some(split) => {
                 if !split.0.is_empty() {
+                    tracing::error!(
+                        "The given url is not a github gist url (second split). Url: {}",
+                        &gist_url
+                    );
                     return Err(GithubGistError::NotGist(gist_url.to_string()));
                 }
             }
-            None => return Err(GithubGistError::NotGist(gist_url.to_string())),
+            None => {
+                tracing::error!(
+                    "The given url is not a github gist url (first split). Url: {}",
+                    &gist_url
+                );
+                return Err(GithubGistError::NotGist(gist_url.to_string()));
+            }
         }
 
         // get gist
         let response_body = match self.client.get(gist_url).send().await {
             Ok(res) => {
                 if res.status() != reqwest::StatusCode::OK {
+                    tracing::error!(
+                        "Get request to {} return status code: {}",
+                        &gist_url,
+                        &res.status()
+                    );
                     return Err(GithubGistError::ErrorCode(res.status()));
                 }
 
                 match res.text().await {
                     Ok(body) => body,
-                    Err(err) => return Err(GithubGistError::InvalidReponseBody(err)),
+                    Err(err) => {
+                        tracing::error!(
+                            "The response body recieved from {} is invalid. Error: {}",
+                            &gist_url,
+                            &err
+                        );
+                        return Err(GithubGistError::InvalidReponseBody(err));
+                    }
                 }
             }
-            Err(err) => return Err(GithubGistError::InvalidRequest(err)),
+            Err(err) => {
+                tracing::error!(
+                    "Failed to make a get request to {}. Error: {}",
+                    &gist_url,
+                    &err
+                );
+                return Err(GithubGistError::InvalidRequest(err));
+            }
         };
 
         // get raw gist urls
@@ -153,6 +190,11 @@ impl GithubGist {
 
         // check if the gist content we got is valid
         if !response_body.contains(raw_gist_sep) {
+            tracing::error!(
+                "The response body from {} doesn't contain any raw gist links. Response body {}",
+                &gist_url,
+                &response_body
+            );
             return Err(GithubGistError::InvalidPageContent);
         }
 
@@ -170,26 +212,54 @@ impl GithubGist {
 
         // check if we got any urls
         if raw_gist_urls.is_empty() {
+            tracing::error!(
+                "After filtering the raw gist urls from {} there were none left.",
+                &gist_url
+            );
             return Err(GithubGistError::InvalidPageContent);
         }
 
+        tracing::debug!(
+            "Request all github gist files (from {}) {:#?} parallel as a future.",
+            &gist_url,
+            &raw_gist_urls
+        );
         // get request all gist files at the same time
         let gist_files = futures::stream::iter(raw_gist_urls)
             .map(|url| {
                 let client = self.client.clone();
                 tokio::spawn(async move {
-                    Ok(match client.get(url).send().await {
+                    Ok(match client.get(&url).send().await {
                         Ok(res) => {
                             if res.status() != reqwest::StatusCode::OK {
+                                tracing::error!(
+                                    "Making get request to {} returned status code: {}",
+                                    &url,
+                                    &res.status()
+                                );
                                 return Err(GithubGistError::ErrorCode(res.status()));
                             }
 
                             match res.text().await {
                                 Ok(text) => text,
-                                Err(err) => return Err(GithubGistError::InvalidReponseBody(err)),
+                                Err(err) => {
+                                    tracing::error!(
+                                        "The response body recieved from {} is invalid. Error: {}",
+                                        &url,
+                                        &err
+                                    );
+                                    return Err(GithubGistError::InvalidReponseBody(err));
+                                }
                             }
                         }
-                        Err(err) => return Err(GithubGistError::InvalidRequest(err)),
+                        Err(err) => {
+                            tracing::error!(
+                                "Failed to make a get request to {}. Error: {}",
+                                &url,
+                                &err
+                            );
+                            return Err(GithubGistError::InvalidRequest(err));
+                        }
                     })
                 })
             })
@@ -209,6 +279,10 @@ impl GithubGist {
 
         // check if we managed to get back any file
         if gist_files.is_empty() {
+            tracing::error!(
+                "Failed to get any of the gist files from gist: {}",
+                &gist_url
+            );
             return Err(GithubGistError::NoGistFileGot);
         }
 
@@ -258,14 +332,13 @@ impl GithubGist {
     ///
     /// First error is for duckduckgo, second is for the future hanle, third is for the actual
     /// page content
+    #[tracing::instrument]
     pub async fn get_multiple_gists_content(
         &self,
         query: &str,
         limit: Option<usize>,
-    ) -> Result<
-        IndexMap<String, tokio::task::JoinHandle<Result<Vec<String>, GithubGistError>>>,
-        GithubGistError,
-    > {
+    ) -> Result<IndexMap<String, tokio::task::JoinHandle<GistContent>>, GithubGistError> {
+        tracing::info!("Get multiple GitHub gists and their content for search query: {} with a results limit of: {:#?}", &query, &limit);
         // get the links from duckduckgo
         let links = match self
             .ddg
