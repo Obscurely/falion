@@ -17,12 +17,9 @@ async fn main() {
 
     // Pre-setup
     // make sure terminal raw mode is not enabled
-    match terminal::disable_raw_mode() {
-        Ok(_) => (),
-        Err(err) => {
-            falion::clean(&mut stdout);
-            panic!("Failed to disable raw mode: {}", err);
-        }
+    if let Err(err) = terminal::disable_raw_mode() {
+        falion::clean(&mut stdout);
+        panic!("Failed to disable raw mode: {}", err);
     }
 
     if !disable_logs {
