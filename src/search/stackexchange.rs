@@ -39,6 +39,7 @@ pub enum SeError {
 }
 
 /// Scrape questions from StackExchange
+#[derive(std::fmt::Debug)]
 pub struct StackExchange {
     client: reqwest::Client,
     ddg: ddg::Ddg,
@@ -114,7 +115,12 @@ impl StackExchange {
     /// * `InvalidQuestionContent` - Usually this means the content returned by the website is
     /// corrupted because it did return 200 OK.
     /// * `ErrorCode` - The website returned an error code
+    #[tracing::instrument]
     pub async fn get_question_content(&self, question_url: &str) -> SeQuestion {
+        tracing::info!(
+            "Get the content for the following stackexchange question: {}",
+            &question_url
+        );
         // set term width
         let term_width: usize = match crossterm::terminal::size() {
             Ok(size) => size.0.into(),
@@ -125,31 +131,64 @@ impl StackExchange {
         if question_url.contains(STACKEXCHANGE_INVALID1)
             || question_url.contains(STACKEXCHANGE_INVALID2)
         {
+            tracing::error!(
+                "The given url is not a stackexchange url (first check). Url: {}",
+                &question_url
+            );
             return Err(SeError::NotSeQuestion(question_url.to_string()));
         }
 
         match question_url.split_once(STACKEXCHANGE_QUESTION_URL) {
             Some(split) => {
                 if split.0.is_empty() {
+                    tracing::error!(
+                        "The given url is not a stackexchange url (second check, second split). Url: {}",
+                        &question_url
+                    );
                     return Err(SeError::NotSeQuestion(question_url.to_string()));
                 }
             }
-            None => return Err(SeError::NotSeQuestion(question_url.to_string())),
+            None => {
+                tracing::error!(
+                    "The given url is not a stackexchange url (second check, first split). Url: {}",
+                    &question_url
+                );
+                return Err(SeError::NotSeQuestion(question_url.to_string()));
+            }
         }
 
         // get stackexchange page
         let response_body = match self.client.get(question_url).send().await {
             Ok(res) => {
                 if res.status() != reqwest::StatusCode::OK {
+                    tracing::error!(
+                        "Get request to {} return status code: {}",
+                        &question_url,
+                        &res.status()
+                    );
                     return Err(SeError::ErrorCode(res.status()));
                 }
 
                 match res.text().await {
                     Ok(body) => body,
-                    Err(error) => return Err(SeError::InvalidReponseBody(error)),
+                    Err(error) => {
+                        tracing::error!(
+                            "The response body recieved from {} is invalid. Error: {}",
+                            &question_url,
+                            &error
+                        );
+                        return Err(SeError::InvalidReponseBody(error));
+                    }
                 }
             }
-            Err(error) => return Err(SeError::InvalidRequest(error)),
+            Err(error) => {
+                tracing::error!(
+                    "Failed to make a get request to {}. Error: {}",
+                    &question_url,
+                    &error
+                );
+                return Err(SeError::InvalidRequest(error));
+            }
         };
 
         // parse the page to get the question and answers
@@ -166,6 +205,11 @@ impl StackExchange {
 
         // check if page data was valid and we parsed something
         if question_content.is_empty() {
+            tracing::error!(
+                "The stackexchange question ({}) content is empty. Response body: {}",
+                &question_url,
+                &response_body
+            );
             return Err(SeError::InvalidQuestionContent);
         }
 
@@ -215,11 +259,13 @@ impl StackExchange {
     ///
     /// First error is for duckduckgo, second is for the future hanle, third is for the actual
     /// question content
+    #[tracing::instrument]
     pub async fn get_multiple_questions_content(
         &self,
         query: &str,
         limit: Option<usize>,
     ) -> Result<IndexMap<String, tokio::task::JoinHandle<SeQuestion>>, SeError> {
+        tracing::info!("Get multiple Stackexchange questions and their content for search query: {} with a results limit of: {:#?}", &query, &limit);
         // get the links from duckduckgo
         let links = match self
             .ddg
