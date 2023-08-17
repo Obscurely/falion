@@ -1,5 +1,5 @@
 {
-  description = "A devShell example";
+  description = "Rust devshell";
 
   inputs = {
     nixpkgs.url      = "github:NixOS/nixpkgs/nixos-unstable";
@@ -25,7 +25,6 @@
             llvmPackages_latest.lld
             openssl
             pkg-config
-            exa
             fd
             zlib.out
             xorriso
@@ -45,7 +44,6 @@
           ];
 
           shellHook = ''
-            alias ls=exa
             alias find=fd
           '';
 
