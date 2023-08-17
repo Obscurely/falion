@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-use std::path::StripPrefixError;
-
 use super::utils;
 use thiserror::Error;
 

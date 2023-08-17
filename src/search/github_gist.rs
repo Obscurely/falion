@@ -357,14 +357,10 @@ impl GithubGist {
         // IndexMap
         for link in links {
             // unwrap is safe here since ddg & GithubGist do all the checks
-            let name = match link
-                .split_once(GIST_URL)
-                .unwrap()
-                .1
-                .split_once('/') {
-                    Some(s) => s.0,
-                    None => continue,
-                };
+            let name = match link.split_once(GIST_URL).unwrap().1.split_once('/') {
+                Some(s) => s.0,
+                None => continue,
+            };
             let id = link.split('/').last().unwrap().replace('-', " ");
             let mut full_name = String::with_capacity(name.len() + id.len() + 3);
             full_name.push_str(name);

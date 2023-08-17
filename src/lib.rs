@@ -5,6 +5,7 @@ use crossterm::style::Stylize;
 use crossterm::terminal;
 use indexmap::IndexMap;
 use std::fs;
+use std::io::Write;
 use std::{fs::File, sync::Arc};
 use thiserror::Error;
 use tokio::task::{JoinError, JoinHandle};
@@ -40,30 +41,41 @@ pub enum GetResultsError {
 #[tracing::instrument(skip_all)]
 pub fn clean(stdout: &mut std::io::Stdout) {
     let _ = terminal::disable_raw_mode();
-    if let Err(error) = crossterm::execute!(stdout, crossterm::style::ResetColor) {
+    if let Err(error) = crossterm::queue!(stdout, crossterm::style::ResetColor) {
         tracing::warn!("Failed to reset term collor. Error: {}", error);
     }
-    if let Err(error) = crossterm::execute!(stdout, terminal::Clear(terminal::ClearType::All)) {
+    if let Err(error) = crossterm::queue!(stdout, crossterm::cursor::Show) {
+        tracing::warn!("Failed to show back cursor. Error: {}", error);
+    }
+    if let Err(error) = crossterm::queue!(stdout, terminal::Clear(terminal::ClearType::All)) {
         tracing::warn!("Failed to clear terminal. Error: {}", error);
     }
-    if let Err(error) = crossterm::execute!(stdout, terminal::ScrollUp(u16::MAX)) {
+    if let Err(error) = crossterm::queue!(stdout, terminal::ScrollUp(u16::MAX)) {
         tracing::warn!("Failed to scroll up the terminal. Error: {}", error);
     }
-    if let Err(error) = crossterm::execute!(stdout, crossterm::cursor::MoveTo(0, 0)) {
+    if let Err(error) = crossterm::queue!(stdout, crossterm::cursor::MoveTo(0, 0)) {
         tracing::warn!("Failed to move terminal cursor. Error: {}", error);
     }
+
+    if let Err(error) = stdout.flush() {
+        tracing::warn!("Failed to flush stdout. Error: {}", error);
+    };
 }
 
 #[tracing::instrument(skip_all)]
 pub fn clear_terminal(stdout: &mut std::io::Stdout) {
-    if let Err(error) = crossterm::execute!(stdout, terminal::Clear(terminal::ClearType::All)) {
+    if let Err(error) = crossterm::queue!(stdout, terminal::Clear(terminal::ClearType::All)) {
         tracing::warn!("Failed to clear terminal. Error: {}", error);
     }
-    if let Err(error) = crossterm::execute!(stdout, terminal::ScrollUp(u16::MAX)) {
+    if let Err(error) = crossterm::queue!(stdout, terminal::ScrollUp(u16::MAX)) {
         tracing::warn!("Failed to scroll up the terminal. Error: {}", error);
     }
-    if let Err(error) = crossterm::execute!(stdout, crossterm::cursor::MoveTo(0, 0)) {
+    if let Err(error) = crossterm::queue!(stdout, crossterm::cursor::MoveTo(0, 0)) {
         tracing::warn!("Failed to move terminal cursor. Error: {}", error);
+    }
+
+    if let Err(error) = stdout.flush() {
+        tracing::warn!("Failed to flush stdout. Error: {}", error);
     }
 }
 

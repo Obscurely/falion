@@ -1,12 +1,11 @@
 mod search;
 use clap::Parser;
+use crossterm::event;
 use crossterm::style::{self, Stylize};
 use crossterm::terminal;
-use indexmap::IndexMap;
 
 #[tokio::main]
 async fn main() {
-    let now = std::time::Instant::now();
     // initiate cli
     let cli = falion::Cli::parse();
 
@@ -29,6 +28,11 @@ async fn main() {
         falion::clean(&mut stdout);
         panic!("Failed to enable raw mode: {}", err);
     }
+
+    // hide the cursor
+    if let Err(error) = crossterm::execute!(&mut stdout, crossterm::cursor::Hide) {
+        tracing::warn!("Failed to hide terminal cursor. Error: {}", error);
+    };
 
     // enable (or not) logs based on flag
     if !disable_logs {
@@ -85,7 +89,7 @@ async fn main() {
 
     // actual cli
     // reusable prints
-    let query_print = format!("{} {}", "Your search query is:".green(), query.blue()).stylize();
+    let query_print = format!("{} {}", "Your search query is:".green(), query.blue());
     let sof_print = format!("{} {} ", "(1)".green(), "[  StackOverFlow  ]".yellow());
     let se_print = format!("{} {} ", "(2)".green(), "[  StackExchange  ]".yellow());
     let gg_print = format!("{} {} ", "(3)".green(), "[   Github Gist   ]".yellow());
@@ -94,50 +98,315 @@ async fn main() {
     // clear terminal
     falion::clear_terminal(&mut stdout);
 
-    // display query
-    if let Err(error) = crossterm::queue!(
-        &mut stdout,
-        style::PrintStyledContent(query_print),
-        style::Print("\n\r")
-    ) {
-        tracing::warn!("There was an error printing some text. Error: {}", error);
-    };
+    loop {
+        // display query
+        if let Err(error) = crossterm::queue!(
+            &mut stdout,
+            style::PrintStyledContent(query_print.as_str().stylize()),
+            style::Print("\n\r")
+        ) {
+            tracing::warn!("There was an error printing some text. Error: {}", error);
+        };
 
-    // display resources
-    falion::print_resource(
-        &mut stdout,
-        stackoverflow_index,
-        &sof_print,
-        &stackoverflow_results,
-    );
-    falion::print_resource(
-        &mut stdout,
-        stackexchange_index,
-        &se_print,
-        &stackexchange_results,
-    );
-    falion::print_resource(
-        &mut stdout,
-        github_gist_index,
-        &gg_print,
-        &github_gist_results,
-    );
-    falion::print_resource(
-        &mut stdout,
-        geeksforgeeks_index,
-        &gfg_print,
-        &geeksforgeeks_results,
-    );
-    falion::print_resource(
-        &mut stdout,
-        ddg_search_index,
-        &ddg_print,
-        &ddg_search_results,
-    );
+        // display resources
+        falion::print_resource(
+            &mut stdout,
+            stackoverflow_index,
+            &sof_print,
+            &stackoverflow_results,
+        );
+        falion::print_resource(
+            &mut stdout,
+            stackexchange_index,
+            &se_print,
+            &stackexchange_results,
+        );
+        falion::print_resource(
+            &mut stdout,
+            github_gist_index,
+            &gg_print,
+            &github_gist_results,
+        );
+        falion::print_resource(
+            &mut stdout,
+            geeksforgeeks_index,
+            &gfg_print,
+            &geeksforgeeks_results,
+        );
+        falion::print_resource(
+            &mut stdout,
+            ddg_search_index,
+            &ddg_print,
+            &ddg_search_results,
+        );
 
-    let total = std::time::Instant::now() - now;
+        let event_read = match event::read() {
+            Ok(ev) => ev,
+            Err(error) => {
+                tracing::warn!("There was an error reading the input event... going to the next iteration. If this continue please post an issue on github with the specific log file. Error: {}", error);
+                continue;
+            }
+        };
 
-    crossterm::terminal::disable_raw_mode().unwrap();
-    // falion::clean(&mut stdout);
-    println!("Total execution time: {}ms", total.as_millis());
+        // matching the pressed key
+        match event_read {
+            // enter the menu for first resource
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('1'),
+                modifiers: event::KeyModifiers::NONE,
+                ..
+            }) => {
+                // stackoverflow current result content
+            }
+            // go to next element in the first resource (using ! because of terminal limitations)
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('!'),
+                modifiers: event::KeyModifiers::NONE,
+                ..
+            }) => {
+                // stackoverflow next result
+                match &stackoverflow_results {
+                    Ok(res) => {
+                        if stackoverflow_index < res.len() - 1 {
+                            stackoverflow_index += 1;
+                        }
+                    }
+                    // we already handled the error
+                    Err(_) => (),
+                }
+            }
+            // go to the previous element in the first resource (using alt instead of ctrl because of terminal limitations)
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('1'),
+                modifiers: event::KeyModifiers::ALT,
+                ..
+            }) => {
+                // stackoverflow back results by one
+                stackoverflow_index = stackoverflow_index.saturating_sub(1);
+            }
+
+            // enter the menu of the second resource
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('2'),
+                modifiers: event::KeyModifiers::NONE,
+                ..
+            }) => {
+                // stackexchange current result content
+            }
+            // go to the next element in the second resource list
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('@'),
+                modifiers: event::KeyModifiers::NONE,
+                ..
+            }) => {
+                // stackexchange next result
+                match &stackexchange_results {
+                    Ok(res) => {
+                        if stackexchange_index < res.len() - 1 {
+                            stackexchange_index += 1;
+                        }
+                    }
+                    // we already handled the error
+                    Err(_) => (),
+                }
+            }
+            // go to previous element in the second resource list
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('2'),
+                modifiers: event::KeyModifiers::ALT,
+                ..
+            }) => {
+                // stackexchange back results by one
+                stackexchange_index = stackexchange_index.saturating_sub(1);
+            }
+
+            // enter the menu for the third resource
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('3'),
+                modifiers: event::KeyModifiers::NONE,
+                ..
+            }) => {
+                // github_gist show current result content
+            }
+            // go to the next element in the third resource list
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('#'),
+                modifiers: event::KeyModifiers::NONE,
+                ..
+            }) => {
+                // github gist next result
+                match &github_gist_results {
+                    Ok(res) => {
+                        if github_gist_index < res.len() - 1 {
+                            github_gist_index += 1;
+                        }
+                    }
+                    // we already handled the error
+                    Err(_) => (),
+                }
+            }
+            // go to the previous element in the third resource list
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('3'),
+                modifiers: event::KeyModifiers::ALT,
+                ..
+            }) => {
+                // github gist back results by one
+                github_gist_index = github_gist_index.saturating_sub(1);
+            }
+
+            // enter the forth resource menu
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('4'),
+                modifiers: event::KeyModifiers::NONE,
+                ..
+            }) => {
+                // geeksforgeeks show content for current result
+            }
+            // go to the next element in the forth resource list
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('$'),
+                modifiers: event::KeyModifiers::NONE,
+                ..
+            }) => {
+                // geeksforgeeks next result
+                match &geeksforgeeks_results {
+                    Ok(res) => {
+                        if geeksforgeeks_index < res.len() - 1 {
+                            geeksforgeeks_index += 1;
+                        }
+                    }
+                    // we already handled the error
+                    Err(_) => (),
+                }
+            }
+            // go to the previous element in the forth resource list
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('4'),
+                modifiers: event::KeyModifiers::ALT,
+                ..
+            }) => {
+                // geeksforgeeks back results by one
+                geeksforgeeks_index = geeksforgeeks_index.saturating_sub(1);
+            }
+
+            // enter the fifth resource menu
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('5'),
+                modifiers: event::KeyModifiers::NONE,
+                ..
+            }) => {
+                // ddg search show content for current result
+            }
+            // go to the next element in the fifth resource list
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('%'),
+                modifiers: event::KeyModifiers::NONE,
+                ..
+            }) => {
+                // ddg search next result
+                match &ddg_search_results {
+                    Ok(res) => {
+                        if ddg_search_index < res.len() - 1 {
+                            ddg_search_index += 1;
+                        }
+                    }
+                    // we already handled the error
+                    Err(_) => (),
+                }
+            }
+            // go to the previous element in the fifth resource list
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('5'),
+                modifiers: event::KeyModifiers::ALT,
+                ..
+            }) => {
+                // ddg search back results by one
+                ddg_search_index = ddg_search_index.saturating_sub(1);
+            }
+
+            // move every resource to it's next element in the list, if any more
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('n'),
+                modifiers: event::KeyModifiers::CONTROL,
+                ..
+            }) => {
+                // move all resources to the next element
+                match &stackoverflow_results {
+                    Ok(res) => {
+                        if stackoverflow_index < res.len() - 1 {
+                            stackoverflow_index += 1;
+                        }
+                    }
+                    // we already handled the error
+                    Err(_) => (),
+                }
+                match &stackexchange_results {
+                    Ok(res) => {
+                        if stackexchange_index < res.len() - 1 {
+                            stackexchange_index += 1;
+                        }
+                    }
+                    // we already handled the error
+                    Err(_) => (),
+                }
+                match &github_gist_results {
+                    Ok(res) => {
+                        if github_gist_index < res.len() - 1 {
+                            github_gist_index += 1;
+                        }
+                    }
+                    // we already handled the error
+                    Err(_) => (),
+                }
+                match &geeksforgeeks_results {
+                    Ok(res) => {
+                        if geeksforgeeks_index < res.len() - 1 {
+                            geeksforgeeks_index += 1;
+                        }
+                    }
+                    // we already handled the error
+                    Err(_) => (),
+                }
+                match &ddg_search_results {
+                    Ok(res) => {
+                        if ddg_search_index < res.len() - 1 {
+                            ddg_search_index += 1;
+                        }
+                    }
+                    // we already handled the error
+                    Err(_) => (),
+                }
+            }
+            // move to the previous element in the list of every resource, if any more
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('b'),
+                modifiers: event::KeyModifiers::CONTROL,
+                ..
+            }) => {
+                // move all the resources to the previous element
+                stackoverflow_index = stackoverflow_index.saturating_sub(1);
+                stackexchange_index = stackexchange_index.saturating_sub(1);
+                github_gist_index = github_gist_index.saturating_sub(1);
+                geeksforgeeks_index = geeksforgeeks_index.saturating_sub(1);
+                ddg_search_index = ddg_search_index.saturating_sub(1);
+            }
+
+            // clear the terminal and exit the program
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('c'),
+                modifiers: event::KeyModifiers::CONTROL,
+                ..
+            }) => {
+                if let Err(error) = crossterm::terminal::disable_raw_mode() {
+                    tracing::warn!("Failed to disable termial raw mode! Error: {}", error);
+                }
+                falion::clean(&mut stdout);
+                return;
+            }
+            _ => (),
+        }
+
+        falion::clear_terminal(&mut stdout);
+    }
 }

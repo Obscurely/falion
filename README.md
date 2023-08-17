@@ -148,9 +148,8 @@ If you've got any questions please give the [FAQ](#faq) a check.
 
 #### Portable EXE
 
-1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases)
-   and download the _falion-windows.exe_ file (might have to click show
-   all).
+1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases) and
+   download the _falion-windows.exe_ file (might have to click show all).
 1. Double click the exe you just downloaded and there you go the program works.
 1. Might wanna take a look at the [Usage Tab](#-usage) if you don't understand
    something about it.
@@ -159,14 +158,14 @@ If you've got any questions please give the [FAQ](#faq) a check.
 
 #### Installer
 
-1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases)
-   and download the _falion-windows-installer.exe_ file (might have to
-   click show all).
+1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases) and
+   download the _falion-windows-installer.exe_ file (might have to click show
+   all).
 1. Double click the installer and go through it as you would with any other
    installer.
 1. If you look now in the start menu (or on the desktop if you ticked create
-   desktop shortcut) you are gonna see a shortcut for falion, just run it
-   like any other program.
+   desktop shortcut) you are gonna see a shortcut for falion, just run it like
+   any other program.
 1. Might wanna take a look at the [Usage Tab](#-usage) if you don't understand
    something about it.
 
@@ -186,21 +185,20 @@ If you've got any questions please give the [FAQ](#faq) a check.
 
 #### Portable Bin
 
-1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases)
-   and download the _falion-linux_ file.
+1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases) and
+   download the _falion-linux_ file.
 1. Double click the bin you just downloaded and there you go the program works.
 1. Might wanna take a look at the [Usage Tab](#-usage) if you don't understand
    something about it.
-1. Also you might wanna download _falion-linux.tar.gz_ file instead and
-   extract linux/desktop/falion.desktop to
-   $HOME/.local/share/applications, linux/desktop/icons to
-   $HOME/.local/share/icons in order to have a start-menu shortcut and
-   falion to /usr/bin/.
+1. Also you might wanna download _falion-linux.tar.gz_ file instead and extract
+   linux/desktop/falion.desktop to $HOME/.local/share/applications,
+   linux/desktop/icons to $HOME/.local/share/icons in order to have a start-menu
+   shortcut and falion to /usr/bin/.
 
 #### AppImage
 
-1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases)
-   and download the _falion-linux.AppImage_ file.
+1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases) and
+   download the _falion-linux.AppImage_ file.
 1. Double click the AppImage you download and there you go the program just
    works. You may want to install
    [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) if you
@@ -265,8 +263,8 @@ b. Manually cloning and building it from AUR
 
 You are using NixOS, don't worry I got you bro.
 
-1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases)
-   and download the _falion-linux.nix_ file.
+1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases) and
+   download the _falion-linux.nix_ file.
 1. If you use flakes then put it in your pkgs folder, and up-top add your tag
    (like _my_). If you don't just add the code in your default.nix file and
    install it this way.
@@ -279,8 +277,8 @@ You should use the app image. This does not provide a desktop file, you'll have
 to run it from the command-line. It's here just as another means if needed. I
 will try to make a ppa eventually.
 
-1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases)
-   and download the _falion-linux.deb_ file.
+1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases) and
+   download the _falion-linux.deb_ file.
 1. Open a terminal in the folder where your download is and run the following
    command:
 
@@ -291,10 +289,10 @@ will try to make a ppa eventually.
 1. Run _falion_ in the terminal and there it is, the app.
 1. Might wanna take a look at the [Usage Tab](#-usage) if you don't understand
    something about it.
-1. Also you might wanna download _falion-linux.tar.gz_ file instead and
-   extract linux/desktop/falion.desktop to
-   $HOME/.local/share/applications and linux/desktop/icons to
-   $HOME/.local/share/icons in order to have a start-menu shortcut.
+1. Also you might wanna download _falion-linux.tar.gz_ file instead and extract
+   linux/desktop/falion.desktop to $HOME/.local/share/applications and
+   linux/desktop/icons to $HOME/.local/share/icons in order to have a start-menu
+   shortcut.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -311,8 +309,8 @@ will try to make a ppa eventually.
 
 #### Portable binary
 
-1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases)
-   and download the _falion-macos_ file.
+1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases) and
+   download the _falion-macos_ file.
 1. Double click the bin you just downloaded and there you go the program works.
 1. Might wanna take a look at the [Usage Tab](#-usage) if you don't understand
    something about it.
@@ -324,8 +322,8 @@ will try to make a ppa eventually.
 Damn simillar to [portable binary](#portable-binary), only real difference is
 this has an icon.
 
-1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases)
-   and download the _falion-macos-app.tar.gz_ file.
+1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases) and
+   download the _falion-macos-app.tar.gz_ file.
 1. Use your archive manager or run in the terminal the following command:
 
    ```shell
@@ -341,8 +339,8 @@ this has an icon.
 
 Works just like any other dmg installer you've used.
 
-1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases)
-   and download the _falion-macos-installer.dmg_ file.
+1. Go to the [Releases Tab](https://github.com/Obscurely/falion/releases) and
+   download the _falion-macos-installer.dmg_ file.
 1. Double click to run the dmg.
 1. Drag the app folder over the _Applications_ folder.
 1. Done, you've just installed the app, should see it in launchpad now.
@@ -460,8 +458,7 @@ use nix).
    It will take a bit depending on your system because of executable speed
    optimizations, but be patient.
 
-1. Done, navigate to target/release and grab only the "falion" file from
-   there.
+1. Done, navigate to target/release and grab only the "falion" file from there.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -523,8 +520,8 @@ falion is following [Semantic Versioning 2.0](https://semver.org/).
 
 ## 🔰 Security
 
-If you happen to find any issues please carefully read [SECURITY.md](SECURITY.md)
-and strictly follow everything stated.
+If you happen to find any issues please carefully read
+[SECURITY.md](SECURITY.md) and strictly follow everything stated.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -538,15 +535,16 @@ have fun :)
 ## 📧 Contact
 
 Either post an issue in the
-[Issues Tab](https://github.com/Obscurely/falion/issues) or contact me at
-this email address if you have more to say:
+[Issues Tab](https://github.com/Obscurely/falion/issues) or contact me at this
+email address if you have more to say:
 [obscurely.message@protonmail.com](mailto:obscurely.message@protonmail.com)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## 📄 Template
 
-This repository is based on this template [Obscurely/RustTemplate](https://github.com/Obscurely/RustTemplate)
+This repository is based on this template
+[Obscurely/RustTemplate](https://github.com/Obscurely/RustTemplate)
 
 ## 🦾 Acknowledgments
 
