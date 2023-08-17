@@ -19,17 +19,17 @@
       {
         devShells.default = mkShell {
           buildInputs = [
+            rust-bin.stable.latest.default
+            llvmPackages_latest.llvm
+            llvmPackages_latest.bintools
+            llvmPackages_latest.lld
             openssl
             pkg-config
             exa
             fd
-            rust-bin.stable.latest.default
-            llvmPackages_latest.llvm
-            llvmPackages_latest.bintools
             zlib.out
             xorriso
             grub2
-            llvmPackages_latest.lld
             cargo-audit # audit dependencies in order to scan for supply chain attacks 
             cargo-fuzz # fuzzing tool
             cargo-deny # tool to deny crates based on checks.
@@ -41,7 +41,6 @@
             pkg-config
             python311
             python311Packages.pillow # this is for python repo script
-            # falion specific
             openssl
           ];
 
@@ -49,6 +48,8 @@
             alias ls=exa
             alias find=fd
           '';
+
+          RUST_BACKTRACE=1;
         };
       }
     );
