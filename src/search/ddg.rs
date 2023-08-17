@@ -1,4 +1,6 @@
 #![allow(dead_code)]
+use std::path::StripPrefixError;
+
 use super::utils;
 use thiserror::Error;
 
@@ -274,7 +276,14 @@ impl Ddg {
         // get links
         let mut links = match links_response_body.split_once(LINKS_SPLIT1) {
             Some(start) => match start.1.split_once(LINKS_SPLIT2) {
-                Some(full) => full.0.split(LINKS_SEP).collect::<Vec<&str>>(),
+                Some(full) => full
+                    .0
+                    .split(LINKS_SEP)
+                    .map(|s| match s.strip_suffix('/') {
+                        Some(s_stripped) => s_stripped,
+                        None => s,
+                    })
+                    .collect::<Vec<&str>>(),
                 None => {
                     tracing::error!(
                         "Failed to second split response body from ddg links. Response body: {}",
