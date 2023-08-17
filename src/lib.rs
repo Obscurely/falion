@@ -1,9 +1,16 @@
 pub mod search;
 use clap::Parser;
+use crossterm::style;
+use crossterm::style::Stylize;
 use crossterm::terminal;
+use indexmap::IndexMap;
 use std::fs;
 use std::{fs::File, sync::Arc};
+use thiserror::Error;
+use tokio::task::{JoinError, JoinHandle};
 use tracing_subscriber::{filter, prelude::*};
+
+type ResultsType<T, S> = IndexMap<String, JoinHandle<Result<T, S>>>;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -18,6 +25,16 @@ pub struct Cli {
     /// Disable logs
     #[arg(short, long)]
     pub disable_logs: bool,
+}
+
+#[derive(Error, Debug)]
+pub enum GetResultsError {
+    #[error("There was an error awaiting the result for this source. Error: {0}")]
+    JoinError(JoinError),
+    #[error(
+        "There was an error getting the result for the given index. Error: Index out of Bounds"
+    )]
+    OutOfBounds,
 }
 
 #[tracing::instrument(skip_all)]
@@ -136,3 +153,64 @@ pub fn setup_logs(stdout: &mut std::io::Stdout, verbose: bool) {
             .init();
     }
 }
+
+pub fn print_resource<T, S>(
+    stdout: &mut std::io::Stdout,
+    resource_index: usize,
+    resource_print: &str,
+    resource_results: &Result<ResultsType<T, S>, S>,
+) where
+    S: std::string::ToString,
+{
+    match resource_results {
+        Ok(results) => {
+            let current_result = match results.get_index(resource_index) {
+                Some(res) => res,
+                None => {
+                    // this should never happen
+                    clean(stdout);
+                    panic!("This should never have happened. Please create a new issue on github and post latest.log file.")
+                }
+            };
+            if let Err(error) = crossterm::queue!(
+                stdout,
+                style::PrintStyledContent(
+                    (resource_print.to_string() + current_result.0).stylize()
+                ),
+                style::Print("\n\r")
+            ) {
+                tracing::warn!("There was an error printing some text. Error: {}", error);
+            }
+        }
+        Err(error) => {
+            if let Err(error) = crossterm::queue!(
+                stdout,
+                style::PrintStyledContent(error.to_string().red()),
+                style::Print("\n\r")
+            ) {
+                tracing::warn!("There was an error printing some text. Error: {}", error);
+            }
+        }
+    }
+}
+
+// pub async fn get_result<'a, T, S>(
+//     index: usize,
+//     results: &'a mut IntoIter<IndexMap<String, JoinHandle<Result<T, S>>>>,
+//     results_awaited: &'a mut IndexMap<String, Result<T, S>>,
+// ) -> Result<(&'a String, &'a Result<T, S>), GetResultsError> {
+//     match results_awaited.get_index(index) {
+//         Some(res) => return Ok(res),
+//         None => {
+//             match results.get_index_mut(index) {
+//                 Some(res) => {
+//                     match res.1.await {
+//                         Ok(res_awaited) => return Ok((res.0, res_awaited.into())),
+//                         Err(error) => return Err(GetResultsError::JoinError(error)),
+//                     }
+//                 },
+//                 None => return Err(GetResultsError::OutOfBounds),
+//             }
+//         }
+//     }
+// }
