@@ -20,12 +20,34 @@ pub struct Cli {
     pub disable_logs: bool,
 }
 
+#[tracing::instrument(skip_all)]
 pub fn clean(stdout: &mut std::io::Stdout) {
     let _ = terminal::disable_raw_mode();
-    let _ = crossterm::execute!(stdout, crossterm::style::ResetColor);
-    let _ = crossterm::execute!(stdout, terminal::Clear(terminal::ClearType::All));
-    let _ = crossterm::execute!(stdout, terminal::ScrollUp(u16::MAX));
-    let _ = crossterm::execute!(stdout, crossterm::cursor::MoveTo(0, 0));
+    if let Err(error) = crossterm::execute!(stdout, crossterm::style::ResetColor) {
+        tracing::warn!("Failed to reset term collor. Error: {}", error);
+    }
+    if let Err(error) = crossterm::execute!(stdout, terminal::Clear(terminal::ClearType::All)) {
+        tracing::warn!("Failed to clear terminal. Error: {}", error);
+    }
+    if let Err(error) = crossterm::execute!(stdout, terminal::ScrollUp(u16::MAX)) {
+        tracing::warn!("Failed to scroll up the terminal. Error: {}", error);
+    }
+    if let Err(error) = crossterm::execute!(stdout, crossterm::cursor::MoveTo(0, 0)) {
+        tracing::warn!("Failed to move terminal cursor. Error: {}", error);
+    }
+}
+
+#[tracing::instrument(skip_all)]
+pub fn clear_terminal(stdout: &mut std::io::Stdout) {
+    if let Err(error) = crossterm::execute!(stdout, terminal::Clear(terminal::ClearType::All)) {
+        tracing::warn!("Failed to clear terminal. Error: {}", error);
+    }
+    if let Err(error) = crossterm::execute!(stdout, terminal::ScrollUp(u16::MAX)) {
+        tracing::warn!("Failed to scroll up the terminal. Error: {}", error);
+    }
+    if let Err(error) = crossterm::execute!(stdout, crossterm::cursor::MoveTo(0, 0)) {
+        tracing::warn!("Failed to move terminal cursor. Error: {}", error);
+    }
 }
 
 pub fn setup_logs(stdout: &mut std::io::Stdout, verbose: bool) {
@@ -87,7 +109,7 @@ pub fn setup_logs(stdout: &mut std::io::Stdout, verbose: bool) {
             .with(
                 stdout_log
                     // Add an `INFO` filter to the stdout logging layer
-                    .with_filter(filter::LevelFilter::ERROR)
+                    .with_filter(filter::LevelFilter::WARN)
                     // Combine the filtered `stdout_log` layer with the
                     // `debug_log` layer, producing a new `Layered` layer.
                     .and_then(debug_log.with_filter(filter_debug_log)), // Add a filter to *both* layers that rejects spans and

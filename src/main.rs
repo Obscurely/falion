@@ -1,5 +1,6 @@
 mod search;
 use clap::Parser;
+use crossterm::style::{self, Stylize};
 use crossterm::terminal;
 
 #[tokio::main]
@@ -12,16 +13,22 @@ async fn main() {
     let verbose = cli.verbose;
     let disable_logs = cli.disable_logs;
 
+    // check if query is not shorter than 5 characters
+    if query.len() < 5 {
+        panic!("\n-> Your query is shorter than 5 characters <-\n");
+    }
+
     // get stdout
     let mut stdout = std::io::stdout();
 
     // Pre-setup
-    // make sure terminal raw mode is not enabled
-    if let Err(err) = terminal::disable_raw_mode() {
+    // enable terminal raw mode
+    if let Err(err) = terminal::enable_raw_mode() {
         falion::clean(&mut stdout);
-        panic!("Failed to disable raw mode: {}", err);
+        panic!("Failed to enable raw mode: {}", err);
     }
 
+    // enable (or not) logs based on flag
     if !disable_logs {
         falion::setup_logs(&mut stdout, verbose);
     }
@@ -55,10 +62,37 @@ async fn main() {
 
     // transfer the awaited futures back
     let stackoverflow_results = results_awaited.0;
-    let stachexchange_results = results_awaited.1;
+    let stackexchange_results = results_awaited.1;
     let github_gist_results = results_awaited.2;
     let geeksforgeeks_results = results_awaited.3;
     let ddg_search_results = results_awaited.4;
 
-    dbg!(stackoverflow_results);
+    // store wheter or not there are available results
+    let stackoverflow_available = stackoverflow_results.is_ok();
+    let stackexchange_available = stackexchange_results.is_ok();
+    let github_gist_available = github_gist_results.is_ok();
+    let geeksforgeeks_available = geeksforgeeks_results.is_ok();
+    let ddg_search_available = ddg_search_results.is_ok();
+
+    // set a current index of result sources
+    let mut stackoverflow_index = 0;
+    let mut stackexchange_index = 0;
+    let mut github_gist_index = 0;
+    let mut geeksforgeeks_index = 0;
+    let mut ddg_search_index = 0;
+
+    // actual cli
+    // query print
+    let query_print = format!("{} {}", "Your search query is:".green(), query.blue())
+        .attribute(style::Attribute::Bold);
+    // clear terminal
+    falion::clear_terminal(&mut stdout);
+
+    // display
+    if let Err(error) = crossterm::queue!(&mut stdout, style::PrintStyledContent(query_print)) {
+        tracing::warn!("There was an error printing some text. Error: {}", error);
+    };
+
+    crossterm::terminal::disable_raw_mode().unwrap();
+    // falion::clean(&mut stdout);
 }
