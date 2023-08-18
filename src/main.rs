@@ -176,47 +176,23 @@ async fn main() {
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
-                match stackoverflow_results_ref {
-                    Ok(res) => {
-                        if let Some(unawaited_res) = res.get_index_mut(stackoverflow_index) {
-                            if let Some(res) = stackoverflow_results_awaited.get(unawaited_res.0) {
-                                // clear the terminal in order to prepare for printing
-                                falion::clear_terminal(&mut stdout);
-                                // show the thread content
-                                if falion::print_dyn_content(&mut stdout, res, true) {
-                                    falion::clean(&mut stdout);
-                                    return;
-                                }
-                            } else {
-                                let awaited = match unawaited_res.1.await {
-                                    Ok(handled) => match handled {
-                                        Ok(awaited) => awaited,
-                                        Err(error) => {
-                                            vec![format!("There has been an error getting the contents for this result. Error: {}", error)]
-                                        }
-                                    },
-                                    Err(error) => {
-                                        vec![format!("There has been an error handeling the future for this result. Error: {}", error)]
-                                    }
-                                };
-
-                                // clear the terminal in order to prepare for printing
-                                falion::clear_terminal(&mut stdout);
-                                // show the thread content
-                                if falion::print_dyn_content(&mut stdout, &awaited, true) {
-                                    falion::clean(&mut stdout);
-                                    return;
-                                }
-
-                                // save already awaited
-                                stackoverflow_results_awaited
-                                    .insert(unawaited_res.0.to_owned(), awaited);
-                            }
+                match falion::get_dyn_result_content(
+                    stackoverflow_results_ref,
+                    &mut stackoverflow_results_awaited,
+                    stackoverflow_index,
+                )
+                .await
+                {
+                    Some(content) => {
+                        falion::clear_terminal(&mut stdout);
+                        if falion::print_dyn_content(&mut stdout, content, true) {
+                            falion::clean(&mut stdout);
+                            return;
                         }
                     }
-                    Err(_) => {
+                    None => {
                         tracing::info!(
-                            "User tryed accessing a resource that has been deemed unavailable."
+                            "User tryed accessing stackoverflow which has been deemed unavailable."
                         );
                     }
                 }
@@ -460,7 +436,7 @@ async fn main() {
                 code: event::KeyCode::Char('c'),
                 modifiers: event::KeyModifiers::CONTROL,
                 ..
-            }) => { 
+            }) => {
                 falion::clean(&mut stdout);
                 return;
             }
