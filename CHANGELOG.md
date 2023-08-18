@@ -20,11 +20,11 @@
 - All of the features present on the
   [features list](https://obscurely.github.io/RustTemplate/template/FEATURES.html)
   of [my rust template](https://github.com/Obscurely/RustTemplate).
-- Added cargo fuzz harness for the duckduckgo get_links function in order to make
-  sure it will not fail making requests over time.
+- Added cargo fuzz harness for the duckduckgo get_links function in order to
+  make sure it will not fail making requests over time.
 - General performance improvements.
-- Added logging across the whole application. Not too much, just enough to be able
-  to debug eventual errors. I tried to keep it simple.
+- Added logging across the whole application. Not too much, just enough to be
+  able to debug eventual errors. I tried to keep it simple.
 
 ### Changed
 
@@ -52,6 +52,8 @@
   requesting the gist files instead of concurent and simplified process.
 - Better error handling.
 - Better argument parsing using clap instead of arg_parse.
+- Rewrote the cli. More efficient, less error prone and just better in general.
+  Note: it works almost the same, this is just the backend.
 
 ### Deprecated
 

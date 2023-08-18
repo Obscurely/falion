@@ -1,8 +1,11 @@
 mod search;
+use std::io::Write;
+
 use clap::Parser;
 use crossterm::event;
 use crossterm::style::{self, Stylize};
 use crossterm::terminal;
+use indexmap::IndexMap;
 
 #[tokio::main]
 async fn main() {
@@ -67,11 +70,11 @@ async fn main() {
     );
 
     // transfer the awaited futures back
-    let stackoverflow_results = results_awaited.0;
-    let stackexchange_results = results_awaited.1;
-    let github_gist_results = results_awaited.2;
-    let geeksforgeeks_results = results_awaited.3;
-    let ddg_search_results = results_awaited.4;
+    let mut stackoverflow_results = results_awaited.0;
+    let mut stackexchange_results = results_awaited.1;
+    let mut github_gist_results = results_awaited.2;
+    let mut geeksforgeeks_results = results_awaited.3;
+    let mut ddg_search_results = results_awaited.4;
 
     // set a current index of result resources
     let mut stackoverflow_index = 0;
@@ -80,12 +83,14 @@ async fn main() {
     let mut geeksforgeeks_index = 0;
     let mut ddg_search_index = 0;
 
+    // let test = stackexchange_results.as_mut().unwrap().get_index_mut(0).unwrap().1.await.unwrap().unwrap();
+
     // set results awaited vars
-    // let mut stackoverflow_results_awaited = IndexMap::new();
-    // let mut stackexchange_results_awaited = IndexMap::new();
-    // let mut github_gist_results_awaited = IndexMap::new();
-    // let mut geeksforgeeks_results_awaited = IndexMap::new();
-    // let mut ddg_search_results_awaited = IndexMap::new();
+    let mut stackoverflow_results_awaited: IndexMap<String, Vec<String>> = IndexMap::new();
+    let mut stackexchange_results_awaited: IndexMap<&str, Vec<String>> = IndexMap::new();
+    let mut github_gist_results_awaited: IndexMap<&str, String> = IndexMap::new();
+    let mut geeksforgeeks_results_awaited: IndexMap<&str, String> = IndexMap::new();
+    let mut ddg_search_results_awaited: IndexMap<&str, String> = IndexMap::new();
 
     // actual cli
     // reusable prints
@@ -99,6 +104,13 @@ async fn main() {
     falion::clear_terminal(&mut stdout);
 
     loop {
+        // save values as mutable references in loop in order to mitigate nll borrow checker false
+        // positives when in a loop
+        let stackoverflow_results_ref = &mut stackoverflow_results;
+        let stackexchange_results_ref = &mut stackexchange_results;
+        let github_gist_results_ref = &mut github_gist_results;
+        let geeksforgeeks_results_ref = &mut geeksforgeeks_results;
+        let ddg_search_results_ref = &mut ddg_search_results;
         // display query
         if let Err(error) = crossterm::queue!(
             &mut stdout,
@@ -113,32 +125,40 @@ async fn main() {
             &mut stdout,
             stackoverflow_index,
             &sof_print,
-            &stackoverflow_results,
+            stackoverflow_results_ref,
         );
         falion::print_resource(
             &mut stdout,
             stackexchange_index,
             &se_print,
-            &stackexchange_results,
+            stackexchange_results_ref,
         );
         falion::print_resource(
             &mut stdout,
             github_gist_index,
             &gg_print,
-            &github_gist_results,
+            github_gist_results_ref,
         );
         falion::print_resource(
             &mut stdout,
             geeksforgeeks_index,
             &gfg_print,
-            &geeksforgeeks_results,
+            geeksforgeeks_results_ref,
         );
         falion::print_resource(
             &mut stdout,
             ddg_search_index,
             &ddg_print,
-            &ddg_search_results,
+            ddg_search_results_ref,
         );
+
+        // flush in order to print content
+        if let Err(error) = stdout.flush() {
+            tracing::warn!(
+                "There was an error flushing stdout in order to print resources. Error: {}",
+                error
+            );
+        }
 
         let event_read = match event::read() {
             Ok(ev) => ev,
@@ -156,7 +176,50 @@ async fn main() {
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
-                // stackoverflow current result content
+                match stackoverflow_results_ref {
+                    Ok(res) => {
+                        if let Some(unawaited_res) = res.get_index_mut(stackoverflow_index) {
+                            if let Some(res) = stackoverflow_results_awaited.get(unawaited_res.0) {
+                                // clear the terminal in order to prepare for printing
+                                falion::clear_terminal(&mut stdout);
+                                // show the thread content
+                                if falion::print_dyn_content(&mut stdout, res, true) {
+                                    falion::clean(&mut stdout);
+                                    return;
+                                }
+                            } else {
+                                let awaited = match unawaited_res.1.await {
+                                    Ok(handled) => match handled {
+                                        Ok(awaited) => awaited,
+                                        Err(error) => {
+                                            vec![format!("There has been an error getting the contents for this result. Error: {}", error)]
+                                        }
+                                    },
+                                    Err(error) => {
+                                        vec![format!("There has been an error handeling the future for this result. Error: {}", error)]
+                                    }
+                                };
+
+                                // clear the terminal in order to prepare for printing
+                                falion::clear_terminal(&mut stdout);
+                                // show the thread content
+                                if falion::print_dyn_content(&mut stdout, &awaited, true) {
+                                    falion::clean(&mut stdout);
+                                    return;
+                                }
+
+                                // save already awaited
+                                stackoverflow_results_awaited
+                                    .insert(unawaited_res.0.to_owned(), awaited);
+                            }
+                        }
+                    }
+                    Err(_) => {
+                        tracing::info!(
+                            "User tryed accessing a resource that has been deemed unavailable."
+                        );
+                    }
+                }
             }
             // go to next element in the first resource (using ! because of terminal limitations)
             event::Event::Key(event::KeyEvent {
@@ -200,7 +263,7 @@ async fn main() {
                 ..
             }) => {
                 // stackexchange next result
-                match &stackexchange_results {
+                match stackexchange_results_ref {
                     Ok(res) => {
                         if stackexchange_index < res.len() - 1 {
                             stackexchange_index += 1;
@@ -235,7 +298,7 @@ async fn main() {
                 ..
             }) => {
                 // github gist next result
-                match &github_gist_results {
+                match github_gist_results_ref {
                     Ok(res) => {
                         if github_gist_index < res.len() - 1 {
                             github_gist_index += 1;
@@ -270,7 +333,7 @@ async fn main() {
                 ..
             }) => {
                 // geeksforgeeks next result
-                match &geeksforgeeks_results {
+                match geeksforgeeks_results_ref {
                     Ok(res) => {
                         if geeksforgeeks_index < res.len() - 1 {
                             geeksforgeeks_index += 1;
@@ -305,7 +368,7 @@ async fn main() {
                 ..
             }) => {
                 // ddg search next result
-                match &ddg_search_results {
+                match ddg_search_results_ref {
                     Ok(res) => {
                         if ddg_search_index < res.len() - 1 {
                             ddg_search_index += 1;
@@ -332,7 +395,7 @@ async fn main() {
                 ..
             }) => {
                 // move all resources to the next element
-                match &stackoverflow_results {
+                match stackoverflow_results_ref {
                     Ok(res) => {
                         if stackoverflow_index < res.len() - 1 {
                             stackoverflow_index += 1;
@@ -341,7 +404,7 @@ async fn main() {
                     // we already handled the error
                     Err(_) => (),
                 }
-                match &stackexchange_results {
+                match stackexchange_results_ref {
                     Ok(res) => {
                         if stackexchange_index < res.len() - 1 {
                             stackexchange_index += 1;
@@ -350,7 +413,7 @@ async fn main() {
                     // we already handled the error
                     Err(_) => (),
                 }
-                match &github_gist_results {
+                match github_gist_results_ref {
                     Ok(res) => {
                         if github_gist_index < res.len() - 1 {
                             github_gist_index += 1;
@@ -359,7 +422,7 @@ async fn main() {
                     // we already handled the error
                     Err(_) => (),
                 }
-                match &geeksforgeeks_results {
+                match geeksforgeeks_results_ref {
                     Ok(res) => {
                         if geeksforgeeks_index < res.len() - 1 {
                             geeksforgeeks_index += 1;
@@ -368,7 +431,7 @@ async fn main() {
                     // we already handled the error
                     Err(_) => (),
                 }
-                match &ddg_search_results {
+                match ddg_search_results_ref {
                     Ok(res) => {
                         if ddg_search_index < res.len() - 1 {
                             ddg_search_index += 1;
@@ -397,10 +460,7 @@ async fn main() {
                 code: event::KeyCode::Char('c'),
                 modifiers: event::KeyModifiers::CONTROL,
                 ..
-            }) => {
-                if let Err(error) = crossterm::terminal::disable_raw_mode() {
-                    tracing::warn!("Failed to disable termial raw mode! Error: {}", error);
-                }
+            }) => { 
                 falion::clean(&mut stdout);
                 return;
             }
