@@ -87,10 +87,10 @@ async fn main() {
 
     // set results awaited vars
     let mut stackoverflow_results_awaited: IndexMap<String, Vec<String>> = IndexMap::new();
-    let mut stackexchange_results_awaited: IndexMap<&str, Vec<String>> = IndexMap::new();
-    let mut github_gist_results_awaited: IndexMap<&str, String> = IndexMap::new();
-    let mut geeksforgeeks_results_awaited: IndexMap<&str, String> = IndexMap::new();
-    let mut ddg_search_results_awaited: IndexMap<&str, String> = IndexMap::new();
+    let mut stackexchange_results_awaited: IndexMap<String, Vec<String>> = IndexMap::new();
+    let mut github_gist_results_awaited: IndexMap<String, Vec<String>> = IndexMap::new();
+    let mut geeksforgeeks_results_awaited: IndexMap<String, String> = IndexMap::new();
+    let mut ddg_search_results_awaited: IndexMap<String, String> = IndexMap::new();
 
     // actual cli
     // reusable prints
@@ -191,8 +191,8 @@ async fn main() {
                         }
                     }
                     None => {
-                        tracing::info!(
-                            "User tryed accessing stackoverflow which has been deemed unavailable."
+                        tracing::warn!(
+                            "User tried accessing stackoverflow which has been deemed unavailable."
                         );
                     }
                 }
@@ -231,6 +231,26 @@ async fn main() {
                 ..
             }) => {
                 // stackexchange current result content
+                match falion::get_dyn_result_content(
+                    stackexchange_results_ref,
+                    &mut stackexchange_results_awaited,
+                    stackexchange_index,
+                )
+                .await
+                {
+                    Some(content) => {
+                        falion::clear_terminal(&mut stdout);
+                        if falion::print_dyn_content(&mut stdout, content, true) {
+                            falion::clean(&mut stdout);
+                            return;
+                        }
+                    }
+                    None => {
+                        tracing::warn!(
+                            "User tried accessing stackexchange which has been deemed unavailable."
+                        );
+                    }
+                }
             }
             // go to the next element in the second resource list
             event::Event::Key(event::KeyEvent {
@@ -266,6 +286,26 @@ async fn main() {
                 ..
             }) => {
                 // github_gist show current result content
+                match falion::get_dyn_result_content(
+                    github_gist_results_ref,
+                    &mut github_gist_results_awaited,
+                    github_gist_index,
+                )
+                .await
+                {
+                    Some(content) => {
+                        falion::clear_terminal(&mut stdout);
+                        if falion::print_dyn_content(&mut stdout, content, false) {
+                            falion::clean(&mut stdout);
+                            return;
+                        }
+                    }
+                    None => {
+                        tracing::warn!(
+                            "User tried accessing github gist which has been deemed unavailable."
+                        );
+                    }
+                }
             }
             // go to the next element in the third resource list
             event::Event::Key(event::KeyEvent {
@@ -301,6 +341,26 @@ async fn main() {
                 ..
             }) => {
                 // geeksforgeeks show content for current result
+                match falion::get_static_result_content(
+                    geeksforgeeks_results_ref,
+                    &mut geeksforgeeks_results_awaited,
+                    geeksforgeeks_index,
+                )
+                .await
+                {
+                    Some(content) => {
+                        falion::clear_terminal(&mut stdout);
+                        if falion::print_static_content(&mut stdout, content) {
+                            falion::clean(&mut stdout);
+                            return;
+                        }
+                    }
+                    None => {
+                        tracing::warn!(
+                            "User tried accessing geeksforgeeks which has been deemed unavailable."
+                        );
+                    }
+                }
             }
             // go to the next element in the forth resource list
             event::Event::Key(event::KeyEvent {
@@ -336,6 +396,26 @@ async fn main() {
                 ..
             }) => {
                 // ddg search show content for current result
+                match falion::get_static_result_content(
+                    ddg_search_results_ref,
+                    &mut ddg_search_results_awaited,
+                    ddg_search_index,
+                )
+                .await
+                {
+                    Some(content) => {
+                        falion::clear_terminal(&mut stdout);
+                        if falion::print_static_content(&mut stdout, content) {
+                            falion::clean(&mut stdout);
+                            return;
+                        }
+                    }
+                    None => {
+                        tracing::warn!(
+                            "User tried accessing ddg search which has been deemed unavailable."
+                        );
+                    }
+                }
             }
             // go to the next element in the fifth resource list
             event::Event::Key(event::KeyEvent {

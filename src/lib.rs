@@ -226,8 +226,8 @@ pub fn print_dyn_content(
     loop {
         // print content
         let content = match content.get(current_index) {
-            Some(content) => content,
-            None => "There has been error getting the contents for this result",
+            Some(content) => content.replace('\n', "\n\r"),
+            None => "There has been error getting the contents for this result".to_string(),
         };
         if current_index == 0 {
             if let Err(error) = crossterm::queue!(
@@ -308,6 +308,69 @@ pub fn print_dyn_content(
             }) => {
                 return false;
             }
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('c'),
+                modifiers: event::KeyModifiers::CONTROL,
+                ..
+            }) => {
+                return true;
+            }
+            _ => (),
+        }
+
+        // clear terminal
+        clear_terminal(stdout);
+    }
+}
+
+pub fn print_static_content(stdout: &mut std::io::Stdout, content: &str) -> bool {
+    let content = content.replace('\n', "\n\r");
+    let page_title = "Page:".green().bold();
+    loop {
+        // print content
+        if let Err(error) = crossterm::queue!(
+            stdout,
+            style::PrintStyledContent(page_title),
+            style::Print("\n\r\n\r")
+        ) {
+            tracing::warn!(
+                "There was an error printing the title of thread's current entry. Error: {}",
+                error
+            );
+        }
+
+        if let Err(error) = crossterm::queue!(stdout, style::Print(&content)) {
+            tracing::warn!(
+                "There was an error printing a thread's content. Error: {}",
+                error
+            );
+        }
+
+        if let Err(error) = stdout.flush() {
+            tracing::warn!(
+                "There was an error flushing stdout in order to print thread's content. Error: {}",
+                error
+            );
+        }
+
+        let event_read = match event::read() {
+            Ok(ev) => ev,
+            Err(error) => {
+                tracing::warn!("There was an error reading the input event... going to the next iteration. If this continue please post an issue on github with the specific log file. Error: {}", error);
+                continue;
+            }
+        };
+
+        match event_read {
+            // return to main menu
+            event::Event::Key(event::KeyEvent {
+                code: event::KeyCode::Char('q'),
+                modifiers: event::KeyModifiers::CONTROL,
+                ..
+            }) => {
+                return false;
+            }
+            // quit app
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('c'),
                 modifiers: event::KeyModifiers::CONTROL,
