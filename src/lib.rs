@@ -139,11 +139,15 @@ pub fn setup_logs(stdout: &mut std::io::Stdout, verbose: bool) {
         let filter_debug_log = filter::Targets::new()
             .with_target("falion", filter::LevelFilter::DEBUG)
             .with_target("hyper", filter::LevelFilter::WARN);
+        let filter_stdout_log = filter::Targets::new()
+            .with_target("falion", filter::LevelFilter::WARN)
+            .with_target("falion::search", filter::LevelFilter::OFF)
+            .with_target("hyper", filter::LevelFilter::WARN);
         tracing_subscriber::registry()
             .with(
                 stdout_log
                     // Add an `INFO` filter to the stdout logging layer
-                    .with_filter(filter::LevelFilter::WARN)
+                    .with_filter(filter_stdout_log)
                     // Combine the filtered `stdout_log` layer with the
                     // `debug_log` layer, producing a new `Layered` layer.
                     .and_then(debug_log.with_filter(filter_debug_log)), // Add a filter to *both* layers that rejects spans and
