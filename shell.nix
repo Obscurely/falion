@@ -1,5 +1,5 @@
 {pkgs ? import <nixpkgs> {}}:
-pkgs.mkShell {
+pkgs.mkShell rec {
   buildInputs = with pkgs; [
     llvmPackages_latest.llvm
     llvmPackages_latest.bintools
@@ -7,7 +7,6 @@ pkgs.mkShell {
     xorriso
     grub2
     llvmPackages_latest.lld
-    # rustup
     rustc
     cargo
     rustfmt
@@ -23,9 +22,27 @@ pkgs.mkShell {
     pkg-config
     python311
     python311Packages.pillow # this is for python repo script
-    # falion specific
     openssl
+    # falion specific, for ui (iced)
+    libxkbcommon
+    libGL
+    # WINIT_UNIX_BACKEND=wayland
+    wayland
+    # WINIT_UNIX_BACKEND=x11
+    xorg.libXcursor
+    xorg.libXrandr
+    xorg.libXi
+    xorg.libX11
+    # fonts
+    fontconfig
+    # Extra iced dependencies
+    expat
+    freetype
+    freetype.dev
+    pkgconfig
   ];
 
   RUST_BACKTRACE = 1;
+  # falion specific for ui (iced)
+  LD_LIBRARY_PATH = builtins.foldl' (a: b: "${a}:${b}/lib") "${pkgs.vulkan-loader}/lib" buildInputs;
 }
