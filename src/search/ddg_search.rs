@@ -210,14 +210,16 @@ impl DdgSearch {
         // IndexMap
         for link in links {
             // unwrap is safe here since ddg does all the checks
-            let domain = link
-                .split_once("https://")
-                .unwrap()
-                .1
-                .split_once('/')
-                .unwrap()
-                .0;
-            let name = link.split('/').last().unwrap().replace('-', " ");
+            let mut name = String::from("");
+            let domain = link.split_once("https://").unwrap().1;
+            let domain = match domain.split_once('/') {
+                Some(split) => {
+                    name = link.split('/').last().unwrap().replace('-', " ");
+                    split.1
+                }
+                None => domain,
+            };
+            // let name = link.split('/').last().unwrap().replace('-', " ");
             let mut full_name = String::with_capacity(domain.len() + name.len() + 3);
             full_name.push_str(domain);
             full_name.push_str(" | ");
