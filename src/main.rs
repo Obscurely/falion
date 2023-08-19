@@ -1,6 +1,7 @@
 mod cli;
 mod search;
 mod util;
+mod ui;
 
 /// Main Falion execution
 #[tokio::main]
@@ -43,13 +44,14 @@ async fn main() {
     let ddg_search_results = results_awaited.4;
 
     // run cli
-    cli::cli(
-        query,
-        stackoverflow_results,
-        stackexchange_results,
-        github_gist_results,
-        geeksforgeeks_results,
-        ddg_search_results,
-    )
-    .await;
+    // cli::cli(
+    //     query,
+    //     stackoverflow_results,
+    //     stackexchange_results,
+    //     github_gist_results,
+    //     geeksforgeeks_results,
+    //     ddg_search_results,
+    // )
+    // .await;
+    ui::ui().unwrap();
 }

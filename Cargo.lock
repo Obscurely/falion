@@ -872,6 +872,7 @@ dependencies = [
  "html2text",
  "iced",
  "indexmap 2.0.0",
+ "once_cell",
  "rand",
  "rayon",
  "reqwest",
