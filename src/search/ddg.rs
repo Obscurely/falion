@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use super::utils;
+use super::util;
 use thiserror::Error;
 
 const BASE_ADDRESS: &str = "https://duckduckgo.com/?q={QUERY}%20site%3A{SITE}&ia=web";
@@ -76,7 +76,7 @@ impl Ddg {
     /// ```
     pub fn new() -> Self {
         Self {
-            client: utils::client_with_special_settings(),
+            client: util::client_with_special_settings(),
         }
     }
 

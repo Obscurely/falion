@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use super::ddg;
-use super::utils;
+use super::util;
 use indexmap::IndexMap;
 use thiserror::Error;
 
@@ -67,7 +67,7 @@ impl GeeksForGeeks {
     /// ```
     pub fn new() -> Self {
         Self {
-            client: utils::client_with_special_settings(),
+            client: util::client_with_special_settings(),
             ddg: ddg::Ddg::new(),
         }
     }
@@ -211,7 +211,7 @@ impl GeeksForGeeks {
         };
 
         // return article
-        Ok(utils::html_to_text(article, term_width))
+        Ok(util::html_to_text(article, term_width))
     }
 
     /// Search for GeeksForGeeks results using duckduckgo and a provided query. This function will
@@ -319,7 +319,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_gfg_page() {
-        let client = search::utils::client_with_special_settings();
+        let client = search::util::client_with_special_settings();
         let gfg = GeeksForGeeks::with_client(client);
 
         let link = "https://www.geeksforgeeks.org/rust-basics/";
@@ -335,7 +335,7 @@ mod tests {
         thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
 
         // actual function
-        let client = utils::client_with_special_settings();
+        let client = util::client_with_special_settings();
         let gfg = GeeksForGeeks::with_client(client);
 
         let page_content = gfg

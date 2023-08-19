@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use super::ddg;
-use super::utils;
+use super::util;
 use futures::StreamExt;
 use indexmap::IndexMap;
 use rayon::prelude::*;
@@ -64,7 +64,7 @@ impl GithubGist {
     /// ```
     pub fn new() -> Self {
         Self {
-            client: utils::client_with_special_settings(),
+            client: util::client_with_special_settings(),
             ddg: ddg::Ddg::new(),
         }
     }
@@ -397,7 +397,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_gist() {
-        let client = search::utils::client_with_special_settings();
+        let client = search::util::client_with_special_settings();
         let github_gist = GithubGist::with_client(client);
 
         let link = "https://gist.github.com/noxasaxon/7bf5ebf930e281529161e51cd221cf8a";
@@ -413,7 +413,7 @@ mod tests {
         thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
 
         // actual function
-        let client = utils::client_with_special_settings();
+        let client = util::client_with_special_settings();
         let github_gist = GithubGist::with_client(client);
 
         let gist_content = github_gist

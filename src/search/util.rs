@@ -8,9 +8,9 @@ use reqwest::header;
 /// # Examples
 ///
 /// ```
-/// use falion::search::utils;
+/// use falion::search::util;
 ///
-/// let client = utils::client_with_special_settings();
+/// let client = util::client_with_special_settings();
 /// ```
 pub fn client_with_special_settings() -> reqwest::Client {
     let mut rng = rand::thread_rng();
@@ -70,10 +70,10 @@ pub fn client_with_special_settings() -> reqwest::Client {
 /// # Examples
 ///
 /// ```
-/// use falion::search::utils;
+/// use falion::search::util;
 ///
 /// let text = "<p>Hello World!</p>";
-/// assert_eq!(utils::html_to_text(text, 50), "Hello World!\n");
+/// assert_eq!(util::html_to_text(text, 50), "Hello World!\n");
 /// ```
 pub fn html_to_text(html: &str, term_width: usize) -> String {
     let mut text = html2text::from_read(html.as_bytes(), term_width);

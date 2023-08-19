@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use super::{ddg, utils};
+use super::{ddg, util};
 use indexmap::IndexMap;
 use thiserror::Error;
 
@@ -60,7 +60,7 @@ impl StackExchange {
     /// ```
     pub fn new() -> Self {
         Self {
-            client: utils::client_with_special_settings(),
+            client: util::client_with_special_settings(),
             ddg: ddg::Ddg::new(),
         }
     }
@@ -205,7 +205,7 @@ impl StackExchange {
             .filter_map(|q| {
                 q.split_once(QUESTION_END).map(|q_sep| {
                     let html = q_sep.0;
-                    utils::html_to_text(html, term_width)
+                    util::html_to_text(html, term_width)
                 })
             })
             .collect::<Vec<String>>();
@@ -322,7 +322,7 @@ impl Default for StackExchange {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::search::utils;
+    use crate::search::util;
     use rand::Rng;
     use std::thread;
     use std::time::Duration;
@@ -330,7 +330,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_se_content() {
         // actual function
-        let client = utils::client_with_special_settings();
+        let client = util::client_with_special_settings();
         let se = StackExchange::with_client(client.clone());
 
         let link =
@@ -347,7 +347,7 @@ mod tests {
         thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
 
         // actual function
-        let se = StackExchange::with_client(utils::client_with_special_settings());
+        let se = StackExchange::with_client(util::client_with_special_settings());
 
         let question_content = se
             .get_multiple_questions_content("Rust out lives static", Some(1))

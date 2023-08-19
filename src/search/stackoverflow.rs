@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use super::{ddg, utils};
+use super::{ddg, util};
 use indexmap::IndexMap;
 use thiserror::Error;
 
@@ -61,7 +61,7 @@ impl StackOverflow {
     /// ```
     pub fn new() -> Self {
         Self {
-            client: utils::client_with_special_settings(),
+            client: util::client_with_special_settings(),
             ddg: ddg::Ddg::new(),
         }
     }
@@ -206,7 +206,7 @@ impl StackOverflow {
             .filter_map(|q| {
                 q.split_once(QUESTION_END).map(|q_sep| {
                     let html = q_sep.0;
-                    utils::html_to_text(html, term_width)
+                    util::html_to_text(html, term_width)
                 })
             })
             .collect::<Vec<String>>();
@@ -323,7 +323,7 @@ impl Default for StackOverflow {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::search::utils;
+    use crate::search::util;
     use rand::Rng;
     use std::thread;
     use std::time::Duration;
@@ -331,7 +331,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_sof_content() {
         // actual function
-        let client = utils::client_with_special_settings();
+        let client = util::client_with_special_settings();
         let sof = StackOverflow::with_client(client.clone());
 
         let link = "https://stackoverflow.com/questions/17490716/lifetimes-in-rust";
@@ -347,7 +347,7 @@ mod tests {
         thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
 
         // actual function
-        let client = utils::client_with_special_settings();
+        let client = util::client_with_special_settings();
         let sof = StackOverflow::with_client(client);
 
         let question_content = sof

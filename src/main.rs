@@ -10,7 +10,7 @@ async fn main() {
     tracing::debug!("The input query: {}", &query);
 
     // Make objects
-    let client = search::utils::client_with_special_settings();
+    let client = search::util::client_with_special_settings();
     let stackoverflow = search::stackoverflow::StackOverflow::with_client(client.clone());
     let stackexchange = search::stackexchange::StackExchange::with_client(client.clone());
     let github_gist = search::github_gist::GithubGist::with_client(client.clone());
