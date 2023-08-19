@@ -60,7 +60,7 @@ pub fn print_resource<T, S>(
 }
 
 /// Create a screen similar to the cli one where you go through a content that is iterable.
-/// 
+///
 /// # Arguments
 ///
 /// `stdout` - std::io::stdout() you should have one in main you reference across functions. It's
@@ -89,9 +89,7 @@ pub fn print_dyn_content(
             // replace \n to \n\r because in terminal raw mode a new line doesn't bring you the
             // beginning of the row, it only goes down one line literally.
             Some(content) => content.replace('\n', "\n\r"),
-            None => {
-                "There has been error getting the contents for this result".to_string()
-            },
+            None => "There has been error getting the contents for this result".to_string(),
         };
         // print first element tag or not
         if current_index == 0 {

@@ -80,7 +80,7 @@ pub fn setup_cli() -> String {
     // enable terminal raw mode
     if let Err(err) = terminal::enable_raw_mode() {
         panic!("Failed to enable raw mode: {}", err);
-    } 
+    }
 
     // enable (or not) logs based on flag
     if !disable_logs {

@@ -58,7 +58,10 @@ where
             }
         }
         Err(error) => {
-            tracing::info!("User tryed accessing a resource that has been deemed unavailable. Error: {}", error);
+            tracing::info!(
+                "User tryed accessing a resource that has been deemed unavailable. Error: {}",
+                error
+            );
             None
         }
     }
@@ -118,7 +121,10 @@ where
             }
         }
         Err(error) => {
-            tracing::info!("User tryed accessing a resource that has been deemed unavailable. Error: {}", error);
+            tracing::info!(
+                "User tryed accessing a resource that has been deemed unavailable. Error: {}",
+                error
+            );
             None
         }
     }
