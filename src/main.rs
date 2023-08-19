@@ -47,5 +47,6 @@ async fn main() {
         github_gist_results,
         geeksforgeeks_results,
         ddg_search_results,
-    ).await;
+    )
+    .await;
 }

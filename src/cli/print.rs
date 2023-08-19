@@ -1,9 +1,9 @@
-use indexmap::IndexMap;
-use tokio::task::JoinHandle;
-use std::io::Write;
-use crossterm::style::Stylize;
-use crossterm::style;
 use crossterm::event;
+use crossterm::style;
+use crossterm::style::Stylize;
+use indexmap::IndexMap;
+use std::io::Write;
+use tokio::task::JoinHandle;
 
 type ResultsType<T, S> = IndexMap<String, JoinHandle<Result<T, S>>>;
 

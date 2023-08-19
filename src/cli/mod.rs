@@ -1,19 +1,19 @@
 mod content;
 mod print;
 mod util;
-pub use util::setup_cli;
 use super::search::ddg_search::DdgSearchError;
 use super::search::geeksforgeeks::GfgError;
 use super::search::github_gist::GithubGistError;
 use super::search::stackexchange::SeError;
 use super::search::stackoverflow::SofError;
+use clap::Parser;
 use crossterm::event;
 use crossterm::style;
 use crossterm::style::Stylize;
 use indexmap::IndexMap;
 use std::io::Write;
 use tokio::task::JoinHandle;
-use clap::Parser;
+pub use util::setup_cli;
 
 type StackOverflowResults =
     Result<IndexMap<String, JoinHandle<Result<Vec<String>, SofError>>>, SofError>;
@@ -45,9 +45,9 @@ pub async fn cli(
     query: String,
     mut stackoverflow_results: StackOverflowResults,
     mut stackexchange_results: StackExchangeResults,
-    mut github_gist_results: GithubGistResults, 
-    mut geeksforgeeks_results: GeeksForGeeksResults, 
-    mut ddg_search_results: DdgSearchResults, 
+    mut github_gist_results: GithubGistResults,
+    mut geeksforgeeks_results: GeeksForGeeksResults,
+    mut ddg_search_results: DdgSearchResults,
 ) {
     // create stdout
     let mut stdout = std::io::stdout();
