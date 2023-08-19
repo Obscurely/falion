@@ -256,7 +256,13 @@ impl GeeksForGeeks {
         // get the links from duckduckgo
         let links = match self
             .ddg
-            .get_links(query, Some(GEEKSFORGEEKS_SITE), Some(false), Some(&GEEKSFORGEEKS_INVALID), limit)
+            .get_links(
+                query,
+                Some(GEEKSFORGEEKS_SITE),
+                Some(false),
+                Some(&GEEKSFORGEEKS_INVALID),
+                limit,
+            )
             .await
         {
             Ok(res) => res,

@@ -197,7 +197,11 @@ impl DdgSearch {
     ) -> Result<IndexMap<String, tokio::task::JoinHandle<DdgPage>>, DdgSearchError> {
         tracing::info!("Get multiple pages and their content for search query: {} with a results limit of: {:#?}", &query, &limit);
         // get the links from duckduckgo
-        let links = match self.ddg.get_links(query, None, Some(true), None, limit).await {
+        let links = match self
+            .ddg
+            .get_links(query, None, Some(true), None, limit)
+            .await
+        {
             Ok(res) => res,
             Err(err) => return Err(DdgSearchError::DdgError(err)),
         };

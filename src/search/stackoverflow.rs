@@ -272,7 +272,13 @@ impl StackOverflow {
         // get the links from duckduckgo
         let links = match self
             .ddg
-            .get_links(query, Some(STACKOVERFLOW_SITE), Some(false), Some(&STACKOVERFLOW_INVALID), limit)
+            .get_links(
+                query,
+                Some(STACKOVERFLOW_SITE),
+                Some(false),
+                Some(&STACKOVERFLOW_INVALID),
+                limit,
+            )
             .await
         {
             Ok(res) => res,

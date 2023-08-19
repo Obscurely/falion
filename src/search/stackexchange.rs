@@ -271,7 +271,13 @@ impl StackExchange {
         // get the links from duckduckgo
         let links = match self
             .ddg
-            .get_links(query, Some(STACKEXCHANGE_QUESTION_URL), Some(true), Some(&STACKEXCHANGE_INVALID), limit)
+            .get_links(
+                query,
+                Some(STACKEXCHANGE_QUESTION_URL),
+                Some(true),
+                Some(&STACKEXCHANGE_INVALID),
+                limit,
+            )
             .await
         {
             Ok(res) => res,
