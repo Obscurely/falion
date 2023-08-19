@@ -6,8 +6,10 @@ use thiserror::Error;
 const QUESTION_SEP: &str = "<div class=\"s-prose js-post-body\" itemprop=\"text\">";
 const QUESTION_END: &str = "</div>";
 const STACKEXCHANGE_QUESTION_URL: &str = "stackexchange.com/questions/";
-const STACKEXCHANGE_INVALID1: &str = "stackexchange.com/questions/tagged";
-const STACKEXCHANGE_INVALID2: &str = "stackexchange.com/tag";
+const STACKEXCHANGE_INVALID: [&str; 2] = [
+    "stackexchange.com/questions/tagged",
+    "stackexchange.com/tag",
+];
 
 type SeQuestion = Result<Vec<String>, SeError>;
 
@@ -128,14 +130,14 @@ impl StackExchange {
         };
 
         // check if it's a valid stackexchange question url
-        if question_url.contains(STACKEXCHANGE_INVALID1)
-            || question_url.contains(STACKEXCHANGE_INVALID2)
-        {
-            tracing::error!(
-                "The given url is not a stackexchange url (first check). Url: {}",
-                &question_url
-            );
-            return Err(SeError::NotSeQuestion(question_url.to_string()));
+        for invalid in STACKEXCHANGE_INVALID {
+            if question_url.contains(invalid) {
+                tracing::error!(
+                    "The given url is not a stackexchange url (first check). Url: {}",
+                    &question_url
+                );
+                return Err(SeError::NotSeQuestion(question_url.to_string()));
+            }
         }
 
         match question_url.split_once(STACKEXCHANGE_QUESTION_URL) {

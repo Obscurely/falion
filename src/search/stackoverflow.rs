@@ -7,8 +7,10 @@ const QUESTION_SEP: &str = "<div class=\"s-prose js-post-body\" itemprop=\"text\
 const QUESTION_END: &str = "</div>";
 const STACKOVERFLOW_QUESTION_URL: &str = "https://stackoverflow.com/questions/";
 const STACKOVERFLOW_SITE: &str = "stackoverflow.com/questions/";
-const STACKOVERFLOW_INVALID1: &str = "https://stackoverflow.com/questions/tagged";
-const STACKOVERFLOW_INVALID2: &str = "https://stackoverflow.com/questions/tagged";
+const STACKOVERFLOW_INVALID: [&str; 2] = [
+    "https://stackoverflow.com/questions/tagged",
+    "https://stackoverflow.com/questions/tagged",
+];
 
 type SofQuestion = Result<Vec<String>, SofError>;
 
@@ -129,14 +131,14 @@ impl StackOverflow {
         };
 
         // check if it's a valid stackoverflow question url
-        if question_url.contains(STACKOVERFLOW_INVALID1)
-            || question_url.contains(STACKOVERFLOW_INVALID2)
-        {
-            tracing::error!(
-                "The given url is not a stackoverflow url (first check). Url: {}",
-                &question_url
-            );
-            return Err(SofError::NotSofQuestion(question_url.to_string()));
+        for invalid in STACKOVERFLOW_INVALID {
+            if question_url.contains(invalid) {
+                tracing::error!(
+                    "The given url is not a stackoverflow url (first check). Url: {}",
+                    &question_url
+                );
+                return Err(SofError::NotSofQuestion(question_url.to_string()));
+            }
         }
 
         match question_url.split_once(STACKOVERFLOW_QUESTION_URL) {
