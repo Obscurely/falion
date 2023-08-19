@@ -38,7 +38,7 @@ pub enum GfgError {
     #[error("Failed to make a request with the provided query/url: {0}")]
     InvalidRequest(reqwest::Error),
     #[error("A request has been successfully made, but there was an error getting the response body: {0}")]
-    InvalidReponseBody(reqwest::Error),
+    InvalidResponseBody(reqwest::Error),
     #[error("Couldn't format the content of the page even though the content was successfully retrieved with 200 OK.")]
     InvalidPageContent,
     #[error("The request was successful, but the response wasn't 200 OK, it was: {0}")]
@@ -167,7 +167,7 @@ impl GeeksForGeeks {
                             &page_url,
                             &err
                         );
-                        return Err(GfgError::InvalidReponseBody(err));
+                        return Err(GfgError::InvalidResponseBody(err));
                     }
                 }
             }
