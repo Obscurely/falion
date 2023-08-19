@@ -342,7 +342,7 @@ impl GithubGist {
         // get the links from duckduckgo
         let links = match self
             .ddg
-            .get_links(query, Some(GIST_SITE), Some(true), limit)
+            .get_links(query, Some(GIST_SITE), Some(false), None, limit)
             .await
         {
             Ok(res) => res,

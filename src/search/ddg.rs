@@ -102,6 +102,8 @@ impl Ddg {
     /// * `site` - Optional, specific site to get results from.
     /// * `allow_subdomain` - Optional, if you want to allow something before the site like
     /// (something.site.com)
+    /// * `contains_filter` - Is gonna filter the results so they DON'T contain whatever is in the
+    /// array.
     /// * `limit` - Optional, limit the results to the first 10 for example.
     ///
     /// # Examples
@@ -135,6 +137,7 @@ impl Ddg {
         query: &str,
         site: Option<&str>,
         allow_subdomain: Option<bool>,
+        contains_filter: Option<&[&str]>,
         limit: Option<usize>,
     ) -> Result<Vec<String>, DdgError> {
         tracing::info!(
@@ -311,34 +314,83 @@ impl Ddg {
         tracing::debug!("Links before filtering: {:#?}", &links);
 
         let links: Vec<String> = if allow_subdomain {
-            links
-                .into_iter()
-                .filter_map(|s| {
-                    if s.contains("https://") && s.contains(site) {
-                        Some(s.to_string())
-                    } else {
-                        None
-                    }
-                })
-                .take(limit.unwrap_or(100))
-                .collect()
+            match contains_filter {
+                Some(filters) => links
+                    .into_iter()
+                    .filter_map(|s| {
+                        if s.contains("https://") && s.contains(site) {
+                            let mut valid = true;
+                            for filter in filters {
+                                if s.contains(filter) {
+                                    valid = false;
+                                }
+                            }
+                            if valid {
+                                Some(s.to_string())
+                            } else {
+                                None
+                            }
+                        } else {
+                            None
+                        }
+                    })
+                    .take(limit.unwrap_or(100))
+                    .collect(),
+                None => links
+                    .into_iter()
+                    .filter_map(|s| {
+                        if s.contains("https://") && s.contains(site) {
+                            Some(s.to_string())
+                        } else {
+                            None
+                        }
+                    })
+                    .take(limit.unwrap_or(100))
+                    .collect(),
+            }
         } else {
             // filter links
             let mut site_filter = String::with_capacity(8 + site.len());
             site_filter.push_str("https://");
             site_filter.push_str(site);
 
-            links
-                .into_iter()
-                .filter_map(|s| {
-                    if s.contains(&site_filter) {
-                        Some(s.to_string())
-                    } else {
-                        None
-                    }
-                })
-                .take(limit.unwrap_or(100))
-                .collect()
+            match contains_filter {
+                Some(filters) => {
+                    links
+                        .into_iter()
+                        .filter_map(|s| {
+                            if s.contains(&site_filter) {
+                                // Some(s.to_string())
+                                let mut valid = true;
+                                for filter in filters {
+                                    if s.contains(filter) {
+                                        valid = false;
+                                    }
+                                }
+                                if valid {
+                                    Some(s.to_string())
+                                } else {
+                                    None
+                                }
+                            } else {
+                                None
+                            }
+                        })
+                        .take(limit.unwrap_or(100))
+                        .collect()
+                }
+                None => links
+                    .into_iter()
+                    .filter_map(|s| {
+                        if s.contains(&site_filter) {
+                            Some(s.to_string())
+                        } else {
+                            None
+                        }
+                    })
+                    .take(limit.unwrap_or(100))
+                    .collect(),
+            }
         };
 
         // check if we even have links
@@ -376,7 +428,7 @@ mod tests {
         // actual function
         let ddg = Ddg::new();
         let links = ddg
-            .get_links("Rust threading", None, None, None)
+            .get_links("Rust threading", None, None, None, None)
             .await
             .unwrap();
 
