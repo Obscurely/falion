@@ -3,6 +3,13 @@ use clap::Parser;
 use crossterm::terminal;
 use std::io::Write;
 
+/// Reset the terminal basically. Disable raw mode, reset colors, show cursor, clear screen
+/// scroll up the terminal, move the cursor to the beginning.
+///
+/// # Arguments
+///
+/// * `stdout` - std::io::stdout(), you should have one in main that you reference to all your
+/// functions for ideal performance and queue commands to it.
 #[tracing::instrument(skip_all)]
 pub fn clean(stdout: &mut std::io::Stdout) {
     if let Err(error) = crossterm::terminal::disable_raw_mode() {
@@ -29,6 +36,12 @@ pub fn clean(stdout: &mut std::io::Stdout) {
     };
 }
 
+/// Clear the terminal, scroll up, and move cursor to the beginning.
+///
+/// # Arguments
+///
+/// * `stdout` - std::io::stdout() you should have one in main that you reference to all your
+/// functions for ideal performance and queue commands to it.
 #[tracing::instrument(skip_all)]
 pub fn clear_terminal(stdout: &mut std::io::Stdout) {
     if let Err(error) = crossterm::queue!(stdout, terminal::Clear(terminal::ClearType::All)) {
@@ -46,6 +59,9 @@ pub fn clear_terminal(stdout: &mut std::io::Stdout) {
     }
 }
 
+/// Setup the cli. Setup the arguments for bin, get the given values and panic if a query equal or
+/// long to 5 in length hasn't been given. Enable terminal raw mode, hide the cursor, setup
+/// logging. Create an std::io::Stdout instance.
 pub fn setup_cli() -> String {
     // initiate cli
     let cli = super::Cli::parse();
@@ -60,19 +76,11 @@ pub fn setup_cli() -> String {
         panic!("\n-> Your query is shorter than 5 characters <-\n");
     }
 
-    // get stdout
-    let mut stdout = std::io::stdout();
-
     // Pre-setup
     // enable terminal raw mode
     if let Err(err) = terminal::enable_raw_mode() {
         panic!("Failed to enable raw mode: {}", err);
-    }
-
-    // hide the cursor
-    if let Err(error) = crossterm::execute!(&mut stdout, crossterm::cursor::Hide) {
-        tracing::warn!("Failed to hide terminal cursor. Error: {}", error);
-    };
+    } 
 
     // enable (or not) logs based on flag
     if !disable_logs {

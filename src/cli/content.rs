@@ -4,6 +4,15 @@ use tokio::task::JoinHandle;
 type ResultsStaticType<E> = IndexMap<String, JoinHandle<Result<String, E>>>;
 type ResultsDynType<E> = IndexMap<String, JoinHandle<Result<Vec<String>, E>>>;
 
+/// Get dynamic type content (in form of a vector). Either await it if it wasn't already, it it was
+/// get it from the awaited list.
+///
+/// # Arguments
+///
+/// `results_ref` - mutable reference to results.
+/// `results_awaited_ref` - mutable reference to the object keeping already awaited resources.
+/// `results_index` - which result to get back, it's index.
+#[tracing::instrument(skip_all)]
 pub async fn get_dyn_result_content<'a, E>(
     results_ref: &'a mut Result<ResultsDynType<E>, E>,
     results_awaited_ref: &'a mut IndexMap<String, Vec<String>>,
@@ -25,10 +34,15 @@ where
                         Ok(handled) => match handled {
                             Ok(content) => content,
                             Err(error) => {
-                                vec![format!("There has been an error handeling the future for this result. Error: {}", error)]
+                                tracing::error!("There was an error getting the contetn for this a result. Error: {}", error);
+                                vec![format!("There has been an error getting the content for this result. Error: {}", error)]
                             }
                         },
                         Err(error) => {
+                            tracing::error!(
+                                "There was an error handeling the future for a result. Error: {}",
+                                error
+                            );
                             vec![format!("There has been an error handeling the future for this result. Error: {}", error)]
                         }
                     };
@@ -43,13 +57,22 @@ where
                 None
             }
         }
-        Err(_) => {
-            tracing::info!("User tryed accessing a resource that has been deemed unavailable.");
+        Err(error) => {
+            tracing::info!("User tryed accessing a resource that has been deemed unavailable. Error: {}", error);
             None
         }
     }
 }
 
+/// Get the static content for a result (String type). Either await it or get it from the list of
+/// already awaited.
+///
+/// # Arguments
+///
+/// `results_ref` - mutable reference to results.
+/// `results_awaited_ref` - mutable reference to the object keeping already awaited resources.
+/// `results_index` - which result to get back, it's index.
+#[tracing::instrument(skip_all)]
 pub async fn get_static_result_content<'a, E>(
     results_ref: &'a mut Result<ResultsStaticType<E>, E>,
     results_awaited_ref: &'a mut IndexMap<String, String>,
@@ -71,10 +94,15 @@ where
                         Ok(handled) => match handled {
                             Ok(content) => content,
                             Err(error) => {
-                                format!("There has been an error handeling the future for this result. Error: {}", error)
+                                tracing::error!("There was an error getting the contetn for this a result. Error: {}", error);
+                                format!("There has been an error getting the content for this result. Error: {}", error)
                             }
                         },
                         Err(error) => {
+                            tracing::error!(
+                                "There was an error handeling the future for a result. Error: {}",
+                                error
+                            );
                             format!("There has been an error handeling the future for this result. Error: {}", error)
                         }
                     };
@@ -89,8 +117,8 @@ where
                 None
             }
         }
-        Err(_) => {
-            tracing::info!("User tryed accessing a resource that has been deemed unavailable.");
+        Err(error) => {
+            tracing::info!("User tryed accessing a resource that has been deemed unavailable. Error: {}", error);
             None
         }
     }

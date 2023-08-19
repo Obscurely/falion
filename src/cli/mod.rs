@@ -26,6 +26,13 @@ type GeeksForGeeksResults =
 type DdgSearchResults =
     Result<IndexMap<String, JoinHandle<Result<String, DdgSearchError>>>, DdgSearchError>;
 
+/// Command line options, cli setup done with clap.
+///
+/// # Options
+///
+/// query - mandatory, what to search for
+/// verbose - optional, enable debug logging to stdout
+/// disable_logs - optional, disable log completely, including writting to files.
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 pub struct Cli {
@@ -41,6 +48,22 @@ pub struct Cli {
     pub disable_logs: bool,
 }
 
+/// The main cli function for falion. Show results and lets you scroll through them.
+///
+/// # Arguments
+///
+/// `query` - The query to search for.
+/// `stackoverflow_results` - stackoverflow results which should be got in the main function and
+/// passed entierly (no reference)
+/// `stackexchange_results` - stackexchange results which should be got in the main function and
+/// passed entierly (no reference)
+/// `github_gist_results` - github gist results which should be got in the main function and
+/// passed entierly (no reference)
+/// `geeksforgeeks_results` - geeksforgeeks results which should be got in the main function and
+/// passed entierly (no reference)
+/// `ddg_search_results` - ddg results which should be got in the main function and
+/// passed entierly (no reference)
+#[tracing::instrument(skip_all)]
 pub async fn cli(
     query: String,
     mut stackoverflow_results: StackOverflowResults,
@@ -51,6 +74,11 @@ pub async fn cli(
 ) {
     // create stdout
     let mut stdout = std::io::stdout();
+
+    // hide the cursor
+    if let Err(error) = crossterm::execute!(&mut stdout, crossterm::cursor::Hide) {
+        tracing::warn!("Failed to hide terminal cursor. Error: {}", error);
+    };
 
     // create vars
     let mut stackoverflow_results_awaited: IndexMap<String, Vec<String>> = IndexMap::new();
@@ -131,6 +159,7 @@ pub async fn cli(
             );
         }
 
+        // listen for key presses
         let event_read = match event::read() {
             Ok(ev) => ev,
             Err(error) => {
@@ -147,6 +176,10 @@ pub async fn cli(
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
+                tracing::info!(
+                    "Accessing content for resource 1 at index: {}",
+                    stackoverflow_index
+                );
                 match content::get_dyn_result_content(
                     stackoverflow_results_ref,
                     &mut stackoverflow_results_awaited,
@@ -201,6 +234,10 @@ pub async fn cli(
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
+                tracing::info!(
+                    "Accessing content for resource 2 at index: {}",
+                    stackexchange_index
+                );
                 // stackexchange current result content
                 match content::get_dyn_result_content(
                     stackexchange_results_ref,
@@ -256,6 +293,10 @@ pub async fn cli(
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
+                tracing::info!(
+                    "Accessing content for resource 3 at index: {}",
+                    github_gist_index
+                );
                 // github_gist show current result content
                 match content::get_dyn_result_content(
                     github_gist_results_ref,
@@ -311,6 +352,10 @@ pub async fn cli(
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
+                tracing::info!(
+                    "Accessing content for resource 4 at index: {}",
+                    geeksforgeeks_index
+                );
                 // geeksforgeeks show content for current result
                 match content::get_static_result_content(
                     geeksforgeeks_results_ref,
@@ -366,6 +411,10 @@ pub async fn cli(
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
+                tracing::info!(
+                    "Accessing content for resource 5 at index: {}",
+                    ddg_search_index
+                );
                 // ddg search show content for current result
                 match content::get_static_result_content(
                     ddg_search_results_ref,
@@ -488,6 +537,7 @@ pub async fn cli(
                 modifiers: event::KeyModifiers::CONTROL,
                 ..
             }) => {
+                tracing::info!("Exit app on user command!");
                 util::clean(&mut stdout);
                 return;
             }

@@ -7,6 +7,15 @@ use tokio::task::JoinHandle;
 
 type ResultsType<T, S> = IndexMap<String, JoinHandle<Result<T, S>>>;
 
+/// Print the given print followed by the title of the given index result.
+///
+/// # Arguments
+///
+/// `stdout` - std::io::stdout() you should have one in main you reference across functions. It's
+/// used to manipulate the terminal.
+/// `resource_index` - The index of the given resource to print.
+/// `resource_results` - Actual results of the resource you want to print.
+#[tracing::instrument(skip_all)]
 pub fn print_resource<T, S>(
     stdout: &mut std::io::Stdout,
     resource_index: usize,
@@ -17,14 +26,17 @@ pub fn print_resource<T, S>(
 {
     match resource_results {
         Ok(results) => {
+            // get the current result
             let current_result = match results.get_index(resource_index) {
                 Some(res) => res,
                 None => {
                     // this should never happen
                     super::util::clean(stdout);
+                    tracing::error!("User tried to get content from a resource with a index that is lower than the lenth - 1 of the resource, but for some reason it still failed!");
                     panic!("This should never have happened. Please create a new issue on github and post latest.log file.")
                 }
             };
+            // display the current result with the given print
             if let Err(error) = crossterm::queue!(
                 stdout,
                 style::PrintStyledContent(
@@ -47,6 +59,16 @@ pub fn print_resource<T, S>(
     }
 }
 
+/// Create a screen similar to the cli one where you go through a content that is iterable.
+/// 
+/// # Arguments
+///
+/// `stdout` - std::io::stdout() you should have one in main you reference across functions. It's
+/// used to manipulate the terminal.
+/// `content` - the iterable content to display
+/// `is_thread` - Specify if the content is thread type, so the first element is gonna be tagged as
+/// question and the rest as answers, if not each element is gonna be tagged a file.
+#[tracing::instrument(skip_all)]
 pub fn print_dyn_content(
     stdout: &mut std::io::Stdout,
     content: &[String],
@@ -54,17 +76,24 @@ pub fn print_dyn_content(
 ) -> bool {
     let mut current_index = 0;
     let max_index = content.len() - 1;
+    // depending on is_thread set to either question or file 1 as for the first element.
     let question_title = if is_thread {
         "Question:".green().bold()
     } else {
         "File 1:".green().bold()
     };
+    // cli for the given content
     loop {
         // print content
         let content = match content.get(current_index) {
+            // replace \n to \n\r because in terminal raw mode a new line doesn't bring you the
+            // beginning of the row, it only goes down one line literally.
             Some(content) => content.replace('\n', "\n\r"),
-            None => "There has been error getting the contents for this result".to_string(),
+            None => {
+                "There has been error getting the contents for this result".to_string()
+            },
         };
+        // print first element tag or not
         if current_index == 0 {
             if let Err(error) = crossterm::queue!(
                 stdout,
@@ -103,6 +132,7 @@ pub fn print_dyn_content(
             }
         }
 
+        // flush stdout queued commands
         if let Err(error) = stdout.flush() {
             tracing::warn!(
                 "There was an error flushing stdout in order to print thread's content. Error: {}",
@@ -110,6 +140,7 @@ pub fn print_dyn_content(
             );
         }
 
+        // listen for key presses
         let event_read = match event::read() {
             Ok(ev) => ev,
             Err(error) => {
@@ -149,6 +180,7 @@ pub fn print_dyn_content(
                 modifiers: event::KeyModifiers::CONTROL,
                 ..
             }) => {
+                tracing::info!("Exit app on user command!");
                 return true;
             }
             _ => (),
@@ -159,7 +191,17 @@ pub fn print_dyn_content(
     }
 }
 
+/// Create a screen similar to the cli one to print static content. Content that is only one page.
+///
+/// # Arguments
+///
+/// `stdout` - std::io::stdout() you should have one in main you reference across functions. It's
+/// used to manipulate the terminal.
+/// `content` - the content to create the cli for.
+#[tracing::instrument(skip_all)]
 pub fn print_static_content(stdout: &mut std::io::Stdout, content: &str) -> bool {
+    // replace \n to \n\r because in terminal raw mode a new line doesn't bring you the
+    // beginning of the row, it only goes down one line literally.
     let content = content.replace('\n', "\n\r");
     let page_title = "Page:".green().bold();
     loop {
@@ -197,6 +239,7 @@ pub fn print_static_content(stdout: &mut std::io::Stdout, content: &str) -> bool
             }
         };
 
+        // listen to key presses
         match event_read {
             // return to main menu
             event::Event::Key(event::KeyEvent {
@@ -212,6 +255,7 @@ pub fn print_static_content(stdout: &mut std::io::Stdout, content: &str) -> bool
                 modifiers: event::KeyModifiers::CONTROL,
                 ..
             }) => {
+                tracing::info!("Exit app on user command!");
                 return true;
             }
             _ => (),

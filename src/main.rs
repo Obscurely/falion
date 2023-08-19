@@ -2,8 +2,10 @@ mod cli;
 mod search;
 mod util;
 
+/// Main Falion execution
 #[tokio::main]
 async fn main() {
+    // setup cli and get query
     let query = cli::setup_cli();
 
     // debug log the query
@@ -40,6 +42,7 @@ async fn main() {
     let geeksforgeeks_results = results_awaited.3;
     let ddg_search_results = results_awaited.4;
 
+    // run cli
     cli::cli(
         query,
         stackoverflow_results,

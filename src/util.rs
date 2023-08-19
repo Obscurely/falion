@@ -2,6 +2,12 @@ use std::fs;
 use std::{fs::File, sync::Arc};
 use tracing_subscriber::{filter, prelude::*};
 
+/// Setup logging using tracing crate.
+///
+/// # Arguments
+///
+/// * `verbose` if set to true the stdout log output will also show debug information. Log written
+/// to file always have debug output option set.
 pub fn setup_logs(verbose: bool) {
     // get/create cache dir
     let cache_dir = match dirs::cache_dir() {
