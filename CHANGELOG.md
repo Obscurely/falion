@@ -25,6 +25,8 @@
 - General performance improvements.
 - Added logging across the whole application. Not too much, just enough to be
   able to debug eventual errors. I tried to keep it simple.
+- Added code documenation.
+- Added tests.
 
 ### Changed
 
@@ -54,6 +56,8 @@
 - Better argument parsing using clap instead of arg_parse.
 - Rewrote the cli. More efficient, less error prone and just better in general.
   Note: it works almost the same, this is just the backend.
+- Made code way more maintainable.
+- Actual cli code is in it's own module.
 
 ### Deprecated
 
