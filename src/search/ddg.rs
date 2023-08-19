@@ -113,7 +113,7 @@ impl Ddg {
     ///
     /// # async fn run() -> Result<(), ddg::DdgError> {
     /// let ddg = ddg::Ddg::new();
-    /// let links = ddg.get_links("Rust", None, None, None).await.unwrap();
+    /// let links = ddg.get_links("Rust", None, None, None, None).await.unwrap();
     /// # Ok(())
     /// # }
     ///

@@ -101,10 +101,20 @@ impl GeeksForGeeks {
     /// use falion::search::ddg;
     /// use falion::search::geeksforgeeks;
     ///
+    /// const GEEKSFORGEEKS_INVALID: [&str; 7] = [
+    ///     "https://www.geeksforgeeks.org/tag/",
+    ///     "https://www.geeksforgeeks.org/category/",
+    ///     "https://www.geeksforgeeks.org/basic/",
+    ///     "https://www.geeksforgeeks.org/easy/",
+    ///     "https://www.geeksforgeeks.org/medium/",
+    ///     "https://www.geeksforgeeks.org/hard/",
+    ///     "https://www.geeksforgeeks.org/expert/",
+    /// ];
+    ///
     /// # async fn run() -> Result<(), geeksforgeeks::GfgError> {
     /// let ddg = ddg::Ddg::new();
     /// let gfg = geeksforgeeks::GeeksForGeeks::new();
-    /// let link = &ddg.get_links("Rust basics", Some("www.geeksforgeeks.org"), None, Some(1)).await.unwrap()[0];
+    /// let link = &ddg.get_links("Rust basics", Some("www.geeksforgeeks.org"), None, Some(&GEEKSFORGEEKS_INVALID), Some(1)).await.unwrap()[0];
     ///
     /// let page_content = gfg.get_page_content(&link).await.unwrap();
     /// # Ok(())

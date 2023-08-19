@@ -95,10 +95,15 @@ impl StackExchange {
     /// use falion::search::ddg;
     /// use falion::search::stackexchange;
     ///
+    /// const STACKEXCHANGE_INVALID: [&str; 2] = [
+    ///     "stackexchange.com/questions/tagged",
+    ///     "stackexchange.com/tag",
+    /// ];
+    ///
     /// # async fn run() -> Result<(), stackexchange::SeError> {
     /// let ddg = ddg::Ddg::new();
     /// let se = stackexchange::StackExchange::new();
-    /// let link = &ddg.get_links("Rust threading", Some("stackexchange.com/questions/"), Some(true), Some(1)).await.unwrap()[0];
+    /// let link = &ddg.get_links("Rust threading", Some("stackexchange.com/questions/"), Some(true), Some(&STACKEXCHANGE_INVALID), Some(1)).await.unwrap()[0];
     ///
     /// let question_content = se.get_question_content(&link).await.unwrap();
     /// # Ok(())

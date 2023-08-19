@@ -82,7 +82,7 @@ impl DdgSearch {
     /// # async fn run() -> Result<(), ddg_search::DdgSearchError> {
     /// let ddg = ddg::Ddg::new();
     /// let ddg_search = ddg_search::DdgSearch::new();
-    /// let link = &ddg.get_links("Rust basics", None, None, Some(1)).await.unwrap()[0];
+    /// let link = &ddg.get_links("Rust basics", None, None, None, Some(1)).await.unwrap()[0];
     ///
     /// let page_content = ddg_search.get_page_content(&link).await.unwrap();
     /// # Ok(())

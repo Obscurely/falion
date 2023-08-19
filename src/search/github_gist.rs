@@ -103,7 +103,7 @@ impl GithubGist {
     /// # async fn run() -> Result<(), github_gist::GithubGistError> {
     /// let ddg = ddg::Ddg::new();
     /// let github_gist = github_gist::GithubGist::new();
-    /// let link = &ddg.get_links("Rust basics", Some("gist.github.com"), None, Some(1)).await.unwrap()[0];
+    /// let link = &ddg.get_links("Rust basics", Some("gist.github.com"), None, None, Some(1)).await.unwrap()[0];
     ///
     /// let gist_content = github_gist.get_gist_content(&link).await.unwrap();
     /// # Ok(())

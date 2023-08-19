@@ -96,10 +96,15 @@ impl StackOverflow {
     /// use falion::search::ddg;
     /// use falion::search::stackoverflow;
     ///
+    /// const STACKOVERFLOW_INVALID: [&str; 2] = [
+    ///     "https://stackoverflow.com/questions/tagged",
+    ///     "https://stackoverflow.com/questions/tagged",
+    /// ];
+    ///
     /// # async fn run() -> Result<(), stackoverflow::SofError> {
     /// let ddg = ddg::Ddg::new();
     /// let sof = stackoverflow::StackOverflow::new();
-    /// let link = &ddg.get_links("Rust threading", Some("stackoverflow.com/questions/"), Some(false), Some(1)).await.unwrap()[0];
+    /// let link = &ddg.get_links("Rust threading", Some("stackoverflow.com/questions/"), Some(false), Some(&STACKOVERFLOW_INVALID), Some(1)).await.unwrap()[0];
     ///
     /// let question_content = sof.get_question_content(&link).await.unwrap();
     /// # Ok(())
