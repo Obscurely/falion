@@ -19,7 +19,9 @@ impl Sandbox for Falion {
     type Message = Message;
 
     fn new() -> Self {
-        Self { query: "".to_string() }
+        Self {
+            query: "".to_string(),
+        }
     }
 
     fn title(&self) -> String {
@@ -31,9 +33,7 @@ impl Sandbox for Falion {
             Message::InputChanged(value) => {
                 self.query = value;
             }
-            Message::Search => {
-
-            }
+            Message::Search => {}
         }
     }
 

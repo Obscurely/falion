@@ -1,7 +1,7 @@
 mod cli;
 mod search;
-mod util;
 mod ui;
+mod util;
 
 /// Main Falion execution
 #[tokio::main]
