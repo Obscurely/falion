@@ -46,7 +46,7 @@
               python311
               python311Packages.pillow # this is for python repo script
               openssl
-              # falion specific, for ui (slint)
+              # falion specific
               libxkbcommon
               libGL
               # WINIT_UNIX_BACKEND=wayland
@@ -58,7 +58,7 @@
               xorg.libX11
               # fonts
               fontconfig
-              # Extra iced dependencies
+              # Extra possible dependencies
               expat
               freetype
               freetype.dev

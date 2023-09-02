@@ -37,6 +37,11 @@ panic = "unwind"  # Since all of the errors are  handled manually (should be), a
 
 #═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
+[build-dependencies]
+slint-build = "1.1.1"
+
+#═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
 [target.'cfg(windows)'.build-dependencies]
 embed-resource = "2.2.0"
 
@@ -46,10 +51,10 @@ embed-resource = "2.2.0"
 chrono = { version = "0.4.26", default-features = false, features = ["clock"] }
 clap = { version = "4.3.21", features = ["derive"] }
 crossterm = "0.27.0"
+dark-light = "1.0.0"
 dirs = "5.0.1"
 futures = "0.3.28"
 html2text = "0.6.0"
-iced = "0.9.0"
 indexmap = "2.0.0"
 rand = "0.8.5"
 rayon = "1.7.0"
@@ -59,6 +64,7 @@ reqwest = { version = "0.11.18", features = [
   "brotli",
   "deflate",
 ] }
+slint = "1.1.1"
 thiserror = "1.0.46"
 tokio = { version = "1.31.0", features = ["full"] }
 tracing = "0.1.37"
