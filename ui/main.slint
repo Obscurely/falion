@@ -5,38 +5,154 @@ import { SpinBox, Button, CheckBox, Slider, LineEdit, ScrollView, ListView,
     HorizontalBox, VerticalBox, GridBox, StandardButton } from "std-widgets.slint";
 
 export component MainWindow inherits Window {
-    preferred-width: 700px;
-    preferred-height: 500px;
-    min-width: 250px;
-    min-height: 100px;
+    preferred-width: 1250px;
+    preferred-height: 750px;
+    min-width: 750px;
+    min-height: 500px;
+    default-font-size: 24px;
     title: "Falion";
     icon: @image-url("../assets/images/logo.png");
+
     callback query-enter(string);
+    callback sof-enter();
+    callback se-enter();
+    callback gg-enter();
+    callback gfg-enter();
+    callback ddg-enter();
+    callback back-enter();
+    callback next-enter();
 
     VerticalBox {
+        min-width: 750px;
+        min-height: 500px;
         HorizontalBox {
             text-search := LineEdit {
                 max-height: 80px;
-                font-size: 24px;
+                min-height: 40px;
+                font-size: 28px;
                 placeholder-text: "What are you wondering about?";
+                enabled: true;
                 accepted(text) => {
                     root.query-enter(self.text);
-                    self.text = "";
                 }
             }
             btn-search := Button {
-                max-height: 100px;
+                min-width: 50px;
+                max-height: 80px;
+                min-height: 40px;
                 icon: @image-url("../assets/images/logo.png");
                 enabled: text-search.text != "";
                 clicked => {
                     root.query-enter(text-search.text);
-                    text-search.text = "";
                 }
             }
         }
-        btn := Button {
-            text: "Search";
-            clicked => {
+        HorizontalBox {
+            text-sof := Text {
+                text: "(1) StackOverflow:";
+                font-size: 24px;
+                min-width: 220px;
+                max-width: 220px;
+                color: yellow;
+            }
+            btn-sof := Button {
+                text: " ";
+                max-height: 30px;
+                enabled: false;
+                clicked => {
+                    root.sof-enter();
+                }
+            }
+        }
+        HorizontalBox {
+            text-se := Text {
+                text: "(2) StackExchange:";
+                font-size: 24px;
+                min-width: 220px;
+                max-width: 220px;
+                color: yellow;
+            }
+            btn-se := Button {
+                text: " ";
+                max-height: 30px;
+                enabled: false;
+                clicked => {
+                    root.se-enter();
+                }
+            }
+        }
+        HorizontalBox {
+            text-gg := Text {
+                text: "(3) GitHub Gist:";
+                font-size: 24px;
+                min-width: 220px;
+                max-width: 220px;
+                color: yellow;
+            }
+            btn-gg := Button {
+                text: " ";
+                max-height: 30px;
+                enabled: false;
+                clicked => {
+                    root.gg-enter();
+                }
+            }
+        }
+        HorizontalBox {
+            text-gfg := Text {
+                text: "(4) GeeksForGeeks:";
+                font-size: 24px;
+                min-width: 220px;
+                max-width: 220px;
+                color: yellow;
+            }
+            btn-gfg := Button {
+                text: " ";
+                max-height: 30px;
+                enabled: false;
+                clicked => {
+                    root.gfg-enter();
+                }
+            }
+        }
+        HorizontalBox {
+            text-dgg := Text {
+                text: "(5) DuckDuckGO:";
+                font-size: 24px;
+                min-width: 220px;
+                max-width: 220px;
+                color: yellow;
+            }
+            btn-dgg := Button {
+                text: " ";
+                max-height: 30px;
+                enabled: false;
+                clicked => {
+                    root.ddg-enter();
+                }
+            }
+        }
+        HorizontalBox {
+          spacing: 300px;
+          Text {}
+        }
+        HorizontalBox {
+            Button {
+                max-height: 30px;
+                enabled: false;
+                text: "<- Back";
+                clicked => {
+                    root.back-enter();
+                }
+            }
+            spacing: 500px;
+            Button {
+                max-height: 30px;
+                enabled: false;
+                text: "Next ->";
+                clicked => {
+                    root.next-enter();
+                }
             }
         }
     }
