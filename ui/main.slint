@@ -4,116 +4,39 @@
 import { SpinBox, Button, CheckBox, Slider, LineEdit, ScrollView, ListView,
     HorizontalBox, VerticalBox, GridBox, StandardButton } from "std-widgets.slint";
 
-export struct TodoItem  {
-    title: string,
-    checked: bool,
-}
-
-component MainWindow inherits Window {
-    preferred-width: 400px;
-    preferred-height: 600px;
-    callback todo-added(string);
-    callback remove-done();
-
-    callback popup_confirmed;
-    callback show_confirm_popup;
-
-    callback apply_sorting_and_filtering();
-
-    show_confirm_popup => { confirm_popup.show(); }
-
-    confirm_popup := PopupWindow {
-        x: 40px;
-        y: 100px;
-        width: min(confirm_popup_layout.preferred-width, root.width - 80px);
-        Rectangle {
-            background: root.background;
-            border-color: confirm_popup_text.color;
-            border-width: 1px;
-        }
-        confirm_popup_layout := Dialog {
-            height:100%; width: 100%;
-            confirm_popup_text := Text {
-                text: "Some items are not done, are you sure you wish to quit?";
-                wrap: word-wrap;
-            }
-            StandardButton { kind: yes; clicked => { root.popup_confirmed(); } }
-            StandardButton { kind: no; }
-        }
-    }
-
-    in property <[TodoItem]> todo-model: [
-        { title: "Implement the .slint file", checked: true },
-        { title: "Do the Rust part", checked: false },
-        { title: "Make the C++ code", checked: false },
-        { title: "Write some JavaScript code", checked: false },
-        { title: "Test the application", checked: false },
-        { title: "Ship to customer", checked: false },
-        { title: "???", checked: false },
-        { title: "Profit", checked: false },
-    ];
-
-    in property <bool> show-header: false;
-    in-out property <bool> is-sort-by-name: false;
-    in-out property <bool> hide-done-items: false;
+export component MainWindow inherits Window {
+    preferred-width: 700px;
+    preferred-height: 500px;
+    min-width: 250px;
+    min-height: 100px;
+    title: "Falion";
+    icon: @image-url("../assets/images/logo.png");
+    callback query-enter(string);
 
     VerticalBox {
         HorizontalBox {
-            text-edit := LineEdit {
-                placeholder-text: "Search query";
+            text-search := LineEdit {
+                max-height: 80px;
+                font-size: 24px;
+                placeholder-text: "What are you wondering about?";
                 accepted(text) => {
-                    root.todo-added(self.text);
+                    root.query-enter(self.text);
                     self.text = "";
                 }
             }
-            btn := Button {
-                text: "Add New Entry";
-                enabled: text-edit.text != "";
+            btn-search := Button {
+                max-height: 100px;
+                icon: @image-url("../assets/images/logo.png");
+                enabled: text-search.text != "";
                 clicked => {
-                    root.todo-added(text-edit.text);
-                    text-edit.text = "";
+                    root.query-enter(text-search.text);
+                    text-search.text = "";
                 }
             }
         }
-
-        if (root.show-header) : HorizontalBox {
-            alignment: start;
-
-            CheckBox {
-                text: "Sort by name";
-                checked <=> root.is-sort-by-name;
-
-                toggled => {
-                    root.apply_sorting_and_filtering();
-                }
-            }
-
-            CheckBox {
-                text: "Hide done items";
-                checked <=> root.hide-done-items;
-
-                toggled => {
-                    root.apply_sorting_and_filtering();
-                }
-            }
-        }
-
-        list-view := ListView {
-            for todo in root.todo-model:  HorizontalLayout {
-                CheckBox {
-                    text: todo.title;
-                    checked: todo.checked;
-                    toggled => {
-                        todo.checked = self.checked;
-                    }
-                }
-            }
-        }
-        HorizontalBox {
-            alignment: end;
-            Button {
-                text: "Remove Done Items";
-                clicked => { root.remove-done(); }
+        btn := Button {
+            text: "Search";
+            clicked => {
             }
         }
     }
