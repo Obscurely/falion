@@ -1,0 +1,128 @@
+use indexmap::IndexMap;
+use slint::Weak;
+use super::util;
+use super::MainWindow;
+use std::sync::{Arc, Mutex};
+
+pub enum ResultType {
+    StackOverflow,
+    StackExchange,
+    GithubGist,
+    GeeksForGeeks,
+    DdgSearch,
+}
+
+pub fn display_first_result<T, E>(ui: Weak<MainWindow>, results: &Result<IndexMap<String, T>, E>, results_type: ResultType) 
+where
+    E: std::fmt::Display
+{
+    match results {
+        // unwrap is fine here since it would have been an error if there were no
+        // results, so there is at least one
+        Ok(results) => {
+            let res = results.get_index(0).unwrap().0.to_string();
+            if let Err(err) = slint::invoke_from_event_loop(move || {
+                let ui = util::get_ui(ui);
+
+                match results_type {
+                    ResultType::StackOverflow => {
+                        ui.set_sof_result(res.into());
+                        ui.set_is_sof(true);
+                    },
+                    ResultType::StackExchange => {
+                        ui.set_se_result(res.into());
+                        ui.set_is_se(true);
+                    },
+                    ResultType::GithubGist => {
+                        ui.set_gg_result(res.into());
+                        ui.set_is_gg(true);
+                    },
+                    ResultType::GeeksForGeeks => {
+                        ui.set_gfg_result(res.into());
+                        ui.set_is_gfg(true);
+                    },
+                    ResultType::DdgSearch => {
+                        ui.set_ddg_result(res.into());
+                        ui.set_is_ddg(true);
+                    },
+                }
+            }) {
+                util::slint_event_loop_panic(err);
+            };
+        },
+        Err(err) => {
+            let err = err.to_string();
+            match results_type {
+                ResultType::StackOverflow => {
+                    tracing::warn!("There were no results for StackOverflow. Error {}", err);
+                },
+                ResultType::StackExchange => {
+                    tracing::warn!("There were no results for StackExchange. Error {}", err);
+                },
+                ResultType::GithubGist => {
+                    tracing::warn!("There were no results for GithubGist. Error {}", err);
+                },
+                ResultType::GeeksForGeeks => {
+                    tracing::warn!("There were no results for GeeksForGeeks. Error {}", err);
+                },
+                ResultType::DdgSearch => {
+                    tracing::warn!("There were no results for DdgSearch. Error {}", err);
+                },
+            }
+            if let Err(err) = slint::invoke_from_event_loop(move || {
+                let ui = util::get_ui(ui);
+
+                match results_type {
+                    ResultType::StackOverflow => {
+                        ui.set_sof_result(err.into());
+                    },
+                    ResultType::StackExchange => {
+                        ui.set_sof_result(err.into());
+                    },
+                    ResultType::GithubGist => {
+                        ui.set_sof_result(err.into());
+                    },
+                    ResultType::GeeksForGeeks => {
+                        ui.set_sof_result(err.into());
+                    },
+                    ResultType::DdgSearch => {
+                        ui.set_sof_result(err.into());
+                    },
+                }
+            }) {
+                util::slint_event_loop_panic(err);
+            };
+        },              
+    }
+}
+
+pub fn reset_results(ui: Weak<MainWindow>) {
+    if let Err(err) = slint::invoke_from_event_loop(move || {
+        let ui = util::get_ui(ui);
+
+        let space_string = slint::SharedString::from(" ");
+
+        ui.set_sof_result(space_string.clone());
+        ui.set_is_sof(false);
+        ui.set_se_result(space_string.clone());
+        ui.set_is_se(false);
+        ui.set_gg_result(space_string.clone());
+        ui.set_is_gg(false);
+        ui.set_gfg_result(space_string.clone());
+        ui.set_is_gfg(false);
+        ui.set_ddg_result(space_string.clone());
+        ui.set_is_ddg(false);
+        ui.set_is_back(false);
+        ui.set_is_next(false);
+        ui.set_error(space_string);
+    }) {
+        util::slint_event_loop_panic(err);
+    };
+}
+
+pub fn reset_result_index(index: Arc<Mutex<i32>>) {
+    match index.lock() {
+        Ok(mut index) => {*index = 0;},
+        Err(err) => util::poison_panic(err),
+    };
+}
