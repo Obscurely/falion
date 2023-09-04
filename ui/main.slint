@@ -22,6 +22,23 @@ export component MainWindow inherits Window {
     callback back-enter();
     callback next-enter();
 
+    in property <string> sof-result: " ";
+    in property <string> se-result: " ";
+    in property <string> gg-result: " ";
+    in property <string> gfg-result: " ";
+    in property <string> ddg-result: " ";
+
+    in property <bool> is-sof: false;
+    in property <bool> is-se: false;
+    in property <bool> is-gg: false;
+    in property <bool> is-gfg: false;
+    in property <bool> is-ddg: false;
+    
+    in property <bool> is-back: false;
+    in property <bool> is-next: false;
+
+    in property <string> error: "";
+
     VerticalBox {
         min-width: 750px;
         min-height: 500px;
@@ -56,9 +73,9 @@ export component MainWindow inherits Window {
                 color: yellow;
             }
             btn-sof := Button {
-                text: " ";
+                text: root.sof-result;
                 max-height: 30px;
-                enabled: false;
+                enabled: root.is-sof;
                 clicked => {
                     root.sof-enter();
                 }
@@ -73,9 +90,9 @@ export component MainWindow inherits Window {
                 color: yellow;
             }
             btn-se := Button {
-                text: " ";
+                text: root.se-result;
                 max-height: 30px;
-                enabled: false;
+                enabled: root.is-se;
                 clicked => {
                     root.se-enter();
                 }
@@ -90,9 +107,9 @@ export component MainWindow inherits Window {
                 color: yellow;
             }
             btn-gg := Button {
-                text: " ";
+                text: root.gg-result;
                 max-height: 30px;
-                enabled: false;
+                enabled: root.is-gg;
                 clicked => {
                     root.gg-enter();
                 }
@@ -107,9 +124,9 @@ export component MainWindow inherits Window {
                 color: yellow;
             }
             btn-gfg := Button {
-                text: " ";
+                text: root.gfg-result;
                 max-height: 30px;
-                enabled: false;
+                enabled: root.is-gfg;
                 clicked => {
                     root.gfg-enter();
                 }
@@ -124,31 +141,38 @@ export component MainWindow inherits Window {
                 color: yellow;
             }
             btn-dgg := Button {
-                text: " ";
+                text: root.ddg-result;
                 max-height: 30px;
-                enabled: false;
+                enabled: root.is-ddg;
                 clicked => {
                     root.ddg-enter();
                 }
             }
         }
         HorizontalBox {
+            text-error := Text {
+                text: root.error;
+                font-size: 24px;
+                color: red;
+            } 
+        }
+        HorizontalBox {
           spacing: 300px;
           Text {}
         }
         HorizontalBox {
-            Button {
+            btn-back := Button {
                 max-height: 30px;
-                enabled: false;
+                enabled: root.is-back;
                 text: "<- Back";
                 clicked => {
                     root.back-enter();
                 }
             }
             spacing: 500px;
-            Button {
+            btn-next := Button {
                 max-height: 30px;
-                enabled: false;
+                enabled: root.is-next;
                 text: "Next ->";
                 clicked => {
                     root.next-enter();

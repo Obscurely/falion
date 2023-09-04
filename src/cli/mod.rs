@@ -72,6 +72,7 @@ pub async fn cli(
     mut geeksforgeeks_results: GeeksForGeeksResults,
     mut ddg_search_results: DdgSearchResults,
 ) {
+    tracing::info!("User chose the cli.");
     // create stdout
     let mut stdout = std::io::stdout();
 
