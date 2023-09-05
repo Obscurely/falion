@@ -4,21 +4,34 @@
 import { SpinBox, Button, CheckBox, Slider, LineEdit, ScrollView, ListView,
     HorizontalBox, VerticalBox, GridBox, StandardButton } from "std-widgets.slint";
 
+import "../assets/fonts/RobotoMonoNerdFont-Regular.ttf";
+
 export component MainWindow inherits Window {
     preferred-width: 1250px;
     preferred-height: 750px;
     min-width: 750px;
     min-height: 500px;
     default-font-size: 24px;
+    default-font-family: "RobotoMono Nerd Font";
     title: "Falion";
     icon: @image-url("../assets/images/logo.png");
 
     callback query-enter(string);
     callback sof-enter();
+    callback sof-back-enter();
+    callback sof-next-enter();
     callback se-enter();
+    callback se-back-enter();
+    callback se-next-enter();
     callback gg-enter();
+    callback gg-back-enter();
+    callback gg-next-enter();
     callback gfg-enter();
+    callback gfg-back-enter();
+    callback gfg-next-enter();
     callback ddg-enter();
+    callback ddg-back-enter();
+    callback ddg-next-enter();
     callback back-enter();
     callback next-enter();
 
@@ -29,10 +42,24 @@ export component MainWindow inherits Window {
     in property <string> ddg-result: " ";
 
     in property <bool> is-sof: false;
+    in property <bool> is-sof-back: false;
+    in property <bool> is-sof-next: false;
+
     in property <bool> is-se: false;
+    in property <bool> is-se-back: false;
+    in property <bool> is-se-next: false;
+
     in property <bool> is-gg: false;
+    in property <bool> is-gg-back: false;
+    in property <bool> is-gg-next: false;
+
     in property <bool> is-gfg: false;
+    in property <bool> is-gfg-back: false;
+    in property <bool> is-gfg-next: false;
+
     in property <bool> is-ddg: false;
+    in property <bool> is-ddg-back: false;
+    in property <bool> is-ddg-next: false;
     
     in property <bool> is-back: false;
     in property <bool> is-next: false;
@@ -66,11 +93,29 @@ export component MainWindow inherits Window {
         }
         HorizontalBox {
             text-sof := Text {
-                text: "(1) StackOverflow:";
+                text: "(1) StackOverflow";
                 font-size: 24px;
-                min-width: 220px;
-                max-width: 220px;
+                min-width: 260px;
+                max-width: 260px;
                 color: yellow;
+            }
+            btn-sof-back := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-sof-back;
+                clicked => {
+                    root.sof-back-enter(); 
+                }
+            }
+            btn-sof-next := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-sof-next;
+                clicked => {
+                    root.sof-next-enter(); 
+                }
             }
             btn-sof := Button {
                 text: root.sof-result;
@@ -83,11 +128,29 @@ export component MainWindow inherits Window {
         }
         HorizontalBox {
             text-se := Text {
-                text: "(2) StackExchange:";
+                text: "(2) StackExchange";
                 font-size: 24px;
-                min-width: 220px;
-                max-width: 220px;
+                min-width: 260px;
+                max-width: 260px;
                 color: yellow;
+            }
+            btn-se-back := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-se-back;
+                clicked => {
+                    root.se-back-enter(); 
+                }
+            }
+            btn-se-next := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-se-next;
+                clicked => {
+                    root.se-next-enter(); 
+                }
             }
             btn-se := Button {
                 text: root.se-result;
@@ -100,11 +163,29 @@ export component MainWindow inherits Window {
         }
         HorizontalBox {
             text-gg := Text {
-                text: "(3) GitHub Gist:";
+                text: "(3) GitHub Gist";
                 font-size: 24px;
-                min-width: 220px;
-                max-width: 220px;
+                min-width: 260px;
+                max-width: 260px;
                 color: yellow;
+            }
+            btn-gg-back := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-gg-back;
+                clicked => {
+                    root.gg-back-enter(); 
+                }
+            }
+            btn-gg-next := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-gg-next;
+                clicked => {
+                    root.gg-next-enter(); 
+                }
             }
             btn-gg := Button {
                 text: root.gg-result;
@@ -117,11 +198,29 @@ export component MainWindow inherits Window {
         }
         HorizontalBox {
             text-gfg := Text {
-                text: "(4) GeeksForGeeks:";
+                text: "(4) GeeksForGeeks";
                 font-size: 24px;
-                min-width: 220px;
-                max-width: 220px;
+                min-width: 260px;
+                max-width: 260px;
                 color: yellow;
+            }
+            btn-gfg-back := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-gfg-back;
+                clicked => {
+                    root.gfg-back-enter(); 
+                }
+            }
+            btn-gfg-next := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-gfg-next;
+                clicked => {
+                    root.gfg-next-enter(); 
+                }
             }
             btn-gfg := Button {
                 text: root.gfg-result;
@@ -134,11 +233,29 @@ export component MainWindow inherits Window {
         }
         HorizontalBox {
             text-dgg := Text {
-                text: "(5) DuckDuckGO:";
+                text: "(5) DuckDuckGO";
                 font-size: 24px;
-                min-width: 220px;
-                max-width: 220px;
+                min-width: 260px;
+                max-width: 260px;
                 color: yellow;
+            }
+            btn-ddg-back := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-ddg-back;
+                clicked => {
+                    root.sof-back-enter(); 
+                }
+            }
+            btn-ddg-next := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-ddg-next;
+                clicked => {
+                    root.ddg-next-enter(); 
+                }
             }
             btn-dgg := Button {
                 text: root.ddg-result;
@@ -164,7 +281,7 @@ export component MainWindow inherits Window {
             btn-back := Button {
                 max-height: 30px;
                 enabled: root.is-back;
-                text: "<- Back";
+                text: " Back";
                 clicked => {
                     root.back-enter();
                 }
@@ -173,7 +290,7 @@ export component MainWindow inherits Window {
             btn-next := Button {
                 max-height: 30px;
                 enabled: root.is-next;
-                text: "Next ->";
+                text: "Next ";
                 clicked => {
                     root.next-enter();
                 }
