@@ -33,22 +33,32 @@ pub fn display_first_result<T, E>(
                     ResultType::StackOverflow => {
                         ui.set_sof_result(res.into());
                         ui.set_is_sof(true);
+                        ui.set_is_sof_back(true);
+                        ui.set_is_sof_next(true);
                     }
                     ResultType::StackExchange => {
                         ui.set_se_result(res.into());
                         ui.set_is_se(true);
+                        ui.set_is_se_back(true);
+                        ui.set_is_se_next(true);
                     }
                     ResultType::GithubGist => {
                         ui.set_gg_result(res.into());
                         ui.set_is_gg(true);
+                        ui.set_is_gg_back(true);
+                        ui.set_is_gg_next(true);
                     }
                     ResultType::GeeksForGeeks => {
                         ui.set_gfg_result(res.into());
                         ui.set_is_gfg(true);
+                        ui.set_is_gfg_back(true);
+                        ui.set_is_gfg_next(true);
                     }
                     ResultType::DdgSearch => {
                         ui.set_ddg_result(res.into());
                         ui.set_is_ddg(true);
+                        ui.set_is_ddg_back(true);
+                        ui.set_is_ddg_next(true);
                     }
                 }
             }) {
@@ -161,14 +171,29 @@ pub fn reset_results(ui: Weak<MainWindow>) {
 
         ui.set_sof_result(space_string.clone());
         ui.set_is_sof(false);
+        ui.set_is_sof_back(false);
+        ui.set_is_sof_next(false);
+
         ui.set_se_result(space_string.clone());
         ui.set_is_se(false);
+        ui.set_is_se_back(false);
+        ui.set_is_se_next(false);
+
         ui.set_gg_result(space_string.clone());
         ui.set_is_gg(false);
+        ui.set_is_gg_back(false);
+        ui.set_is_gg_next(false);
+
         ui.set_gfg_result(space_string.clone());
         ui.set_is_gfg(false);
+        ui.set_is_gfg_back(false);
+        ui.set_is_gfg_next(false);
+
         ui.set_ddg_result(space_string.clone());
         ui.set_is_ddg(false);
+        ui.set_is_ddg_back(false);
+        ui.set_is_ddg_next(false);
+
         ui.set_is_back(false);
         ui.set_is_next(false);
         ui.set_error(space_string);

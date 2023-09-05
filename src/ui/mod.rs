@@ -254,66 +254,42 @@ pub fn ui() {
 
         // actual closure
         move || {
-            // clone again the necessary ARCs
-            let stackoverflow_results_clone1 = Arc::clone(&stackoverflow_results_clone);
-            let stackexchange_results_clone1 = Arc::clone(&stackexchange_results_clone);
-            let github_gist_results_clone1 = Arc::clone(&github_gist_results_clone);
-            let geeksforgeeks_results_clone1 = Arc::clone(&geeksforgeeks_results_clone);
-            let ddg_search_results_clone1 = Arc::clone(&ddg_search_results_clone);
-            let stackoverflow_index_clone1 = Arc::clone(&stackoverflow_index_clone);
-            let stackexchange_index_clone1 = Arc::clone(&stackexchange_index_clone);
-            let github_gist_index_clone1 = Arc::clone(&github_gist_index_clone);
-            let geeksforgeeks_index_clone1 = Arc::clone(&geeksforgeeks_index_clone);
-            let ddg_search_index_clone1 = Arc::clone(&ddg_search_index_clone);
-
             // try and up the index by one
-            results::try_up_index(stackoverflow_results_clone1, stackoverflow_index_clone1);
-            results::try_up_index(stackexchange_results_clone1, stackexchange_index_clone1);
-            results::try_up_index(github_gist_results_clone1, github_gist_index_clone1);
-            results::try_up_index(geeksforgeeks_results_clone1, geeksforgeeks_index_clone1);
-            results::try_up_index(ddg_search_results_clone1, ddg_search_index_clone1);
-
-            // clone ARCs again
-            let stackoverflow_results_clone2 = Arc::clone(&stackoverflow_results_clone);
-            let stackexchange_results_clone2 = Arc::clone(&stackexchange_results_clone);
-            let github_gist_results_clone2 = Arc::clone(&github_gist_results_clone);
-            let geeksforgeeks_results_clone2 = Arc::clone(&geeksforgeeks_results_clone);
-            let ddg_search_results_clone2 = Arc::clone(&ddg_search_results_clone);
-            let stackoverflow_index_clone2 = Arc::clone(&stackoverflow_index_clone);
-            let stackexchange_index_clone2 = Arc::clone(&stackexchange_index_clone);
-            let github_gist_index_clone2 = Arc::clone(&github_gist_index_clone);
-            let geeksforgeeks_index_clone2 = Arc::clone(&geeksforgeeks_index_clone);
-            let ddg_search_index_clone2 = Arc::clone(&ddg_search_index_clone);
+            results::try_up_index(Arc::clone(&stackoverflow_results_clone), Arc::clone(&stackoverflow_index_clone));
+            results::try_up_index(Arc::clone(&stackexchange_results_clone), Arc::clone(&stackexchange_index_clone));
+            results::try_up_index(Arc::clone(&github_gist_results_clone), Arc::clone(&github_gist_index_clone));
+            results::try_up_index(Arc::clone(&geeksforgeeks_results_clone), Arc::clone(&geeksforgeeks_index_clone));
+            results::try_up_index(Arc::clone(&ddg_search_results_clone), Arc::clone(&ddg_search_index_clone));
 
             // redisplay results
             results::redisplay_result(
                 ui.clone(),
-                stackoverflow_results_clone2,
-                stackoverflow_index_clone2,
+                Arc::clone(&stackoverflow_results_clone),
+                Arc::clone(&stackoverflow_index_clone),
                 results::ResultType::StackOverflow,
             );
             results::redisplay_result(
                 ui.clone(),
-                stackexchange_results_clone2,
-                stackexchange_index_clone2,
+                Arc::clone(&stackexchange_results_clone),
+                Arc::clone(&stackexchange_index_clone),
                 results::ResultType::StackExchange,
             );
             results::redisplay_result(
                 ui.clone(),
-                github_gist_results_clone2,
-                github_gist_index_clone2,
+                Arc::clone(&github_gist_results_clone),
+                Arc::clone(&github_gist_index_clone),
                 results::ResultType::GithubGist,
             );
             results::redisplay_result(
                 ui.clone(),
-                geeksforgeeks_results_clone2,
-                geeksforgeeks_index_clone2,
+                Arc::clone(&geeksforgeeks_results_clone),
+                Arc::clone(&geeksforgeeks_index_clone),
                 results::ResultType::GeeksForGeeks,
             );
             results::redisplay_result(
                 ui.clone(),
-                ddg_search_results_clone2,
-                ddg_search_index_clone2,
+                Arc::clone(&ddg_search_results_clone),
+                Arc::clone(&ddg_search_index_clone),
                 results::ResultType::DdgSearch,
             );
 
@@ -340,61 +316,42 @@ pub fn ui() {
 
         // actual closure
         move || {
-            // clone again the necessary ARCs
-            let stackoverflow_index_clone1 = Arc::clone(&stackoverflow_index_clone);
-            let stackexchange_index_clone1 = Arc::clone(&stackexchange_index_clone);
-            let github_gist_index_clone1 = Arc::clone(&github_gist_index_clone);
-            let geeksforgeeks_index_clone1 = Arc::clone(&geeksforgeeks_index_clone);
-            let ddg_search_index_clone1 = Arc::clone(&ddg_search_index_clone);
-
             // try and up the index by one
-            results::try_down_index(stackoverflow_index_clone1);
-            results::try_down_index(stackexchange_index_clone1);
-            results::try_down_index(github_gist_index_clone1);
-            results::try_down_index(geeksforgeeks_index_clone1);
-            results::try_down_index(ddg_search_index_clone1);
-
-            // clone ARCs again
-            let stackoverflow_results_clone2 = Arc::clone(&stackoverflow_results_clone);
-            let stackexchange_results_clone2 = Arc::clone(&stackexchange_results_clone);
-            let github_gist_results_clone2 = Arc::clone(&github_gist_results_clone);
-            let geeksforgeeks_results_clone2 = Arc::clone(&geeksforgeeks_results_clone);
-            let ddg_search_results_clone2 = Arc::clone(&ddg_search_results_clone);
-            let stackoverflow_index_clone2 = Arc::clone(&stackoverflow_index_clone);
-            let stackexchange_index_clone2 = Arc::clone(&stackexchange_index_clone);
-            let github_gist_index_clone2 = Arc::clone(&github_gist_index_clone);
-            let geeksforgeeks_index_clone2 = Arc::clone(&geeksforgeeks_index_clone);
-            let ddg_search_index_clone2 = Arc::clone(&ddg_search_index_clone);
+            results::try_down_index(Arc::clone(&stackoverflow_index_clone));
+            results::try_down_index(Arc::clone(&stackexchange_index_clone));
+            results::try_down_index(Arc::clone(&github_gist_index_clone));
+            results::try_down_index(Arc::clone(&geeksforgeeks_index_clone));
+            results::try_down_index(Arc::clone(&ddg_search_index_clone));
 
             // redisplay results
             results::redisplay_result(
                 ui.clone(),
-                stackoverflow_results_clone2,
-                stackoverflow_index_clone2,
+                Arc::clone(&stackoverflow_results_clone),
+                Arc::clone(&stackoverflow_index_clone),
                 results::ResultType::StackOverflow,
             );
             results::redisplay_result(
                 ui.clone(),
-                stackexchange_results_clone2,
-                stackexchange_index_clone2,
+                Arc::clone(&stackexchange_results_clone),
+                Arc::clone(&stackexchange_index_clone),
                 results::ResultType::StackExchange,
             );
             results::redisplay_result(
                 ui.clone(),
-                github_gist_results_clone2,
-                github_gist_index_clone2,
+                Arc::clone(&github_gist_results_clone),
+                Arc::clone(&github_gist_index_clone),
                 results::ResultType::GithubGist,
             );
             results::redisplay_result(
                 ui.clone(),
-                geeksforgeeks_results_clone2,
-                geeksforgeeks_index_clone2,
+                Arc::clone(&geeksforgeeks_results_clone),
+                Arc::clone(&geeksforgeeks_index_clone),
                 results::ResultType::GeeksForGeeks,
             );
             results::redisplay_result(
                 ui.clone(),
-                ddg_search_results_clone2,
-                ddg_search_index_clone2,
+                Arc::clone(&ddg_search_results_clone),
+                Arc::clone(&ddg_search_index_clone),
                 results::ResultType::DdgSearch,
             );
 
