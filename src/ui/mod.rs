@@ -28,7 +28,13 @@ type DdgSearchResults =
 pub fn ui() {
     tracing::info!("User chose the GUI.");
     // main window
-    let main_window = MainWindow::new().unwrap();
+    let main_window = match MainWindow::new() {
+        Ok(window) => window,
+        Err(err) => {
+            tracing::error!("There was an error creating the window. Error {}", err);
+            panic!("Error creating the window. Error {}", err);
+        }
+    };
 
     // Make source objects
     let client = search::util::client_with_special_settings();
@@ -52,11 +58,11 @@ pub fn ui() {
     let ddg_search_results: Arc<Mutex<DdgSearchResults>> = Arc::new(Mutex::new(None));
 
     // make variables to store the current index
-    let stackoverflow_index = Arc::new(Mutex::new(0));
-    let stackexchange_index = Arc::new(Mutex::new(0));
-    let github_gist_index = Arc::new(Mutex::new(0));
-    let geeksforgeeks_index = Arc::new(Mutex::new(0));
-    let ddg_search_index = Arc::new(Mutex::new(0));
+    let stackoverflow_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+    let stackexchange_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+    let github_gist_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+    let geeksforgeeks_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+    let ddg_search_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
 
     // on query enter callback
     main_window.on_query_enter({
@@ -230,6 +236,176 @@ pub fn ui() {
         }
     });
 
+    main_window.on_next_enter({
+        tracing::info!("On next enter event hit.");
+        // clone the necessary ARCs
+        let stackoverflow_results_clone = Arc::clone(&stackoverflow_results);
+        let stackexchange_results_clone = Arc::clone(&stackexchange_results);
+        let github_gist_results_clone = Arc::clone(&github_gist_results);
+        let geeksforgeeks_results_clone = Arc::clone(&geeksforgeeks_results);
+        let ddg_search_results_clone = Arc::clone(&ddg_search_results);
+        let stackoverflow_index_clone = Arc::clone(&stackoverflow_index);
+        let stackexchange_index_clone = Arc::clone(&stackexchange_index);
+        let github_gist_index_clone = Arc::clone(&github_gist_index);
+        let geeksforgeeks_index_clone = Arc::clone(&geeksforgeeks_index);
+        let ddg_search_index_clone = Arc::clone(&ddg_search_index);
+        // get a weak pointer to the main window
+        let ui = main_window.as_weak();
+
+        // actual closure
+        move || {
+            // clone again the necessary ARCs
+            let stackoverflow_results_clone1 = Arc::clone(&stackoverflow_results_clone);
+            let stackexchange_results_clone1 = Arc::clone(&stackexchange_results_clone);
+            let github_gist_results_clone1 = Arc::clone(&github_gist_results_clone);
+            let geeksforgeeks_results_clone1 = Arc::clone(&geeksforgeeks_results_clone);
+            let ddg_search_results_clone1 = Arc::clone(&ddg_search_results_clone);
+            let stackoverflow_index_clone1 = Arc::clone(&stackoverflow_index_clone);
+            let stackexchange_index_clone1 = Arc::clone(&stackexchange_index_clone);
+            let github_gist_index_clone1 = Arc::clone(&github_gist_index_clone);
+            let geeksforgeeks_index_clone1 = Arc::clone(&geeksforgeeks_index_clone);
+            let ddg_search_index_clone1 = Arc::clone(&ddg_search_index_clone);
+
+            // try and up the index by one
+            results::try_up_index(stackoverflow_results_clone1, stackoverflow_index_clone1);
+            results::try_up_index(stackexchange_results_clone1, stackexchange_index_clone1);
+            results::try_up_index(github_gist_results_clone1, github_gist_index_clone1);
+            results::try_up_index(geeksforgeeks_results_clone1, geeksforgeeks_index_clone1);
+            results::try_up_index(ddg_search_results_clone1, ddg_search_index_clone1);
+
+            // clone ARCs again
+            let stackoverflow_results_clone2 = Arc::clone(&stackoverflow_results_clone);
+            let stackexchange_results_clone2 = Arc::clone(&stackexchange_results_clone);
+            let github_gist_results_clone2 = Arc::clone(&github_gist_results_clone);
+            let geeksforgeeks_results_clone2 = Arc::clone(&geeksforgeeks_results_clone);
+            let ddg_search_results_clone2 = Arc::clone(&ddg_search_results_clone);
+            let stackoverflow_index_clone2 = Arc::clone(&stackoverflow_index_clone);
+            let stackexchange_index_clone2 = Arc::clone(&stackexchange_index_clone);
+            let github_gist_index_clone2 = Arc::clone(&github_gist_index_clone);
+            let geeksforgeeks_index_clone2 = Arc::clone(&geeksforgeeks_index_clone);
+            let ddg_search_index_clone2 = Arc::clone(&ddg_search_index_clone);
+
+            // redisplay results
+            results::redisplay_result(
+                ui.clone(),
+                stackoverflow_results_clone2,
+                stackoverflow_index_clone2,
+                results::ResultType::StackOverflow,
+            );
+            results::redisplay_result(
+                ui.clone(),
+                stackexchange_results_clone2,
+                stackexchange_index_clone2,
+                results::ResultType::StackExchange,
+            );
+            results::redisplay_result(
+                ui.clone(),
+                github_gist_results_clone2,
+                github_gist_index_clone2,
+                results::ResultType::GithubGist,
+            );
+            results::redisplay_result(
+                ui.clone(),
+                geeksforgeeks_results_clone2,
+                geeksforgeeks_index_clone2,
+                results::ResultType::GeeksForGeeks,
+            );
+            results::redisplay_result(
+                ui.clone(),
+                ddg_search_results_clone2,
+                ddg_search_index_clone2,
+                results::ResultType::DdgSearch,
+            );
+
+            // log the end of the function
+            tracing::info!("Up the results by one successfully and resdisplayed them.");
+        }
+    });
+
+    main_window.on_back_enter({
+        tracing::info!("On next enter event hit.");
+        // clone the necessary ARCs
+        let stackoverflow_results_clone = Arc::clone(&stackoverflow_results);
+        let stackexchange_results_clone = Arc::clone(&stackexchange_results);
+        let github_gist_results_clone = Arc::clone(&github_gist_results);
+        let geeksforgeeks_results_clone = Arc::clone(&geeksforgeeks_results);
+        let ddg_search_results_clone = Arc::clone(&ddg_search_results);
+        let stackoverflow_index_clone = Arc::clone(&stackoverflow_index);
+        let stackexchange_index_clone = Arc::clone(&stackexchange_index);
+        let github_gist_index_clone = Arc::clone(&github_gist_index);
+        let geeksforgeeks_index_clone = Arc::clone(&geeksforgeeks_index);
+        let ddg_search_index_clone = Arc::clone(&ddg_search_index);
+        // get a weak pointer to the main window
+        let ui = main_window.as_weak();
+
+        // actual closure
+        move || {
+            // clone again the necessary ARCs
+            let stackoverflow_index_clone1 = Arc::clone(&stackoverflow_index_clone);
+            let stackexchange_index_clone1 = Arc::clone(&stackexchange_index_clone);
+            let github_gist_index_clone1 = Arc::clone(&github_gist_index_clone);
+            let geeksforgeeks_index_clone1 = Arc::clone(&geeksforgeeks_index_clone);
+            let ddg_search_index_clone1 = Arc::clone(&ddg_search_index_clone);
+
+            // try and up the index by one
+            results::try_down_index(stackoverflow_index_clone1);
+            results::try_down_index(stackexchange_index_clone1);
+            results::try_down_index(github_gist_index_clone1);
+            results::try_down_index(geeksforgeeks_index_clone1);
+            results::try_down_index(ddg_search_index_clone1);
+
+            // clone ARCs again
+            let stackoverflow_results_clone2 = Arc::clone(&stackoverflow_results_clone);
+            let stackexchange_results_clone2 = Arc::clone(&stackexchange_results_clone);
+            let github_gist_results_clone2 = Arc::clone(&github_gist_results_clone);
+            let geeksforgeeks_results_clone2 = Arc::clone(&geeksforgeeks_results_clone);
+            let ddg_search_results_clone2 = Arc::clone(&ddg_search_results_clone);
+            let stackoverflow_index_clone2 = Arc::clone(&stackoverflow_index_clone);
+            let stackexchange_index_clone2 = Arc::clone(&stackexchange_index_clone);
+            let github_gist_index_clone2 = Arc::clone(&github_gist_index_clone);
+            let geeksforgeeks_index_clone2 = Arc::clone(&geeksforgeeks_index_clone);
+            let ddg_search_index_clone2 = Arc::clone(&ddg_search_index_clone);
+
+            // redisplay results
+            results::redisplay_result(
+                ui.clone(),
+                stackoverflow_results_clone2,
+                stackoverflow_index_clone2,
+                results::ResultType::StackOverflow,
+            );
+            results::redisplay_result(
+                ui.clone(),
+                stackexchange_results_clone2,
+                stackexchange_index_clone2,
+                results::ResultType::StackExchange,
+            );
+            results::redisplay_result(
+                ui.clone(),
+                github_gist_results_clone2,
+                github_gist_index_clone2,
+                results::ResultType::GithubGist,
+            );
+            results::redisplay_result(
+                ui.clone(),
+                geeksforgeeks_results_clone2,
+                geeksforgeeks_index_clone2,
+                results::ResultType::GeeksForGeeks,
+            );
+            results::redisplay_result(
+                ui.clone(),
+                ddg_search_results_clone2,
+                ddg_search_index_clone2,
+                results::ResultType::DdgSearch,
+            );
+
+            // log the end of the function
+            tracing::info!("Up the results by one successfully and resdisplayed them.");
+        }
+    });
+
     // show the window
-    main_window.run().unwrap();
+    if let Err(err) = main_window.run() {
+        tracing::error!("There was an error displaying the window. Error {}", err);
+        panic!("There was an error displaying the window. Error {}", err);
+    };
 }

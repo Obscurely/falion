@@ -1,8 +1,8 @@
 use slint::Weak;
 
-pub fn get_ui<T>(ui: Weak<T>) -> T 
+pub fn get_ui<T>(ui: Weak<T>) -> T
 where
-    T: slint::ComponentHandle
+    T: slint::ComponentHandle,
 {
     match ui.upgrade() {
         Some(ui) => ui,
