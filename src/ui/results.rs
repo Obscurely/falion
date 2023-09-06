@@ -6,6 +6,7 @@ use std::sync::{Arc, Mutex};
 
 type Results<T, E> = Result<IndexMap<String, T>, E>;
 
+#[derive(Clone, Copy)]
 pub enum ResultType {
     StackOverflow,
     StackExchange,
@@ -240,6 +241,87 @@ pub fn try_down_index(index: Arc<Mutex<usize>>) {
         }
         Err(err) => {
             util::poison_panic(err);
+        }
+    }
+}
+
+pub fn setup_results<T, E>(ui: Weak<MainWindow>, results: Arc<Mutex<Option<Results<T, E>>>>, index: Arc<Mutex<usize>>, results_type: ResultType) 
+where
+    E: std::fmt::Display + 'static,
+    T: 'static
+{
+    let ui_deref = util::get_ui(ui.clone());
+    let ui_clone = ui.clone();
+
+    // events
+    let back_event = {
+        tracing::info!("On sof back enter event hit.");
+        // clone the necessary ARCs
+        let results_clone = Arc::clone(&results);
+        let index_clone = Arc::clone(&index);
+
+        // actual closure
+        move || {
+            // try down the index by one
+            try_down_index(Arc::clone(&index_clone));
+
+            // redisplay the result
+            redisplay_result(
+                ui_clone.clone(),
+                Arc::clone(&results_clone),
+                Arc::clone(&index_clone),
+                results_type,
+            );
+
+            // log the end of the function
+            tracing::info!("Successfully backed the StaceOverflow results by one.");
+        }
+    };
+
+    let next_event = {
+        tracing::info!("On sof next enter event hit.");
+        // clone the necessary ARCs
+        let results_clone = Arc::clone(&results);
+        let index_clone = Arc::clone(&index);
+
+        // actual closure
+        move || {
+            // try down the index by one
+            try_up_index(Arc::clone(&results_clone), Arc::clone(&index_clone));
+
+            // redisplay the result
+            redisplay_result(
+                ui.clone(),
+                Arc::clone(&results_clone),
+                Arc::clone(&index_clone),
+                results_type,
+            );
+
+            // log the end of the function
+            tracing::info!("Successfully upped the StaceOverflow results by one.");
+        }
+    };
+
+    match results_type {
+        ResultType::StackOverflow => {
+            ui_deref.on_sof_back_enter(back_event);
+            ui_deref.on_sof_next_enter(next_event);
+        }
+        ResultType::StackExchange => {
+            ui_deref.on_se_back_enter(back_event);
+            ui_deref.on_se_next_enter(next_event);
+        }
+        ResultType::GithubGist => {
+            ui_deref.on_gg_back_enter(back_event);
+            ui_deref.on_gg_next_enter(next_event);
+        }
+        ResultType::GeeksForGeeks => {
+            ui_deref.on_gfg_back_enter(back_event);
+            ui_deref.on_gfg_next_enter(next_event);
+        }
+        ResultType::DdgSearch => {
+            ui_deref.on_ddg_back_enter(back_event);
+            ui_deref.on_ddg_next_enter(next_event);
         }
     }
 }

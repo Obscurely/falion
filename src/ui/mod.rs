@@ -64,7 +64,7 @@ pub fn ui() {
     let geeksforgeeks_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
     let ddg_search_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
 
-    // on query enter callback
+    // Event for when a search enter is hit
     main_window.on_query_enter({
         tracing::info!("Query enter event hit.");
         // get weak pointer the ui in order to use it in an event loop
@@ -236,6 +236,7 @@ pub fn ui() {
         }
     });
 
+    // Event for when the button to move all results up by one is hit
     main_window.on_next_enter({
         tracing::info!("On next enter event hit.");
         // clone the necessary ARCs
@@ -255,11 +256,26 @@ pub fn ui() {
         // actual closure
         move || {
             // try and up the index by one
-            results::try_up_index(Arc::clone(&stackoverflow_results_clone), Arc::clone(&stackoverflow_index_clone));
-            results::try_up_index(Arc::clone(&stackexchange_results_clone), Arc::clone(&stackexchange_index_clone));
-            results::try_up_index(Arc::clone(&github_gist_results_clone), Arc::clone(&github_gist_index_clone));
-            results::try_up_index(Arc::clone(&geeksforgeeks_results_clone), Arc::clone(&geeksforgeeks_index_clone));
-            results::try_up_index(Arc::clone(&ddg_search_results_clone), Arc::clone(&ddg_search_index_clone));
+            results::try_up_index(
+                Arc::clone(&stackoverflow_results_clone),
+                Arc::clone(&stackoverflow_index_clone),
+            );
+            results::try_up_index(
+                Arc::clone(&stackexchange_results_clone),
+                Arc::clone(&stackexchange_index_clone),
+            );
+            results::try_up_index(
+                Arc::clone(&github_gist_results_clone),
+                Arc::clone(&github_gist_index_clone),
+            );
+            results::try_up_index(
+                Arc::clone(&geeksforgeeks_results_clone),
+                Arc::clone(&geeksforgeeks_index_clone),
+            );
+            results::try_up_index(
+                Arc::clone(&ddg_search_results_clone),
+                Arc::clone(&ddg_search_index_clone),
+            );
 
             // redisplay results
             results::redisplay_result(
@@ -298,6 +314,7 @@ pub fn ui() {
         }
     });
 
+    // Event for when the button move back all results by one is hit
     main_window.on_back_enter({
         tracing::info!("On next enter event hit.");
         // clone the necessary ARCs
@@ -359,6 +376,38 @@ pub fn ui() {
             tracing::info!("Up the results by one successfully and resdisplayed them.");
         }
     });
+
+    // setup individual move results buttons and the actual results button (to display)
+    results::setup_results(
+        main_window.as_weak(),
+        Arc::clone(&stackoverflow_results),
+        Arc::clone(&stackoverflow_index),
+        results::ResultType::StackOverflow,
+    );
+    results::setup_results(
+        main_window.as_weak(),
+        Arc::clone(&stackexchange_results),
+        Arc::clone(&stackexchange_index),
+        results::ResultType::StackExchange,
+    );
+    results::setup_results(
+        main_window.as_weak(),
+        Arc::clone(&github_gist_results),
+        Arc::clone(&github_gist_index),
+        results::ResultType::GithubGist,
+    );
+    results::setup_results(
+        main_window.as_weak(),
+        Arc::clone(&geeksforgeeks_results),
+        Arc::clone(&geeksforgeeks_index),
+        results::ResultType::GeeksForGeeks,
+    );
+    results::setup_results(
+        main_window.as_weak(),
+        Arc::clone(&ddg_search_results),
+        Arc::clone(&ddg_search_index),
+        results::ResultType::DdgSearch,
+    );
 
     // show the window
     if let Err(err) = main_window.run() {
