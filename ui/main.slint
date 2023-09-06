@@ -4,6 +4,12 @@
 import { SpinBox, Button, CheckBox, Slider, LineEdit, ScrollView, ListView,
     HorizontalBox, VerticalBox, GridBox, StandardButton } from "std-widgets.slint";
 
+import { Results } from "./results.slint";
+import { DynContent } from "./dyn_content.slint";
+import { StaticContent } from "./static_content.slint";
+
+export { Results }
+
 import "../assets/fonts/RobotoMonoNerdFont-Regular.ttf";
 
 export component MainWindow inherits Window {
@@ -15,6 +21,8 @@ export component MainWindow inherits Window {
     default-font-family: "RobotoMono Nerd Font";
     title: "Falion";
     icon: @image-url("../assets/images/logo.png");
+
+    in property <int> view: 0;
 
     callback query-enter(string);
     callback sof-enter();
@@ -66,235 +74,70 @@ export component MainWindow inherits Window {
 
     in property <string> error: "";
 
-    VerticalBox {
-        min-width: 750px;
-        min-height: 500px;
-        HorizontalBox {
-            text-search := LineEdit {
-                max-height: 80px;
-                min-height: 40px;
-                font-size: 28px;
-                placeholder-text: "What are you wondering about?";
-                enabled: true;
-                accepted(text) => {
-                    root.query-enter(self.text);
-                }
-            }
-            btn-search := Button {
-                min-width: 50px;
-                max-height: 80px;
-                min-height: 40px;
-                icon: @image-url("../assets/images/logo.png");
-                enabled: text-search.text != "";
-                clicked => {
-                    root.query-enter(text-search.text);
-                }
-            }
+    in property <string> dyn-content-tag: "";
+    in property <string> dyn-content: "";
+    in property <string> static-content-tag: "";
+    in property <string> static-content: "";
+
+    VerticalLayout {
+        if (view == 0) : Results {
+            query-enter(text) => {query-enter(text);}
+            sof-enter() => {sof-enter()}
+            sof-back-enter() => {sof-back-enter();}
+            sof-next-enter() => {sof-next-enter();}
+            se-enter() => {se-enter()}
+            se-back-enter() => {se-back-enter();}
+            se-next-enter() => {se-next-enter();}
+            gg-enter() => {gg-enter()}
+            gg-back-enter() => {gg-back-enter();}
+            gg-next-enter() => {gg-next-enter();}
+            gfg-enter() => {gfg-enter()}
+            gfg-back-enter() => {gfg-back-enter();}
+            gfg-next-enter() => {gfg-next-enter();}
+            ddg-enter() => {ddg-enter()}
+            ddg-back-enter() => {ddg-back-enter();}
+            ddg-next-enter() => {ddg-next-enter();}
+            back-enter() => {back-enter();}
+            next-enter() => {next-enter();}
+
+            sof-result: sof-result;
+            se-result: se-result;
+            gg-result: gg-result;
+            gfg-result: gfg-result;
+            ddg-result: ddg-result;
+
+            is-sof: is-sof;
+            is-sof-back: is-sof-back;
+            is-sof-next: is-sof-next;
+
+            is-se: is-se;
+            is-se-back: is-se-back;
+            is-se-next: is-se-next;
+
+            is-gg: is-gg;
+            is-gg-back: is-gg-back;
+            is-gg-next: is-gg-next;
+
+            is-gfg: is-gfg;
+            is-gfg-back: is-gfg-back;
+            is-gfg-next: is-gfg-next;
+
+            is-ddg: is-ddg;
+            is-ddg-back: is-ddg-back;
+            is-ddg-next: is-ddg-next;
+
+            is-back: is-back;
+            is-next: is-next;
+
+            error: error;
         }
-        HorizontalBox {
-            text-sof := Text {
-                text: "(1) StackOverflow";
-                font-size: 24px;
-                min-width: 260px;
-                max-width: 260px;
-                color: yellow;
-            }
-            btn-sof-back := Button {
-                text: "";
-                max-width: 20px;
-                max-height: 30px;
-                enabled: root.is-sof-back;
-                clicked => {
-                    root.sof-back-enter(); 
-                }
-            }
-            btn-sof-next := Button {
-                text: "";
-                max-width: 20px;
-                max-height: 30px;
-                enabled: root.is-sof-next;
-                clicked => {
-                    root.sof-next-enter(); 
-                }
-            }
-            btn-sof := Button {
-                text: root.sof-result;
-                max-height: 30px;
-                enabled: root.is-sof;
-                clicked => {
-                    root.sof-enter();
-                }
-            }
+        if (view == 1) : DynContent {
+            content-tag: dyn-content-tag;
+            content: dyn-content;
         }
-        HorizontalBox {
-            text-se := Text {
-                text: "(2) StackExchange";
-                font-size: 24px;
-                min-width: 260px;
-                max-width: 260px;
-                color: yellow;
-            }
-            btn-se-back := Button {
-                text: "";
-                max-width: 20px;
-                max-height: 30px;
-                enabled: root.is-se-back;
-                clicked => {
-                    root.se-back-enter(); 
-                }
-            }
-            btn-se-next := Button {
-                text: "";
-                max-width: 20px;
-                max-height: 30px;
-                enabled: root.is-se-next;
-                clicked => {
-                    root.se-next-enter(); 
-                }
-            }
-            btn-se := Button {
-                text: root.se-result;
-                max-height: 30px;
-                enabled: root.is-se;
-                clicked => {
-                    root.se-enter();
-                }
-            }
-        }
-        HorizontalBox {
-            text-gg := Text {
-                text: "(3) GitHub Gist";
-                font-size: 24px;
-                min-width: 260px;
-                max-width: 260px;
-                color: yellow;
-            }
-            btn-gg-back := Button {
-                text: "";
-                max-width: 20px;
-                max-height: 30px;
-                enabled: root.is-gg-back;
-                clicked => {
-                    root.gg-back-enter(); 
-                }
-            }
-            btn-gg-next := Button {
-                text: "";
-                max-width: 20px;
-                max-height: 30px;
-                enabled: root.is-gg-next;
-                clicked => {
-                    root.gg-next-enter(); 
-                }
-            }
-            btn-gg := Button {
-                text: root.gg-result;
-                max-height: 30px;
-                enabled: root.is-gg;
-                clicked => {
-                    root.gg-enter();
-                }
-            }
-        }
-        HorizontalBox {
-            text-gfg := Text {
-                text: "(4) GeeksForGeeks";
-                font-size: 24px;
-                min-width: 260px;
-                max-width: 260px;
-                color: yellow;
-            }
-            btn-gfg-back := Button {
-                text: "";
-                max-width: 20px;
-                max-height: 30px;
-                enabled: root.is-gfg-back;
-                clicked => {
-                    root.gfg-back-enter(); 
-                }
-            }
-            btn-gfg-next := Button {
-                text: "";
-                max-width: 20px;
-                max-height: 30px;
-                enabled: root.is-gfg-next;
-                clicked => {
-                    root.gfg-next-enter(); 
-                }
-            }
-            btn-gfg := Button {
-                text: root.gfg-result;
-                max-height: 30px;
-                enabled: root.is-gfg;
-                clicked => {
-                    root.gfg-enter();
-                }
-            }
-        }
-        HorizontalBox {
-            text-dgg := Text {
-                text: "(5) DuckDuckGO";
-                font-size: 24px;
-                min-width: 260px;
-                max-width: 260px;
-                color: yellow;
-            }
-            btn-ddg-back := Button {
-                text: "";
-                max-width: 20px;
-                max-height: 30px;
-                enabled: root.is-ddg-back;
-                clicked => {
-                    root.ddg-back-enter(); 
-                }
-            }
-            btn-ddg-next := Button {
-                text: "";
-                max-width: 20px;
-                max-height: 30px;
-                enabled: root.is-ddg-next;
-                clicked => {
-                    root.ddg-next-enter(); 
-                }
-            }
-            btn-dgg := Button {
-                text: root.ddg-result;
-                max-height: 30px;
-                enabled: root.is-ddg;
-                clicked => {
-                    root.ddg-enter();
-                }
-            }
-        }
-        HorizontalBox {
-            text-error := Text {
-                text: root.error;
-                font-size: 24px;
-                color: red;
-            } 
-        }
-        HorizontalBox {
-          spacing: 300px;
-          Text {}
-        }
-        HorizontalBox {
-            btn-back := Button {
-                max-height: 30px;
-                enabled: root.is-back;
-                text: " Back";
-                clicked => {
-                    root.back-enter();
-                }
-            }
-            spacing: 500px;
-            btn-next := Button {
-                max-height: 30px;
-                enabled: root.is-next;
-                text: "Next ";
-                clicked => {
-                    root.next-enter();
-                }
-            }
+        if (view == 2) : StaticContent {
+            content-tag: static-content-tag;
+            content: static-content;
         }
     }
 }

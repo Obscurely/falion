@@ -1,0 +1,291 @@
+// Copyright © SixtyFPS GmbH <info@slint.dev>
+// SPDX-License-Identifier: MIT
+
+import { SpinBox, Button, CheckBox, Slider, LineEdit, ScrollView, ListView,
+    HorizontalBox, VerticalBox, GridBox, StandardButton } from "std-widgets.slint";
+
+import "../assets/fonts/RobotoMonoNerdFont-Regular.ttf";
+
+export component Results inherits Window {
+    callback query-enter(string);
+    callback sof-enter();
+    callback sof-back-enter();
+    callback sof-next-enter();
+    callback se-enter();
+    callback se-back-enter();
+    callback se-next-enter();
+    callback gg-enter();
+    callback gg-back-enter();
+    callback gg-next-enter();
+    callback gfg-enter();
+    callback gfg-back-enter();
+    callback gfg-next-enter();
+    callback ddg-enter();
+    callback ddg-back-enter();
+    callback ddg-next-enter();
+    callback back-enter();
+    callback next-enter();
+
+    in property <string> sof-result: " ";
+    in property <string> se-result: " ";
+    in property <string> gg-result: " ";
+    in property <string> gfg-result: " ";
+    in property <string> ddg-result: " ";
+
+    in property <bool> is-sof: false;
+    in property <bool> is-sof-back: false;
+    in property <bool> is-sof-next: false;
+
+    in property <bool> is-se: false;
+    in property <bool> is-se-back: false;
+    in property <bool> is-se-next: false;
+
+    in property <bool> is-gg: false;
+    in property <bool> is-gg-back: false;
+    in property <bool> is-gg-next: false;
+
+    in property <bool> is-gfg: false;
+    in property <bool> is-gfg-back: false;
+    in property <bool> is-gfg-next: false;
+
+    in property <bool> is-ddg: false;
+    in property <bool> is-ddg-back: false;
+    in property <bool> is-ddg-next: false;
+    
+    in property <bool> is-back: false;
+    in property <bool> is-next: false;
+
+    in property <string> error: "";
+
+    VerticalBox {
+        min-width: 750px;
+        min-height: 500px;
+        HorizontalBox {
+            text-search := LineEdit {
+                max-height: 80px;
+                min-height: 40px;
+                font-size: 28px;
+                placeholder-text: "What are you wondering about?";
+                enabled: true;
+                accepted(text) => {
+                    root.query-enter(self.text);
+                }
+            }
+            btn-search := Button {
+                min-width: 50px;
+                max-height: 80px;
+                min-height: 40px;
+                icon: @image-url("../assets/images/logo.png");
+                enabled: text-search.text != "";
+                clicked => {
+                    root.query-enter(text-search.text);
+                }
+            }
+        }
+        HorizontalBox {
+            text-sof := Text {
+                text: "(1) StackOverflow";
+                font-size: 24px;
+                min-width: 260px;
+                max-width: 260px;
+                color: yellow;
+            }
+            btn-sof-back := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-sof-back;
+                clicked => {
+                    root.sof-back-enter(); 
+                }
+            }
+            btn-sof-next := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-sof-next;
+                clicked => {
+                    root.sof-next-enter(); 
+                }
+            }
+            btn-sof := Button {
+                text: root.sof-result;
+                max-height: 30px;
+                enabled: root.is-sof;
+                clicked => {
+                    root.sof-enter();
+                }
+            }
+        }
+        HorizontalBox {
+            text-se := Text {
+                text: "(2) StackExchange";
+                font-size: 24px;
+                min-width: 260px;
+                max-width: 260px;
+                color: yellow;
+            }
+            btn-se-back := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-se-back;
+                clicked => {
+                    root.se-back-enter(); 
+                }
+            }
+            btn-se-next := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-se-next;
+                clicked => {
+                    root.se-next-enter(); 
+                }
+            }
+            btn-se := Button {
+                text: root.se-result;
+                max-height: 30px;
+                enabled: root.is-se;
+                clicked => {
+                    root.se-enter();
+                }
+            }
+        }
+        HorizontalBox {
+            text-gg := Text {
+                text: "(3) GitHub Gist";
+                font-size: 24px;
+                min-width: 260px;
+                max-width: 260px;
+                color: yellow;
+            }
+            btn-gg-back := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-gg-back;
+                clicked => {
+                    root.gg-back-enter(); 
+                }
+            }
+            btn-gg-next := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-gg-next;
+                clicked => {
+                    root.gg-next-enter(); 
+                }
+            }
+            btn-gg := Button {
+                text: root.gg-result;
+                max-height: 30px;
+                enabled: root.is-gg;
+                clicked => {
+                    root.gg-enter();
+                }
+            }
+        }
+        HorizontalBox {
+            text-gfg := Text {
+                text: "(4) GeeksForGeeks";
+                font-size: 24px;
+                min-width: 260px;
+                max-width: 260px;
+                color: yellow;
+            }
+            btn-gfg-back := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-gfg-back;
+                clicked => {
+                    root.gfg-back-enter(); 
+                }
+            }
+            btn-gfg-next := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-gfg-next;
+                clicked => {
+                    root.gfg-next-enter(); 
+                }
+            }
+            btn-gfg := Button {
+                text: root.gfg-result;
+                max-height: 30px;
+                enabled: root.is-gfg;
+                clicked => {
+                    root.gfg-enter();
+                }
+            }
+        }
+        HorizontalBox {
+            text-dgg := Text {
+                text: "(5) DuckDuckGO";
+                font-size: 24px;
+                min-width: 260px;
+                max-width: 260px;
+                color: yellow;
+            }
+            btn-ddg-back := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-ddg-back;
+                clicked => {
+                    root.ddg-back-enter(); 
+                }
+            }
+            btn-ddg-next := Button {
+                text: "";
+                max-width: 20px;
+                max-height: 30px;
+                enabled: root.is-ddg-next;
+                clicked => {
+                    root.ddg-next-enter(); 
+                }
+            }
+            btn-dgg := Button {
+                text: root.ddg-result;
+                max-height: 30px;
+                enabled: root.is-ddg;
+                clicked => {
+                    root.ddg-enter();
+                }
+            }
+        }
+        HorizontalBox {
+            text-error := Text {
+                text: root.error;
+                font-size: 24px;
+                color: red;
+            } 
+        }
+        HorizontalBox {
+          spacing: 300px;
+          Text {}
+        }
+        HorizontalBox {
+            btn-back := Button {
+                max-height: 30px;
+                enabled: root.is-back;
+                text: " Back";
+                clicked => {
+                    root.back-enter();
+                }
+            }
+            spacing: 500px;
+            btn-next := Button {
+                max-height: 30px;
+                enabled: root.is-next;
+                text: "Next ";
+                clicked => {
+                    root.next-enter();
+                }
+            }
+        }
+    }
+}
