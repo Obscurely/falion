@@ -1,0 +1,41 @@
+// Copyright © SixtyFPS GmbH <info@slint.dev>
+// SPDX-License-Identifier: MIT
+
+import { SpinBox, Button, CheckBox, Slider, LineEdit, ScrollView, ListView,
+    HorizontalBox, VerticalBox, GridBox, StandardButton , TextEdit} from "std-widgets.slint";
+
+import "../assets/fonts/RobotoMonoNerdFont-Regular.ttf";
+
+export component StaticContent inherits Window {
+    preferred-width: 1250px;
+    preferred-height: 750px;
+    min-width: 750px;
+    min-height: 500px;
+    default-font-size: 24px;
+    default-font-family: "RobotoMono Nerd Font";
+    title: "Falion";
+    icon: @image-url("../assets/images/logo.png");
+
+    in property <string> content_tag: "Page";
+    in property <string> content;
+
+    VerticalBox {
+        min-width: 750px;
+        min-height: 500px;
+        text-content-tag := Text {
+            text: root.content-tag;
+            font-size: 28px;
+            min-width: 260px;
+            max-width: 260px;
+            color: yellow;
+        }
+        ScrollView {
+          VerticalBox {
+              content := Text {
+                  wrap: TextWrap.word-wrap;
+                  text: root.content;
+              }
+          }
+        }
+    }
+}
