@@ -104,8 +104,10 @@ pub fn ui() {
             tracing::info!("Getting results for search query {}", &text);
 
             // reset results
-            let ui_thread_clone = ui_thread.clone();
-            results::reset_results(ui_thread_clone); 
+            results::reset_results(ui_thread.clone()); 
+
+            // disable search
+            results::disable_search(ui_thread.clone());
 
             // clone any ARCs we need
             let stackoverflow_clone = Arc::clone(&stackoverflow_clone);
@@ -126,7 +128,6 @@ pub fn ui() {
 
             // spawn task to get the results and show in a different thread.
             tokio::spawn(async move {
-                let ui_thread = ui_thread.clone();
                 // get result
                 let so_res = stackoverflow_clone.get_multiple_questions_content(&text, Some(10));
                 let se_res = stackexchange_clone.get_multiple_questions_content(&text, Some(10));
@@ -194,29 +195,24 @@ pub fn ui() {
                 // display the results and enable their respective buttons
                 // using if let and not handling none since we just set values above
                 // stachoverflow
-                let ui_thread_clone = ui_thread.clone();
                 if let Some(results) = stackoverflow_results_clone_lock.as_ref() {
-                    results::display_first_result(ui_thread_clone, results, results::ResultType::StackOverflow);
+                    results::display_first_result(ui_thread.clone(), results, results::ResultType::StackOverflow);
                 }
                 // stackexchange
-                let ui_thread_clone = ui_thread.clone();
                 if let Some(results) = stackexchange_results_clone_lock.as_ref() {
-                    results::display_first_result(ui_thread_clone, results, results::ResultType::StackExchange);
+                    results::display_first_result(ui_thread.clone(), results, results::ResultType::StackExchange);
                 }
                 // github gist
-                let ui_thread_clone = ui_thread.clone();
                 if let Some(results) = github_gist_results_clone_lock.as_ref() {
-                    results::display_first_result(ui_thread_clone, results, results::ResultType::GithubGist);
+                    results::display_first_result(ui_thread.clone(), results, results::ResultType::GithubGist);
                 }
                 // GeeksForGeeks
-                let ui_thread_clone = ui_thread.clone();
                 if let Some(results) = geeksforgeeks_results_clone_lock.as_ref() {
-                    results::display_first_result(ui_thread_clone, results, results::ResultType::GeeksForGeeks);
+                    results::display_first_result(ui_thread.clone(), results, results::ResultType::GeeksForGeeks);
                 }
                 // Ddg Search
-                let ui_thread_clone = ui_thread.clone();
                 if let Some(results) = ddg_search_results_clone_lock.as_ref() {
-                    results::display_first_result(ui_thread_clone, results, results::ResultType::DdgSearch);
+                    results::display_first_result(ui_thread.clone(), results, results::ResultType::DdgSearch);
                 }
 
                 // Enable the next and bach buttons aswell
@@ -229,6 +225,9 @@ pub fn ui() {
                 }) {
                     util::slint_event_loop_panic(err);
                 };
+
+                // enable back search
+                results::enable_search(ui_thread.clone());
                 
                 // log that we displayed the results successfully
                 tracing::info!("Displayed the results successfully!");

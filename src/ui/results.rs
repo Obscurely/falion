@@ -212,6 +212,26 @@ pub fn reset_result_index(index: Arc<Mutex<usize>>) {
     };
 }
 
+pub fn disable_search(ui: Weak<MainWindow>) {
+    if let Err(err) = slint::invoke_from_event_loop(move || {
+        let ui = util::get_ui(ui);
+        
+        ui.set_enable_search(false);
+    }) {
+        util::slint_event_loop_panic(err);
+    };
+}
+
+pub fn enable_search(ui: Weak<MainWindow>) {
+    if let Err(err) = slint::invoke_from_event_loop(move || {
+        let ui = util::get_ui(ui);
+        
+        ui.set_enable_search(true);
+    }) {
+        util::slint_event_loop_panic(err);
+    };
+}
+
 pub fn try_up_index<T, E>(results: Arc<Mutex<Option<Results<T, E>>>>, index: Arc<Mutex<usize>>) {
     match results.lock() {
         Ok(results) => {

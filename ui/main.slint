@@ -43,6 +43,8 @@ export component MainWindow inherits Window {
     callback back-enter();
     callback next-enter();
 
+    in property <bool> enable_search: true;
+
     in property <string> sof-result: " ";
     in property <string> se-result: " ";
     in property <string> gg-result: " ";
@@ -99,6 +101,8 @@ export component MainWindow inherits Window {
             ddg-next-enter() => {ddg-next-enter();}
             back-enter() => {back-enter();}
             next-enter() => {next-enter();}
+
+            enable-search: enable-search;
 
             sof-result: sof-result;
             se-result: se-result;
