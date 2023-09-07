@@ -20,9 +20,3 @@ pub fn slint_event_loop_panic(err: slint::EventLoopError) {
     // the program is not responding.
     panic!("Failed to invoke slint from event loop. Error {}", err);
 }
-
-pub fn poison_panic<T>(err: std::sync::PoisonError<T>) {
-    tracing::error!("Poison error getting the lock on a Mutex. Error {}", err);
-    // panick since this should not happen and it's major issue if it doer
-    panic!("Failed to get the lock on a Mutex. Erron {}", err);
-}

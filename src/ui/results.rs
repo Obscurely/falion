@@ -1,10 +1,15 @@
 use super::util;
 use super::MainWindow;
 use indexmap::IndexMap;
+use slint::ComponentHandle;
 use slint::Weak;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
+use tokio::sync::Mutex;
+use tokio::task::JoinHandle;
 
 type Results<T, E> = Result<IndexMap<String, T>, E>;
+type ResultsStaticType<E, F> = Result<IndexMap<String, JoinHandle<Result<String, E>>>, F>;
+type ResultsDynType<E, F> = Result<IndexMap<String, JoinHandle<Result<Vec<String>, E>>>, F>;
 
 #[derive(Clone, Copy)]
 pub enum ResultType {
@@ -120,47 +125,33 @@ pub fn redisplay_result<T, E>(
 ) where
     E: std::fmt::Display,
 {
-    match results.lock() {
-        Ok(results) => {
-            if let Some(Ok(results)) = results.as_ref() {
-                match index.lock() {
-                    Ok(index) => {
-                        if let Some(res) = results.get_index(*index) {
-                            let res = res.0.to_string();
-                            if let Err(err) = slint::invoke_from_event_loop(move || {
-                                let ui = util::get_ui(ui);
+    if let Some(Ok(results)) = results.blocking_lock().as_ref() {
+        if let Some(res) = results.get_index(*index.blocking_lock()) {
+            let res = res.0.to_string();
+            if let Err(err) = slint::invoke_from_event_loop(move || {
+                let ui = util::get_ui(ui);
 
-                                match results_type {
-                                    ResultType::StackOverflow => {
-                                        ui.set_sof_result(res.into());
-                                    }
-                                    ResultType::StackExchange => {
-                                        ui.set_se_result(res.into());
-                                    }
-                                    ResultType::GithubGist => {
-                                        ui.set_gg_result(res.into());
-                                    }
-                                    ResultType::GeeksForGeeks => {
-                                        ui.set_gfg_result(res.into());
-                                    }
-                                    ResultType::DdgSearch => {
-                                        ui.set_ddg_result(res.into());
-                                    }
-                                }
-                            }) {
-                                util::slint_event_loop_panic(err);
-                            };
-                        };
+                match results_type {
+                    ResultType::StackOverflow => {
+                        ui.set_sof_result(res.into());
                     }
-                    Err(err) => {
-                        util::poison_panic(err);
+                    ResultType::StackExchange => {
+                        ui.set_se_result(res.into());
+                    }
+                    ResultType::GithubGist => {
+                        ui.set_gg_result(res.into());
+                    }
+                    ResultType::GeeksForGeeks => {
+                        ui.set_gfg_result(res.into());
+                    }
+                    ResultType::DdgSearch => {
+                        ui.set_ddg_result(res.into());
                     }
                 }
-            }
-        }
-        Err(err) => {
-            util::poison_panic(err);
-        }
+            }) {
+                util::slint_event_loop_panic(err);
+            };
+        };
     }
 }
 
@@ -203,19 +194,14 @@ pub fn reset_results(ui: Weak<MainWindow>) {
     };
 }
 
-pub fn reset_result_index(index: Arc<Mutex<usize>>) {
-    match index.lock() {
-        Ok(mut index) => {
-            *index = 0;
-        }
-        Err(err) => util::poison_panic(err),
-    };
+pub async fn reset_result_index(index: Arc<Mutex<usize>>) {
+    *index.lock().await = 0
 }
 
 pub fn disable_search(ui: Weak<MainWindow>) {
     if let Err(err) = slint::invoke_from_event_loop(move || {
         let ui = util::get_ui(ui);
-        
+
         ui.set_enable_search(false);
     }) {
         util::slint_event_loop_panic(err);
@@ -225,7 +211,7 @@ pub fn disable_search(ui: Weak<MainWindow>) {
 pub fn enable_search(ui: Weak<MainWindow>) {
     if let Err(err) = slint::invoke_from_event_loop(move || {
         let ui = util::get_ui(ui);
-        
+
         ui.set_enable_search(true);
     }) {
         util::slint_event_loop_panic(err);
@@ -233,42 +219,27 @@ pub fn enable_search(ui: Weak<MainWindow>) {
 }
 
 pub fn try_up_index<T, E>(results: Arc<Mutex<Option<Results<T, E>>>>, index: Arc<Mutex<usize>>) {
-    match results.lock() {
-        Ok(results) => {
-            if let Some(Ok(results)) = results.as_ref() {
-                match index.lock() {
-                    Ok(mut index) => {
-                        if (*index) < results.len() - 1 {
-                            *index += 1;
-                        }
-                    }
-                    Err(err) => {
-                        util::poison_panic(err);
-                    }
-                }
-            }
-        }
-        Err(err) => {
-            util::poison_panic(err);
+    if let Some(Ok(results)) = results.blocking_lock().as_ref() {
+        let mut index = index.blocking_lock();
+        if (*index) < results.len() - 1 {
+            *index += 1;
         }
     }
 }
 
 pub fn try_down_index(index: Arc<Mutex<usize>>) {
-    match index.lock() {
-        Ok(mut index) => {
-            *index = index.saturating_sub(1);
-        }
-        Err(err) => {
-            util::poison_panic(err);
-        }
-    }
+    let mut index = index.blocking_lock();
+    *index = index.saturating_sub(1);
 }
 
-pub fn setup_results<T, E>(ui: Weak<MainWindow>, results: Arc<Mutex<Option<Results<T, E>>>>, index: Arc<Mutex<usize>>, results_type: ResultType) 
-where
-    E: std::fmt::Display + 'static,
-    T: 'static
+pub fn setup_results_btns<T, E>(
+    ui: Weak<MainWindow>,
+    results: Arc<Mutex<Option<Results<T, E>>>>,
+    index: Arc<Mutex<usize>>,
+    results_type: ResultType,
+) where
+    E: std::fmt::Display + std::marker::Send + 'static,
+    T: 'static + std::marker::Send,
 {
     let ui_deref = util::get_ui(ui.clone());
     let ui_clone = ui.clone();
@@ -282,22 +253,28 @@ where
 
         // actual closure
         move || {
-            // try down the index by one
-            try_down_index(Arc::clone(&index_clone));
+            let results_clone = Arc::clone(&results_clone);
+            let index_clone = Arc::clone(&index_clone);
+            let ui_clone = ui_clone.clone();
+            tokio::task::spawn_blocking(move || {
+                // try down the index by one
+                try_down_index(Arc::clone(&index_clone));
 
-            // redisplay the result
-            redisplay_result(
-                ui_clone.clone(),
-                Arc::clone(&results_clone),
-                Arc::clone(&index_clone),
-                results_type,
-            );
+                // redisplay the result
+                redisplay_result(
+                    ui_clone,
+                    Arc::clone(&results_clone),
+                    Arc::clone(&index_clone),
+                    results_type,
+                );
 
-            // log the end of the function
-            tracing::info!("Successfully backed the StaceOverflow results by one.");
+                // log the end of the function
+                tracing::info!("Successfully backed the StaceOverflow results by one.");
+            });
         }
     };
 
+    let ui_clone = ui.clone();
     let next_event = {
         tracing::info!("On sof next enter event hit.");
         // clone the necessary ARCs
@@ -306,19 +283,25 @@ where
 
         // actual closure
         move || {
-            // try down the index by one
-            try_up_index(Arc::clone(&results_clone), Arc::clone(&index_clone));
+            let results_clone = Arc::clone(&results_clone);
+            let index_clone = Arc::clone(&index_clone);
+            let ui_clone = ui_clone.clone();
 
-            // redisplay the result
-            redisplay_result(
-                ui.clone(),
-                Arc::clone(&results_clone),
-                Arc::clone(&index_clone),
-                results_type,
-            );
+            tokio::task::spawn_blocking(move || {
+                // try down the index by one
+                try_up_index(Arc::clone(&results_clone), Arc::clone(&index_clone));
 
-            // log the end of the function
-            tracing::info!("Successfully upped the StaceOverflow results by one.");
+                // redisplay the result
+                redisplay_result(
+                    ui_clone,
+                    Arc::clone(&results_clone),
+                    Arc::clone(&index_clone),
+                    results_type,
+                );
+
+                // log the end of the function
+                tracing::info!("Successfully upped the StaceOverflow results by one.");
+            });
         }
     };
 

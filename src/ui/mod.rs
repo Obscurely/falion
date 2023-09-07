@@ -8,7 +8,7 @@ use super::search::stackexchange::SeError;
 use super::search::stackoverflow::SofError;
 use indexmap::IndexMap;
 use std::sync::Arc;
-use std::sync::Mutex;
+use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
 
 slint::include_modules!();
@@ -56,6 +56,14 @@ pub fn ui() {
     let github_gist_results: Arc<Mutex<GithubGistResults>> = Arc::new(Mutex::new(None));
     let geeksforgeeks_results: Arc<Mutex<GeeksForGeeksResults>> = Arc::new(Mutex::new(None));
     let ddg_search_results: Arc<Mutex<DdgSearchResults>> = Arc::new(Mutex::new(None));
+    
+    // make variables to store awaite results
+    // create vars
+    let stackexchange_results_awaited: Arc<Mutex<IndexMap<String, Vec<String>>>> = Arc::new(Mutex::new(IndexMap::new()));
+    let stackoverflow_results_awaited: Arc<Mutex<IndexMap<String, Vec<String>>>> = Arc::new(Mutex::new(IndexMap::new()));
+    let github_gist_results_awaited: Arc<Mutex<IndexMap<String, Vec<String>>>> = Arc::new(Mutex::new(IndexMap::new()));
+    let geeksforgeeks_results_awaited: Arc<Mutex<IndexMap<String, String>>> = Arc::new(Mutex::new(IndexMap::new()));
+    let ddg_search_results_awaited: Arc<Mutex<IndexMap<String, String>>> = Arc::new(Mutex::new(IndexMap::new()));
 
     // make variables to store the current index
     let stackoverflow_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
@@ -139,51 +147,28 @@ pub fn ui() {
                 let res = futures::join!(so_res, se_res, gg_res, gfg_res, ddg_res);
 
                 // lock the mutex for the results in oder to update them
-                let mut stackoverflow_results_clone_lock = match stackoverflow_results_clone.lock()
-                {
-                    Ok(res) => res,
-                    Err(err) => {
-                        util::poison_panic(err);
-                        panic!(); // never actually reached
-                    },
-                };
-                let mut stackexchange_results_clone_lock = match stackexchange_results_clone.lock()
-                {
-                    Ok(res) => res,
-                    Err(err) => {
-                        util::poison_panic(err);
-                        panic!(); // never actually reached
-                    },
-                };
-                let mut github_gist_results_clone_lock = match github_gist_results_clone.lock() {
-                    Ok(res) => res,
-                    Err(err) => {
-                        util::poison_panic(err);
-                        panic!(); // never actually reached
-                    },
-                };
-                let mut geeksforgeeks_results_clone_lock = match geeksforgeeks_results_clone.lock()
-                {
-                    Ok(res) => res,
-                    Err(err) => {
-                        util::poison_panic(err);
-                        panic!(); // never actually reached
-                    },
-                };
-                let mut ddg_search_results_clone_lock = match ddg_search_results_clone.lock() {
-                    Ok(res) => res,
-                    Err(err) => {
-                        util::poison_panic(err);
-                        panic!(); // never actually reached
-                    },
-                };
+                let locked = futures::join!(
+                    stackoverflow_results_clone.lock(),
+                    stackexchange_results_clone.lock(),
+                    github_gist_results_clone.lock(),
+                    geeksforgeeks_results_clone.lock(),
+                    ddg_search_results_clone.lock(),
+                );
+
+                let mut stackoverflow_results_clone_lock = locked.0;
+                let mut stackexchange_results_clone_lock = locked.1;
+                let mut github_gist_results_clone_lock = locked.2;
+                let mut geeksforgeeks_results_clone_lock = locked.3;
+                let mut ddg_search_results_clone_lock = locked.4;
 
                 // resest index to 0
-                results::reset_result_index(stackoverflow_index_clone);
-                results::reset_result_index(stackexchange_index_clone);
-                results::reset_result_index(github_gist_index_clone);
-                results::reset_result_index(geeksforgeeks_index_clone);
-                results::reset_result_index(ddg_search_index_clone);
+                futures::join!(
+                    results::reset_result_index(stackoverflow_index_clone),
+                    results::reset_result_index(stackexchange_index_clone),
+                    results::reset_result_index(github_gist_index_clone),
+                    results::reset_result_index(geeksforgeeks_index_clone),
+                    results::reset_result_index(ddg_search_index_clone),
+                );
  
                 // update results with the new ones
                 stackoverflow_results_clone_lock.replace(res.0);
@@ -237,7 +222,7 @@ pub fn ui() {
 
     // Event for when the button to move all results up by one is hit
     main_window.on_next_enter({
-        tracing::info!("On next enter event hit.");
+        tracing::info!("On next enter eventphit.");
         // clone the necessary ARCs
         let stackoverflow_results_clone = Arc::clone(&stackoverflow_results);
         let stackexchange_results_clone = Arc::clone(&stackexchange_results);
@@ -254,62 +239,77 @@ pub fn ui() {
 
         // actual closure
         move || {
-            // try and up the index by one
-            results::try_up_index(
-                Arc::clone(&stackoverflow_results_clone),
-                Arc::clone(&stackoverflow_index_clone),
-            );
-            results::try_up_index(
-                Arc::clone(&stackexchange_results_clone),
-                Arc::clone(&stackexchange_index_clone),
-            );
-            results::try_up_index(
-                Arc::clone(&github_gist_results_clone),
-                Arc::clone(&github_gist_index_clone),
-            );
-            results::try_up_index(
-                Arc::clone(&geeksforgeeks_results_clone),
-                Arc::clone(&geeksforgeeks_index_clone),
-            );
-            results::try_up_index(
-                Arc::clone(&ddg_search_results_clone),
-                Arc::clone(&ddg_search_index_clone),
-            );
+            // clone the necessary ARCs
+            let stackoverflow_results_clone = Arc::clone(&stackoverflow_results_clone);
+            let stackexchange_results_clone = Arc::clone(&stackexchange_results_clone);
+            let github_gist_results_clone = Arc::clone(&github_gist_results_clone);
+            let geeksforgeeks_results_clone = Arc::clone(&geeksforgeeks_results_clone);
+            let ddg_search_results_clone = Arc::clone(&ddg_search_results_clone);
+            let stackoverflow_index_clone = Arc::clone(&stackoverflow_index_clone);
+            let stackexchange_index_clone = Arc::clone(&stackexchange_index_clone);
+            let github_gist_index_clone = Arc::clone(&github_gist_index_clone);
+            let geeksforgeeks_index_clone = Arc::clone(&geeksforgeeks_index_clone);
+            let ddg_search_index_clone = Arc::clone(&ddg_search_index_clone);
+            // get a weak pointer to the main window
+            let ui = ui.clone();
+            tokio::task::spawn_blocking(move || {
+                // try and up the index by one
+                results::try_up_index(
+                    Arc::clone(&stackoverflow_results_clone),
+                    Arc::clone(&stackoverflow_index_clone),
+                );
+                results::try_up_index(
+                    Arc::clone(&stackexchange_results_clone),
+                    Arc::clone(&stackexchange_index_clone),
+                );
+                results::try_up_index(
+                    Arc::clone(&github_gist_results_clone),
+                    Arc::clone(&github_gist_index_clone),
+                );
+                results::try_up_index(
+                    Arc::clone(&geeksforgeeks_results_clone),
+                    Arc::clone(&geeksforgeeks_index_clone),
+                );
+                results::try_up_index(
+                    Arc::clone(&ddg_search_results_clone),
+                    Arc::clone(&ddg_search_index_clone),
+                );
 
-            // redisplay results
-            results::redisplay_result(
-                ui.clone(),
-                Arc::clone(&stackoverflow_results_clone),
-                Arc::clone(&stackoverflow_index_clone),
-                results::ResultType::StackOverflow,
-            );
-            results::redisplay_result(
-                ui.clone(),
-                Arc::clone(&stackexchange_results_clone),
-                Arc::clone(&stackexchange_index_clone),
-                results::ResultType::StackExchange,
-            );
-            results::redisplay_result(
-                ui.clone(),
-                Arc::clone(&github_gist_results_clone),
-                Arc::clone(&github_gist_index_clone),
-                results::ResultType::GithubGist,
-            );
-            results::redisplay_result(
-                ui.clone(),
-                Arc::clone(&geeksforgeeks_results_clone),
-                Arc::clone(&geeksforgeeks_index_clone),
-                results::ResultType::GeeksForGeeks,
-            );
-            results::redisplay_result(
-                ui.clone(),
-                Arc::clone(&ddg_search_results_clone),
-                Arc::clone(&ddg_search_index_clone),
-                results::ResultType::DdgSearch,
-            );
+                // redisplay results
+                results::redisplay_result(
+                    ui.clone(),
+                    Arc::clone(&stackoverflow_results_clone),
+                    Arc::clone(&stackoverflow_index_clone),
+                    results::ResultType::StackOverflow,
+                );
+                results::redisplay_result(
+                    ui.clone(),
+                    Arc::clone(&stackexchange_results_clone),
+                    Arc::clone(&stackexchange_index_clone),
+                    results::ResultType::StackExchange,
+                );
+                results::redisplay_result(
+                    ui.clone(),
+                    Arc::clone(&github_gist_results_clone),
+                    Arc::clone(&github_gist_index_clone),
+                    results::ResultType::GithubGist,
+                );
+                results::redisplay_result(
+                    ui.clone(),
+                    Arc::clone(&geeksforgeeks_results_clone),
+                    Arc::clone(&geeksforgeeks_index_clone),
+                    results::ResultType::GeeksForGeeks,
+                );
+                results::redisplay_result(
+                    ui.clone(),
+                    Arc::clone(&ddg_search_results_clone),
+                    Arc::clone(&ddg_search_index_clone),
+                    results::ResultType::DdgSearch,
+                );
 
-            // log the end of the function
-            tracing::info!("Up the results by one successfully and resdisplayed them.");
+                // log the end of the function
+                tracing::info!("Up the results by one successfully and resdisplayed them.");
+            }); 
         }
     });
 
@@ -332,76 +332,92 @@ pub fn ui() {
 
         // actual closure
         move || {
-            // try and up the index by one
-            results::try_down_index(Arc::clone(&stackoverflow_index_clone));
-            results::try_down_index(Arc::clone(&stackexchange_index_clone));
-            results::try_down_index(Arc::clone(&github_gist_index_clone));
-            results::try_down_index(Arc::clone(&geeksforgeeks_index_clone));
-            results::try_down_index(Arc::clone(&ddg_search_index_clone));
+            // clone the necessary ARCs
+            let stackoverflow_results_clone = Arc::clone(&stackoverflow_results_clone);
+            let stackexchange_results_clone = Arc::clone(&stackexchange_results_clone);
+            let github_gist_results_clone = Arc::clone(&github_gist_results_clone);
+            let geeksforgeeks_results_clone = Arc::clone(&geeksforgeeks_results_clone);
+            let ddg_search_results_clone = Arc::clone(&ddg_search_results_clone);
+            let stackoverflow_index_clone = Arc::clone(&stackoverflow_index_clone);
+            let stackexchange_index_clone = Arc::clone(&stackexchange_index_clone);
+            let github_gist_index_clone = Arc::clone(&github_gist_index_clone);
+            let geeksforgeeks_index_clone = Arc::clone(&geeksforgeeks_index_clone);
+            let ddg_search_index_clone = Arc::clone(&ddg_search_index_clone);
+            // get a weak pointer to the main window
+            let ui = ui.clone();
 
-            // redisplay results
-            results::redisplay_result(
-                ui.clone(),
-                Arc::clone(&stackoverflow_results_clone),
-                Arc::clone(&stackoverflow_index_clone),
-                results::ResultType::StackOverflow,
-            );
-            results::redisplay_result(
-                ui.clone(),
-                Arc::clone(&stackexchange_results_clone),
-                Arc::clone(&stackexchange_index_clone),
-                results::ResultType::StackExchange,
-            );
-            results::redisplay_result(
-                ui.clone(),
-                Arc::clone(&github_gist_results_clone),
-                Arc::clone(&github_gist_index_clone),
-                results::ResultType::GithubGist,
-            );
-            results::redisplay_result(
-                ui.clone(),
-                Arc::clone(&geeksforgeeks_results_clone),
-                Arc::clone(&geeksforgeeks_index_clone),
-                results::ResultType::GeeksForGeeks,
-            );
-            results::redisplay_result(
-                ui.clone(),
-                Arc::clone(&ddg_search_results_clone),
-                Arc::clone(&ddg_search_index_clone),
-                results::ResultType::DdgSearch,
-            );
+            tokio::task::spawn_blocking(move || {
+                // try and up the index by one
+                results::try_down_index(Arc::clone(&stackoverflow_index_clone));
+                results::try_down_index(Arc::clone(&stackexchange_index_clone));
+                results::try_down_index(Arc::clone(&github_gist_index_clone));
+                results::try_down_index(Arc::clone(&geeksforgeeks_index_clone));
+                results::try_down_index(Arc::clone(&ddg_search_index_clone));
 
-            // log the end of the function
-            tracing::info!("Up the results by one successfully and resdisplayed them.");
+                // redisplay results
+                results::redisplay_result(
+                    ui.clone(),
+                    Arc::clone(&stackoverflow_results_clone),
+                    Arc::clone(&stackoverflow_index_clone),
+                    results::ResultType::StackOverflow,
+                );
+                results::redisplay_result(
+                    ui.clone(),
+                    Arc::clone(&stackexchange_results_clone),
+                    Arc::clone(&stackexchange_index_clone),
+                    results::ResultType::StackExchange,
+                );
+                results::redisplay_result(
+                    ui.clone(),
+                    Arc::clone(&github_gist_results_clone),
+                    Arc::clone(&github_gist_index_clone),
+                    results::ResultType::GithubGist,
+                );
+                results::redisplay_result(
+                    ui.clone(),
+                    Arc::clone(&geeksforgeeks_results_clone),
+                    Arc::clone(&geeksforgeeks_index_clone),
+                    results::ResultType::GeeksForGeeks,
+                );
+                results::redisplay_result(
+                    ui.clone(),
+                    Arc::clone(&ddg_search_results_clone),
+                    Arc::clone(&ddg_search_index_clone),
+                    results::ResultType::DdgSearch,
+                );
+
+                // log the end of the function
+                tracing::info!("Up the results by one successfully and resdisplayed them.");
+            });
         }
     });
 
-    // setup individual move results buttons and the actual results button (to display)
-    results::setup_results(
+    // setup individual move results buttons
+    results::setup_results_btns(
         main_window.as_weak(),
         Arc::clone(&stackoverflow_results),
         Arc::clone(&stackoverflow_index),
         results::ResultType::StackOverflow,
     );
-    results::setup_results(
+    results::setup_results_btns(
         main_window.as_weak(),
         Arc::clone(&stackexchange_results),
         Arc::clone(&stackexchange_index),
         results::ResultType::StackExchange,
     );
-    results::setup_results(
+    results::setup_results_btns(
         main_window.as_weak(),
         Arc::clone(&github_gist_results),
         Arc::clone(&github_gist_index),
         results::ResultType::GithubGist,
     );
-    results::setup_results(
+    results::setup_results_btns(
         main_window.as_weak(),
         Arc::clone(&geeksforgeeks_results),
         Arc::clone(&geeksforgeeks_index),
         results::ResultType::GeeksForGeeks,
     );
-    results::setup_results(
+    results::setup_results_btns(
         main_window.as_weak(),
         Arc::clone(&ddg_search_results),
         Arc::clone(&ddg_search_index),
