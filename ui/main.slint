@@ -80,6 +80,7 @@ export component MainWindow inherits Window {
     in property <string> dyn-content: "";
     in property <string> static-content-tag: "";
     in property <string> static-content: "";
+    in property <bool> enable_content_btns: false;
 
     VerticalLayout {
         if (view == 0) : Results {
@@ -138,6 +139,7 @@ export component MainWindow inherits Window {
         if (view == 1) : DynContent {
             content-tag: dyn-content-tag;
             content: dyn-content;
+            enable-btns: enable-content-btns;
             next-enter() => {dyn-next-enter();}
             back-enter() => {dyn-back-enter();}
             return-enter() => {dyn-return-enter();}
@@ -145,6 +147,7 @@ export component MainWindow inherits Window {
         if (view == 2) : StaticContent {
             content-tag: static-content-tag;
             content: static-content;
+            enable-btns: enable-content-btns;
             return-enter() => {static-return-enter();}
         }
     }

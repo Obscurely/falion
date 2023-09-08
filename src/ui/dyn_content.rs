@@ -22,6 +22,9 @@ pub fn setup_content_display<E, F>(
 {
     let ui_strong = util::get_ui(ui.clone());
 
+    // disaple buttons
+    ui_strong.set_enable_content_btns(false);
+
     // setup enter content
     match results_type {
         ResultType::StackOverflow => ui_strong.on_sof_enter(get_resource_enter_fn(
@@ -169,7 +172,10 @@ where
                     Arc::clone(&results_awaited_clone),
                     Arc::clone(&index_clone),
                     Arc::clone(&content_index_clone),
-                ));       
+                ));
+
+                // enable btns
+                ui_strong.set_enable_content_btns(true);
             }) {
                 util::slint_event_loop_panic(err);
             };

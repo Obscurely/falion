@@ -9,8 +9,9 @@ export component DynContent inherits Window {
     callback back-enter();
     default-font-size: 24px;
 
-    in property <string> content_tag: "Content";
+    in property <string> content-tag: "Content";
     in property <string> content;
+    in property <bool> enable_btns: false;
 
     VerticalBox {
         min-width: 750px;
@@ -19,6 +20,7 @@ export component DynContent inherits Window {
           back-btn := Button {
               text: " Back";
               max-width: 50px;
+              enabled: enable-btns;
               clicked => {
                   root.return-enter();
               }
@@ -43,7 +45,7 @@ export component DynContent inherits Window {
             btn-content-back := Button {
                 text: "";
                 max-height: 30px;
-                enabled: true;
+                enabled: enable-btns;
                 clicked => {
                     root.back-enter();
                 }
@@ -52,7 +54,7 @@ export component DynContent inherits Window {
             btn-content-next := Button {
                 text: "";
                 max-height: 30px;
-                enabled: true;
+                enabled: enable-btns;
                 clicked => {
                     root.next-enter();
                 }
