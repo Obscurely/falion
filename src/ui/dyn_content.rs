@@ -33,6 +33,7 @@ pub fn setup_content_display<E, F>(
             Arc::clone(&results_awaited),
             Arc::clone(&index),
             Arc::clone(&content_index),
+            results_type,
         )),
         ResultType::StackExchange => ui_strong.on_se_enter(get_resource_enter_fn(
             ui.clone(),
@@ -40,6 +41,7 @@ pub fn setup_content_display<E, F>(
             Arc::clone(&results_awaited),
             Arc::clone(&index),
             Arc::clone(&content_index),
+            results_type,
         )),
         ResultType::GithubGist => ui_strong.on_gg_enter(get_resource_enter_fn(
             ui.clone(),
@@ -47,9 +49,10 @@ pub fn setup_content_display<E, F>(
             Arc::clone(&results_awaited),
             Arc::clone(&index),
             Arc::clone(&content_index),
+            results_type,
         )),
         _ => return,
-    } 
+    }
 }
 
 fn get_resource_enter_fn<E, F>(
@@ -58,6 +61,7 @@ fn get_resource_enter_fn<E, F>(
     results_awaited: Arc<Mutex<IndexMap<String, Vec<String>>>>,
     index: Arc<Mutex<usize>>,
     content_index: Arc<Mutex<usize>>,
+    results_type: ResultType,
 ) -> impl Fn()
 where
     E: std::fmt::Display + std::marker::Send + 'static,
@@ -134,7 +138,7 @@ where
                     Err(err) => return,
                 },
                 None => return,
-            }; 
+            };
 
             // set the first element
             let ui_clone = ui.clone();
@@ -152,7 +156,14 @@ where
             if let Err(err) = slint::invoke_from_event_loop(move || {
                 let ui_strong = util::get_ui(ui_clone);
 
-                // unwrap is fine since it there is always at least one element
+                // set dynamic content first tag
+                if results_type == ResultType::GithubGist {
+                    ui_strong.set_dyn_content_tag("File 1".into());
+                } else {
+                    ui_strong.set_dyn_content_tag("Question".into());
+                }
+
+                // set dyn content
                 ui_strong.set_dyn_content(first.into());
 
                 // setup back and next buttons
@@ -163,6 +174,7 @@ where
                     Arc::clone(&results_awaited_clone),
                     Arc::clone(&index_clone),
                     Arc::clone(&content_index_clone),
+                    results_type,
                 ));
 
                 // setup next content button
@@ -172,6 +184,7 @@ where
                     Arc::clone(&results_awaited_clone),
                     Arc::clone(&index_clone),
                     Arc::clone(&content_index_clone),
+                    results_type,
                 ));
 
                 // enable btns
@@ -189,6 +202,7 @@ fn get_back_content_fn<E, F>(
     results_awaited: Arc<Mutex<IndexMap<String, Vec<String>>>>,
     index: Arc<Mutex<usize>>,
     content_index: Arc<Mutex<usize>>,
+    results_type: ResultType,
 ) -> impl Fn()
 where
     E: std::fmt::Display + std::marker::Send + 'static,
@@ -223,11 +237,25 @@ where
                                 match result.get(*content_index_lock) {
                                     Some(content) => {
                                         let ui_clone = ui.clone();
+                                        // make content tag
+                                        let content_tag = if results_type == ResultType::GithubGist
+                                        {
+                                            format!("File {}", *content_index_lock + 1)
+                                        } else if *content_index_lock == 0 {
+                                            "Question".to_string()
+                                        } else {
+                                            format!("Answer {}", *content_index_lock)
+                                        };
+
+                                        // set content
                                         let content = content.to_owned();
                                         if let Err(err) = slint::invoke_from_event_loop(move || {
                                             let ui = util::get_ui(ui_clone);
 
-                                            // unwrap is fine since it there is always at least one element
+                                            // set content tag
+                                            ui.set_dyn_content_tag(content_tag.into());
+
+                                            // set dynamic content
                                             ui.set_dyn_content(content.into());
                                         }) {
                                             util::slint_event_loop_panic(err);
@@ -254,6 +282,7 @@ fn get_next_content_fn<E, F>(
     results_awaited: Arc<Mutex<IndexMap<String, Vec<String>>>>,
     index: Arc<Mutex<usize>>,
     content_index: Arc<Mutex<usize>>,
+    results_type: ResultType,
 ) -> impl Fn()
 where
     E: std::fmt::Display + std::marker::Send + 'static,
@@ -284,10 +313,24 @@ where
                                     match result.get(*content_index_lock) {
                                         Some(content) => {
                                             let ui_clone = ui.clone();
+                                            // make content tag
+                                            let content_tag =
+                                                if results_type == ResultType::GithubGist {
+                                                    format!("File {}", *content_index_lock + 1)
+                                                } else if *content_index_lock == 0 {
+                                                    "Question".to_string()
+                                                } else {
+                                                    format!("Answer {}", *content_index_lock)
+                                                };
+
+                                            // set content
                                             let content = content.to_owned();
                                             if let Err(err) =
                                                 slint::invoke_from_event_loop(move || {
                                                     let ui = util::get_ui(ui_clone);
+
+                                                    // set content tag
+                                                    ui.set_dyn_content_tag(content_tag.into());
 
                                                     // unwrap is fine since it there is always at least one element
                                                     ui.set_dyn_content(content.into());

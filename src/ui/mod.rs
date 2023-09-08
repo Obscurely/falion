@@ -1,5 +1,6 @@
 mod dyn_content;
 mod results;
+mod static_content;
 mod util;
 use super::search;
 use super::search::ddg_search::DdgSearchError;
@@ -90,8 +91,6 @@ pub fn ui() {
     let stackoverflow_content_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
     let stackexchange_content_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
     let github_gist_content_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
-    let geeksforgeeks_content_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
-    let ddg_search_content_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
 
     // Event for when a search enter is hit
     main_window.on_query_enter({
@@ -505,9 +504,23 @@ pub fn ui() {
         Arc::clone(&github_gist_content_index),
         results::ResultType::GithubGist,
     );
+    static_content::setup_content_display(
+        main_window.as_weak(),
+        Arc::clone(&geeksforgeeks_results),
+        Arc::clone(&geeksforgeeks_results_awaited),
+        Arc::clone(&geeksforgeeks_index),
+        results::ResultType::GeeksForGeeks,
+    );
+    static_content::setup_content_display(
+        main_window.as_weak(),
+        Arc::clone(&ddg_search_results),
+        Arc::clone(&ddg_search_results_awaited),
+        Arc::clone(&ddg_search_index),
+        results::ResultType::DdgSearch,
+    );
 
     // setup content return button
-    main_window.on_dyn_return_enter({
+    main_window.on_content_return_enter({
         let ui = main_window.as_weak();
         move || {
             let ui_clone = ui.clone();

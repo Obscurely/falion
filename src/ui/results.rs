@@ -1,14 +1,14 @@
 use super::util;
 use super::MainWindow;
+use super::Results;
 use indexmap::IndexMap;
 use slint::ComponentHandle;
 use slint::Weak;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
-use super::Results;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum ResultType {
     StackOverflow,
     StackExchange,

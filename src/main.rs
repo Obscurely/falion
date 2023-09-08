@@ -53,5 +53,6 @@ async fn main() {
     //     ddg_search_results,
     // )
     // .await;
+    util::setup_logs(true);
     ui::ui();
 }

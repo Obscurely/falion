@@ -40,8 +40,7 @@ export component MainWindow inherits Window {
 
     callback dyn-back-enter();
     callback dyn-next-enter();
-    callback dyn-return-enter();
-    callback static-return-enter();
+    callback content-return-enter();
 
     in property <bool> enable_search: true;
 
@@ -142,13 +141,13 @@ export component MainWindow inherits Window {
             enable-btns: enable-content-btns;
             next-enter() => {dyn-next-enter();}
             back-enter() => {dyn-back-enter();}
-            return-enter() => {dyn-return-enter();}
+            return-enter() => {content-return-enter();}
         }
         if (view == 2) : StaticContent {
             content-tag: static-content-tag;
             content: static-content;
             enable-btns: enable-content-btns;
-            return-enter() => {static-return-enter();}
+            return-enter() => {content-return-enter();}
         }
     }
 }
