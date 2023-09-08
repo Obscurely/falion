@@ -4,8 +4,10 @@
 import { Button, HorizontalBox, VerticalBox, ScrollView } from "std-widgets.slint";
 
 export component DynContent inherits Window {
+    callback return-enter();
     callback next-enter();
     callback back-enter();
+    default-font-size: 24px;
 
     in property <string> content_tag: "Content";
     in property <string> content;
@@ -13,12 +15,21 @@ export component DynContent inherits Window {
     VerticalBox {
         min-width: 750px;
         min-height: 500px;
-        text-content-tag := Text {
-            text: root.content-tag;
-            font-size: 28px;
-            min-width: 260px;
-            max-width: 260px;
-            color: yellow;
+        HorizontalBox {
+          back-btn := Button {
+              text: " Back";
+              max-width: 50px;
+              clicked => {
+                  root.return-enter();
+              }
+          }
+          text-content-tag := Text {
+              text: root.content-tag;
+              font-size: 28px;
+              min-width: 260px;
+              max-width: 260px;
+              color: yellow;
+          }
         }
         ScrollView {
           VerticalBox {
