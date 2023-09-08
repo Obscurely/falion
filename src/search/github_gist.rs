@@ -7,6 +7,7 @@ use rayon::prelude::*;
 use thiserror::Error;
 
 const GIST_URL: &str = "https://gist.github.com/";
+const GIST_URI: &str = "https://gist.github.com";
 const GIST_SITE: &str = "gist.github.com";
 const GIST_RAW_URL_SPLIT: &str = "<a href=\"/{GIST_LOCATION}/raw/";
 const GIST_RAW_URL: &str = "https://gist.github.com/{GIST_LOCATION}/raw/{FILE_URL}";
@@ -147,6 +148,14 @@ impl GithubGist {
                 );
                 return Err(GithubGistError::NotGist(gist_url.to_string()));
             }
+        }
+
+        if gist_url == GIST_URI {
+            tracing::error!(
+                "The given url is the main page for github gist. Url: {}",
+                &gist_url
+            );
+            return Err(GithubGistError::NotGist(gist_url.to_string()));
         }
 
         // get gist
@@ -357,8 +366,11 @@ impl GithubGist {
         // IndexMap
         for link in links {
             // unwrap is safe here since ddg & GithubGist do all the checks
-            let name = match link.split_once(GIST_URL).unwrap().1.split_once('/') {
-                Some(s) => s.0,
+            let name = match link.split_once(GIST_URL) {
+                Some(s) => match s.1.split_once('/') {
+                    Some(s) => s.0,
+                    None => continue,
+                },
                 None => continue,
             };
             let id = link.split('/').last().unwrap().replace('-', " ");
