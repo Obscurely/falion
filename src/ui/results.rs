@@ -6,10 +6,7 @@ use slint::Weak;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
-
-type Results<T, E> = Result<IndexMap<String, T>, E>;
-type ResultsStaticType<E, F> = Result<IndexMap<String, JoinHandle<Result<String, E>>>, F>;
-type ResultsDynType<E, F> = Result<IndexMap<String, JoinHandle<Result<Vec<String>, E>>>, F>;
+use super::Results;
 
 #[derive(Clone, Copy)]
 pub enum ResultType {

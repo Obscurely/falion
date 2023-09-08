@@ -1,3 +1,4 @@
+mod dyn_content;
 mod results;
 mod util;
 use super::search;
@@ -28,6 +29,10 @@ type GeeksForGeeksResults =
     Option<Result<IndexMap<String, JoinHandle<Result<String, GfgError>>>, GfgError>>;
 type DdgSearchResults =
     Option<Result<IndexMap<String, JoinHandle<Result<String, DdgSearchError>>>, DdgSearchError>>;
+
+type Results<T, E> = Result<IndexMap<String, T>, E>;
+type ResultsStaticType<E, F> = Result<IndexMap<String, JoinHandle<Result<String, E>>>, F>;
+type ResultsDynType<E, F> = Result<IndexMap<String, JoinHandle<Result<Vec<String>, E>>>, F>;
 
 pub fn ui() {
     tracing::info!("User chose the GUI.");
@@ -476,211 +481,34 @@ pub fn ui() {
     );
 
     // setup displaying results content
-    main_window.on_sof_enter({ 
-        // clone necessary ARCs
-        let stackoverflow_results_clone = Arc::clone(&stackoverflow_results);
-        let stackoverflow_index_clone = Arc::clone(&stackoverflow_index);
-        let stackoverflow_content_index_clone = Arc::clone(&stackoverflow_content_index);
-        let stackoverflow_results_awaited_clone = Arc::clone(&stackoverflow_results_awaited);
-        // get weak pointer to ui
-        let ui = main_window.as_weak();
+    dyn_content::setup_content_display(
+        main_window.as_weak(),
+        Arc::clone(&stackoverflow_results),
+        Arc::clone(&stackoverflow_results_awaited),
+        Arc::clone(&stackoverflow_index),
+        Arc::clone(&stackoverflow_content_index),
+        results::ResultType::StackOverflow,
+    );
+    dyn_content::setup_content_display(
+        main_window.as_weak(),
+        Arc::clone(&stackexchange_results),
+        Arc::clone(&stackexchange_results_awaited),
+        Arc::clone(&stackexchange_index),
+        Arc::clone(&stackexchange_content_index),
+        results::ResultType::StackExchange,
+    );
+    dyn_content::setup_content_display(
+        main_window.as_weak(),
+        Arc::clone(&github_gist_results),
+        Arc::clone(&github_gist_results_awaited),
+        Arc::clone(&github_gist_index),
+        Arc::clone(&github_gist_content_index),
+        results::ResultType::GithubGist,
+    );
 
-        move || {
-            // clone necessary ARCs
-            let stackoverflow_results_clone = Arc::clone(&stackoverflow_results_clone);
-            let stackoverflow_index_clone = Arc::clone(&stackoverflow_index_clone);
-            let stackoverflow_content_index_clone = Arc::clone(&stackoverflow_content_index_clone);
-            let stackoverflow_results_awaited_clone = Arc::clone(&stackoverflow_results_awaited_clone);
-            // clone ui weak pointer
-            let ui = ui.clone();
-
-            // actual logic
-            tokio::spawn(async move {
-                // reset content index
-                results::reset_result_index(stackoverflow_content_index_clone).await;
-                // get locks
-                let mut locked = futures::join!(
-                    stackoverflow_results_clone.lock(),
-                    stackoverflow_index_clone.lock(),
-                    stackoverflow_results_awaited_clone.lock(),
-                );
-                let stackoverflow_results_lock = locked.0.as_mut();
-                let stackoverflow_index_lock = locked.1;
-                let mut stackoverflow_results_awaited_lock = locked.2;
-
-                let content = match stackoverflow_results_lock {
-                    Some(results) => match results {
-                        Ok(results) => match results.get_index_mut(*stackoverflow_index_lock) {
-                            Some(result) => {
-                                // show the view dynamic content window
-                                let ui_clone = ui.clone();
-                                if let Err(err) = slint::invoke_from_event_loop(move || {
-                                    let ui = util::get_ui(ui_clone);
-
-                                    ui.set_view(DYN_CONTENT_VIEW);
-                                }) {
-                                    util::slint_event_loop_panic(err);
-                                };
-                                // get content
-                                match stackoverflow_results_awaited_lock.get_index(*stackoverflow_index_lock) {
-                                    Some(result) => result.1,
-                                    None => {
-                                        let awaited = match result.1.await {
-                                            Ok(handled) => match handled {
-                                                Ok(content) => content,
-                                                Err(error) => {
-                                                    tracing::error!("There was an error getting the contetn for this a result. Error: {}", error);
-                                                    vec![format!("There has been an error getting the content for this result. Error: {}", error)]
-                                                }
-                                            },
-                                            Err(error) => {
-                                                tracing::error!(
-                                                    "There was an error handeling the future for a result. Error: {}",
-                                                    error
-                                                );
-                                                vec![format!("There has been an error handeling the future for this result. Error: {}", error)]
-                                            }
-                                        };
-
-                                        // save already awaited
-                                        stackoverflow_results_awaited_lock.insert(result.0.to_owned(), awaited);
-
-                                        // unwrap is safe since we just inserted this element
-                                        stackoverflow_results_awaited_lock.get(result.0).unwrap()
-                                    }
-                                }
-                            },
-                            None => return,
-                        },
-                        Err(err) => return,
-                    },
-                    None => return,
-                };
-
-                // set the first element
-                let ui_clone = ui.clone();
-                let first = content.first().unwrap().to_owned();
-                if let Err(err) = slint::invoke_from_event_loop(move || {
-                    let ui = util::get_ui(ui_clone);
-
-                    // unwrap is fine since it there is always at least one element
-                    ui.set_dyn_content(first.into());
-                }) {
-                    util::slint_event_loop_panic(err);
-                };
-            });
-        }
-    });
-
-    main_window.on_dyn_back_enter({
-        // clone necessary ARCs
-        let stackoverflow_index_clone = Arc::clone(&stackoverflow_index);
-        let stackoverflow_content_index_clone = Arc::clone(&stackoverflow_content_index);
-        let stackoverflow_results_awaited_clone = Arc::clone(&stackoverflow_results_awaited);
-        // get weak pointer to ui
-        let ui = main_window.as_weak();
-
-        move || {
-            // clone necessary ARCs
-            let stackoverflow_index_clone = Arc::clone(&stackoverflow_index_clone);
-            let stackoverflow_content_index_clone = Arc::clone(&stackoverflow_content_index_clone);
-            let stackoverflow_results_awaited_clone =
-                Arc::clone(&stackoverflow_results_awaited_clone);
-            // clone ui weak pointer
-            let ui = ui.clone();
-
-            tokio::task::spawn_blocking(move || {
-                let stackoverflow_index_lock = stackoverflow_index_clone.blocking_lock();
-                let mut stackoverflow_content_index_lock =
-                    stackoverflow_content_index_clone.blocking_lock();
-                // return if the index is already on 0
-                if *stackoverflow_content_index_lock == 0 {
-                    return;
-                } else {
-                    *stackoverflow_content_index_lock =
-                        stackoverflow_content_index_lock.saturating_sub(1);
-                }
-                let stackoverflow_results_awaited_lock =
-                    stackoverflow_results_awaited_clone.blocking_lock();
-
-                match stackoverflow_results_awaited_lock.get_index(*stackoverflow_index_lock) {
-                    Some(result) => {
-                        match result.1.get(*stackoverflow_content_index_lock) {
-                            Some(content) => {
-                                let ui_clone = ui.clone();
-                                let content = content.to_owned();
-                                if let Err(err) = slint::invoke_from_event_loop(move || {
-                                    let ui = util::get_ui(ui_clone);
-
-                                    // unwrap is fine since it there is always at least one element
-                                    ui.set_dyn_content(content.into());
-                                }) {
-                                    util::slint_event_loop_panic(err);
-                                };
-                            }
-                            None => return,
-                        }
-                    }
-                    None => return,
-                }
-            });
-        }
-    });
-
-    main_window.on_dyn_next_enter({
-        // clone necessary ARCs
-        let stackoverflow_index_clone = Arc::clone(&stackoverflow_index);
-        let stackoverflow_content_index_clone = Arc::clone(&stackoverflow_content_index);
-        let stackoverflow_results_awaited_clone = Arc::clone(&stackoverflow_results_awaited);
-        // get weak pointer to ui
-        let ui = main_window.as_weak();
-
-        move || {
-            // clone necessary ARCs
-            let stackoverflow_index_clone = Arc::clone(&stackoverflow_index_clone);
-            let stackoverflow_content_index_clone = Arc::clone(&stackoverflow_content_index_clone);
-            let stackoverflow_results_awaited_clone =
-                Arc::clone(&stackoverflow_results_awaited_clone);
-            // clone ui weak pointer
-            let ui = ui.clone();
-
-            tokio::task::spawn_blocking(move || {
-                let stackoverflow_index_lock = stackoverflow_index_clone.blocking_lock();
-                let mut stackoverflow_content_index_lock =
-                    stackoverflow_content_index_clone.blocking_lock();
-                let stackoverflow_results_awaited_lock =
-                    stackoverflow_results_awaited_clone.blocking_lock();
-
-                match stackoverflow_results_awaited_lock.get_index(*stackoverflow_index_lock) {
-                    Some(result) => {
-                        if *stackoverflow_content_index_lock < result.1.len() - 1 {
-                            *stackoverflow_content_index_lock += 1;
-                            match result.1.get(*stackoverflow_content_index_lock) {
-                                Some(content) => {
-                                    let ui_clone = ui.clone();
-                                    let content = content.to_owned();
-                                    if let Err(err) = slint::invoke_from_event_loop(move || {
-                                        let ui = util::get_ui(ui_clone);
-
-                                        // unwrap is fine since it there is always at least one element
-                                        ui.set_dyn_content(content.into());
-                                    }) {
-                                        util::slint_event_loop_panic(err);
-                                    };
-                                }
-                                None => return,
-                            }
-                        }
-                    }
-                    None => return,
-                }
-            });
-        }
-    });
-
+    // setup content return button
     main_window.on_dyn_return_enter({
         let ui = main_window.as_weak();
-
         move || {
             let ui_clone = ui.clone();
             if let Err(err) = slint::invoke_from_event_loop(move || {
