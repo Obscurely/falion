@@ -6,8 +6,6 @@ import { Button, LineEdit, HorizontalBox, VerticalBox } from "std-widgets.slint"
 import "../assets/fonts/RobotoMonoNerdFont-Regular.ttf";
 
 export component Results inherits Window {
-    forward-focus: key-handler;
-
     callback query-enter(string);
     callback sof-enter();
     callback sof-back-enter();
@@ -58,7 +56,7 @@ export component Results inherits Window {
     in property <bool> is-back: false;
     in property <bool> is-next: false;
 
-    in property <string> error: ""; 
+    in property <string> error: "";
 
     // window
     VerticalBox {
@@ -74,7 +72,6 @@ export component Results inherits Window {
                 accepted(text) => {
                     if (enable-search) {
                         root.query-enter(self.text);
-                        key-handler.focus();
                     }
                 }
             }
@@ -86,7 +83,6 @@ export component Results inherits Window {
                 enabled: text-search.text != "" && enable-search;
                 clicked => {
                     root.query-enter(text-search.text);
-                    key-handler.focus();
                 }
             }
         }
@@ -294,68 +290,6 @@ export component Results inherits Window {
                     root.next-enter();
                 }
             }
-        }
-    }
-
-    // results key press handle
-    key-handler := FocusScope {
-        key-pressed(event) => {
-            debug(event.text);
-            if (event.text == "s") {
-                text-search.focus();
-            }
-            if (event.text == "1" && event.modifiers.alt == false && event.modifiers.shift == false && is-sof) {
-                sof-enter();
-            }
-            if (event.text == "2" && event.modifiers.alt == false && event.modifiers.shift == false && is-se) {
-                se-enter();
-            }
-            if (event.text == "3" && event.modifiers.alt == false && event.modifiers.shift == false && is-gg) {
-                gg-enter();
-            }
-            if (event.text == "4" && event.modifiers.alt == false && event.modifiers.shift == false && is-gfg) {
-                gfg-enter();
-            }
-            if (event.text == "5" && event.modifiers.alt == false && event.modifiers.shift == false && is-ddg) {
-                ddg-enter();
-            }
-            if (event.text == "1" && event.modifiers.alt == true && event.modifiers.shift == false && is-sof) {
-                sof-back-enter();
-            }
-            if (event.text == "2" && event.modifiers.alt == true && event.modifiers.shift == false && is-se) {
-                se-back-enter();
-            }
-            if (event.text == "3" && event.modifiers.alt == true && event.modifiers.shift == false && is-gg) {
-                gg-back-enter();
-            }
-            if (event.text == "4" && event.modifiers.alt == true && event.modifiers.shift == false && is-gfg) {
-                gfg-back-enter();
-            }
-            if (event.text == "5" && event.modifiers.alt == true && event.modifiers.shift == false && is-ddg) {
-                ddg-back-enter();
-            }
-            if (event.text == "!" && event.modifiers.alt == false && event.modifiers.shift == true && is-sof) {
-                sof-next-enter();
-            }
-            if (event.text == "@" && event.modifiers.alt == false && event.modifiers.shift == true && is-se) {
-                se-next-enter();
-            }
-            if (event.text == "#" && event.modifiers.alt == false && event.modifiers.shift == true && is-gg) {
-                gg-next-enter();
-            }
-            if (event.text == "$" && event.modifiers.alt == false && event.modifiers.shift == true && is-gfg) {
-                gfg-next-enter();
-            }
-            if (event.text == "%" && event.modifiers.alt == false && event.modifiers.shift == true && is-ddg) {
-                ddg-next-enter();
-            }
-            if (event.text == "n" && event.modifiers.control == true && (is-sof || is-se || is-gg || is-gfg || is-ddg)) {
-                next-enter();
-            }
-            if (event.text == "b" && event.modifiers.control == true && (is-sof || is-se || is-gg || is-gfg || is-ddg)) {
-                back-enter();
-            }
-            accept
         }
     }
 }

@@ -4,8 +4,6 @@
 import { Button, HorizontalBox, VerticalBox, ScrollView } from "std-widgets.slint";
 
 export component DynContent inherits Window {
-    forward-focus: key-handler; 
-    
     callback return-enter();
     callback next-enter();
     callback back-enter();
@@ -61,22 +59,6 @@ export component DynContent inherits Window {
                     root.next-enter();
                 }
             }
-        }
-    }
-
-    // results key press handle
-    key-handler := FocusScope {
-        key-pressed(event) => {
-            if (event.text == "n" && event.modifiers.control == true && enable-btns) {
-                next-enter();
-            }
-            if (event.text == "b" && event.modifiers.control == true && enable-btns) {
-                back-enter();
-            }
-            if (event.text == "q" && event.modifiers.control == true && enable-btns) {
-                return-enter();
-            }
-            accept
         }
     }
 }

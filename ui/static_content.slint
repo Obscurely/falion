@@ -4,8 +4,6 @@
 import { ScrollView, VerticalBox , HorizontalBox, Button } from "std-widgets.slint";
 
 export component StaticContent inherits Window {
-    forward-focus: key-handler;
-
     callback return-enter();
 
     in property <string> content-tag: "Page";
@@ -40,16 +38,6 @@ export component StaticContent inherits Window {
                   text: root.content;
               }
           }
-        }
-    }
-
-    // results key press handle
-    key-handler := FocusScope {
-        key-pressed(event) => {
-            if (event.text == "q" && event.modifiers.control == true && enable-btns) {
-                return-enter();
-            }
-            accept
         }
     }
 }
