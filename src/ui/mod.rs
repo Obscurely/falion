@@ -442,7 +442,7 @@ pub fn ui() {
                 );
 
                 // log the end of the function
-                tracing::info!("Up the results by one successfully and resdisplayed them.");
+                tracing::info!("Down the results by one successfully and resdisplayed them.");
             });
         }
     });
