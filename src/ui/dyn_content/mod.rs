@@ -1,8 +1,10 @@
+mod button;
+use super::results;
 use super::results::ResultType;
 use super::util;
 use super::MainWindow;
-use super::ResultsStaticType;
-use super::STATIC_CONTENT_VIEW;
+use super::ResultsDynType;
+use super::DYN_CONTENT_VIEW;
 use indexmap::IndexMap;
 use slint::Weak;
 use std::sync::Arc;
@@ -10,9 +12,10 @@ use tokio::sync::Mutex;
 
 pub fn setup_content_display<E, F>(
     ui: Weak<MainWindow>,
-    results: Arc<Mutex<Option<ResultsStaticType<E, F>>>>,
-    results_awaited: Arc<Mutex<IndexMap<String, String>>>,
+    results: Arc<Mutex<Option<ResultsDynType<E, F>>>>,
+    results_awaited: Arc<Mutex<IndexMap<String, Vec<String>>>>,
     index: Arc<Mutex<usize>>,
+    content_index: Arc<Mutex<usize>>,
     results_type: ResultType,
 ) where
     E: std::fmt::Display + std::marker::Send + 'static,
@@ -25,17 +28,29 @@ pub fn setup_content_display<E, F>(
 
     // setup enter content
     match results_type {
-        ResultType::GeeksForGeeks => ui_strong.on_gfg_enter(get_resource_enter_fn(
+        ResultType::StackOverflow => ui_strong.on_sof_enter(get_resource_enter_fn(
             ui.clone(),
             Arc::clone(&results),
             Arc::clone(&results_awaited),
             Arc::clone(&index),
+            Arc::clone(&content_index),
+            results_type,
         )),
-        ResultType::DdgSearch => ui_strong.on_ddg_enter(get_resource_enter_fn(
+        ResultType::StackExchange => ui_strong.on_se_enter(get_resource_enter_fn(
             ui.clone(),
             Arc::clone(&results),
             Arc::clone(&results_awaited),
             Arc::clone(&index),
+            Arc::clone(&content_index),
+            results_type,
+        )),
+        ResultType::GithubGist => ui_strong.on_gg_enter(get_resource_enter_fn(
+            ui.clone(),
+            Arc::clone(&results),
+            Arc::clone(&results_awaited),
+            Arc::clone(&index),
+            Arc::clone(&content_index),
+            results_type,
         )),
         _ => return,
     }
@@ -43,9 +58,11 @@ pub fn setup_content_display<E, F>(
 
 fn get_resource_enter_fn<E, F>(
     ui: Weak<MainWindow>,
-    results: Arc<Mutex<Option<ResultsStaticType<E, F>>>>,
-    results_awaited: Arc<Mutex<IndexMap<String, String>>>,
+    results: Arc<Mutex<Option<ResultsDynType<E, F>>>>,
+    results_awaited: Arc<Mutex<IndexMap<String, Vec<String>>>>,
     index: Arc<Mutex<usize>>,
+    content_index: Arc<Mutex<usize>>,
+    results_type: ResultType,
 ) -> impl Fn()
 where
     E: std::fmt::Display + std::marker::Send + 'static,
@@ -55,12 +72,15 @@ where
         // clone necessary ARCs
         let results_clone = Arc::clone(&results);
         let index_clone = Arc::clone(&index);
+        let content_index_clone = Arc::clone(&content_index);
         let results_awaited_clone = Arc::clone(&results_awaited);
         // clone ui weak pointer
         let ui = ui.clone();
 
         // actual logic
         tokio::spawn(async move {
+            // reset content index
+            results::index::reset_result_index(Arc::clone(&content_index_clone)).await;
             // get locks
             let locked = futures::join!(
                 results_clone.lock(),
@@ -75,13 +95,13 @@ where
                 Some(results) => match results {
                     Ok(results) => match results.get_index_mut(*index_lock) {
                         Some(result) => {
-                            // show the view static content window
+                            // show the view dynamic content window
                             let ui_clone = ui.clone();
                             if let Err(err) = slint::invoke_from_event_loop(move || {
                                 let ui = util::get_ui(ui_clone);
 
-                                ui.set_static_content("".into());
-                                ui.set_view(STATIC_CONTENT_VIEW);
+                                ui.set_dyn_content("".into());
+                                ui.set_view(DYN_CONTENT_VIEW);
                             }) {
                                 util::slint_event_loop_panic(err);
                             };
@@ -94,7 +114,7 @@ where
                                             Ok(content) => content,
                                             Err(error) => {
                                                 tracing::error!("There was an error getting the contetn for this a result. Error: {}", error);
-                                                format!("There has been an error getting the content for this result. Error: {}", error)
+                                                vec![format!("There has been an error getting the content for this result. Error: {}", error)]
                                             }
                                         },
                                         Err(error) => {
@@ -102,7 +122,7 @@ where
                                                 "There was an error handeling the future for a result. Error: {}",
                                                 error
                                             );
-                                            format!("There has been an error handeling the future for this result. Error: {}", error)
+                                            vec![format!("There has been an error handeling the future for this result. Error: {}", error)]
                                         }
                                     };
 
@@ -123,8 +143,13 @@ where
 
             // set the first element
             let ui_clone = ui.clone();
-            // get owned data for content
-            let content = content.to_owned();
+            // clone necessary ARCs
+            let results_clone = Arc::clone(&results_clone);
+            let index_clone = Arc::clone(&index_clone);
+            let content_index_clone = Arc::clone(&content_index_clone);
+            let results_awaited_clone = Arc::clone(&results_awaited_clone);
+            // get first element
+            let first = content.first().unwrap().to_owned();
             // drop the Mutex locks
             drop(results_lock);
             drop(results_awaited_lock);
@@ -132,11 +157,36 @@ where
             if let Err(err) = slint::invoke_from_event_loop(move || {
                 let ui_strong = util::get_ui(ui_clone);
 
-                // set content tag
-                ui_strong.set_static_content_tag("Page".into());
+                // set dynamic content first tag
+                if results_type == ResultType::GithubGist {
+                    ui_strong.set_dyn_content_tag("File 1".into());
+                } else {
+                    ui_strong.set_dyn_content_tag("Question".into());
+                }
 
-                // set content
-                ui_strong.set_static_content(content.into());
+                // set dyn content
+                ui_strong.set_dyn_content(first.into());
+
+                // setup back and next buttons
+                // setup back content button
+                ui_strong.on_dyn_back_enter(button::get_back_content_fn(
+                    ui.clone(),
+                    Arc::clone(&results_clone),
+                    Arc::clone(&results_awaited_clone),
+                    Arc::clone(&index_clone),
+                    Arc::clone(&content_index_clone),
+                    results_type,
+                ));
+
+                // setup next content button
+                ui_strong.on_dyn_next_enter(button::get_next_content_fn(
+                    ui.clone(),
+                    Arc::clone(&results_clone),
+                    Arc::clone(&results_awaited_clone),
+                    Arc::clone(&index_clone),
+                    Arc::clone(&content_index_clone),
+                    results_type,
+                ));
 
                 // enable btns
                 ui_strong.set_enable_content_btns(true);
