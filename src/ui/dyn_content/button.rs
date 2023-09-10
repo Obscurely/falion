@@ -23,24 +23,25 @@ where
         // clone necessary ARCs
         let index_clone = Arc::clone(&index);
         let content_index_clone = Arc::clone(&content_index);
-        let results = Arc::clone(&results);
+        let results_clone = Arc::clone(&results);
         let results_awaited_clone = Arc::clone(&results_awaited);
         // clone ui weak pointer
         let ui = ui.clone();
 
-        tokio::task::spawn_blocking(move || {
-            let index_lock = index_clone.blocking_lock();
-            let mut content_index_lock = content_index_clone.blocking_lock();
+        tokio::spawn(async move {
+            let locked = futures::join!(index_clone.lock(), content_index_clone.lock(), results_clone.lock(), results_awaited_clone.lock());
+            let index_lock = locked.0;
+            let mut content_index_lock = locked.1;
             // return if the index is already on 0
             if *content_index_lock == 0 {
                 return;
             } else {
                 *content_index_lock = content_index_lock.saturating_sub(1);
             }
-            let results = results.blocking_lock();
-            let results_awaited_lock = results_awaited_clone.blocking_lock();
+            let results_lock = locked.2;
+            let results_awaited_lock = locked.3; 
 
-            match results.as_ref() {
+            match results_lock.as_ref() {
                 Some(results) => match results {
                     Ok(results) => match results.get_index(*index_lock) {
                         Some(result) => match results_awaited_lock.get(result.0) {
@@ -103,18 +104,19 @@ where
         // clone necessary ARCs
         let index_clone = Arc::clone(&index);
         let content_index_clone = Arc::clone(&content_index);
-        let results = Arc::clone(&results);
+        let results_clone = Arc::clone(&results);
         let results_awaited_clone = Arc::clone(&results_awaited);
         // clone ui weak pointer
         let ui = ui.clone();
 
-        tokio::task::spawn_blocking(move || {
-            let index_lock = index_clone.blocking_lock();
-            let mut content_index_lock = content_index_clone.blocking_lock();
-            let results = results.blocking_lock();
-            let results_awaited_lock = results_awaited_clone.blocking_lock();
+        tokio::spawn(async move {
+            let locked = futures::join!(index_clone.lock(), content_index_clone.lock(), results_clone.lock(), results_awaited_clone.lock());
+            let index_lock = locked.0;
+            let mut content_index_lock = locked.1;
+            let results_lock = locked.2;
+            let results_awaited_lock = locked.3;
 
-            match results.as_ref() {
+            match results_lock.as_ref() {
                 Some(results) => match results {
                     Ok(results) => match results.get_index(*index_lock) {
                         Some(result) => match results_awaited_lock.get(result.0) {
