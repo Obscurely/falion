@@ -1,6 +1,7 @@
 mod content;
 mod print;
 mod util;
+use super::search;
 use super::search::ddg_search::DdgSearchError;
 use super::search::geeksforgeeks::GfgError;
 use super::search::github_gist::GithubGistError;
@@ -13,7 +14,6 @@ use crossterm::style::Stylize;
 use indexmap::IndexMap;
 use std::io::Write;
 use tokio::task::JoinHandle;
-pub use util::setup_cli;
 
 type StackOverflowResults =
     Result<IndexMap<String, JoinHandle<Result<Vec<String>, SofError>>>, SofError>;
@@ -64,17 +64,55 @@ pub struct Cli {
 /// `ddg_search_results` - ddg results which should be got in the main function and
 /// passed entierly (no reference)
 #[tracing::instrument(skip_all)]
-pub async fn cli(
-    query: String,
-    mut stackoverflow_results: StackOverflowResults,
-    mut stackexchange_results: StackExchangeResults,
-    mut github_gist_results: GithubGistResults,
-    mut geeksforgeeks_results: GeeksForGeeksResults,
-    mut ddg_search_results: DdgSearchResults,
-) {
+pub async fn cli() {
     tracing::info!("User chose the cli.");
     // create stdout
     let mut stdout = std::io::stdout();
+
+    // get results
+    // setup cli and get query
+    let query = match util::setup_cli() {
+        Ok(query) => query,
+        Err(_) => {
+            tracing::error!("Can't continue, user provided a query shorter than 5 characters");
+            eprintln!("Provided query is shorter than 5 characters. Do --help for more information");
+            return;
+        }
+    };
+
+    // debug log the query
+    tracing::debug!("The input query: {}", &query);
+
+    // Make objects
+    let client = search::util::client_with_special_settings();
+    let stackoverflow = search::stackoverflow::StackOverflow::with_client(client.clone());
+    let stackexchange = search::stackexchange::StackExchange::with_client(client.clone());
+    let github_gist = search::github_gist::GithubGist::with_client(client.clone());
+    let geeksforgeeks = search::geeksforgeeks::GeeksForGeeks::with_client(client.clone());
+    let ddg_search = search::ddg_search::DdgSearch::with_client(client.clone());
+
+    // Get results
+    let stackoverflow_results = stackoverflow.get_multiple_questions_content(&query, Some(10));
+    let stackexchange_results = stackexchange.get_multiple_questions_content(&query, Some(10));
+    let github_gist_results = github_gist.get_multiple_gists_content(&query, Some(10));
+    let geeksforgeeks_results = geeksforgeeks.get_multiple_pages_content(&query, Some(10));
+    let ddg_search_results = ddg_search.get_multiple_pages_content(&query, Some(10));
+
+    // await all results at the same time
+    let results_awaited = futures::join!(
+        stackoverflow_results,
+        stackexchange_results,
+        github_gist_results,
+        geeksforgeeks_results,
+        ddg_search_results
+    );
+
+    // transfer the awaited futures back
+    let mut stackoverflow_results = results_awaited.0;
+    let mut stackexchange_results = results_awaited.1;
+    let mut github_gist_results = results_awaited.2;
+    let mut geeksforgeeks_results = results_awaited.3;
+    let mut ddg_search_results = results_awaited.4;
 
     // hide the cursor
     if let Err(error) = crossterm::execute!(&mut stdout, crossterm::cursor::Hide) {

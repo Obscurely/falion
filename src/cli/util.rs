@@ -62,7 +62,11 @@ pub fn clear_terminal(stdout: &mut std::io::Stdout) {
 /// Setup the cli. Setup the arguments for bin, get the given values and panic if a query equal or
 /// long to 5 in length hasn't been given. Enable terminal raw mode, hide the cursor, setup
 /// logging. Create an std::io::Stdout instance.
-pub fn setup_cli() -> String {
+///
+/// # Errors
+///
+/// If the user hasn't provided a query shorter than 5 chars or none at all
+pub fn setup_cli() -> Result<String, std::io::Error> {
     // initiate cli
     let cli = super::Cli::parse();
 
@@ -73,7 +77,10 @@ pub fn setup_cli() -> String {
 
     // check if query is not shorter than 5 characters
     if query.len() < 5 {
-        panic!("\n-> Your query is shorter than 5 characters <-\n");
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "query shorter than 5 chars provided",
+        ));
     }
 
     // Pre-setup
@@ -87,5 +94,5 @@ pub fn setup_cli() -> String {
         setup_logs(verbose);
     }
 
-    query
+    Ok(query)
 }
