@@ -154,6 +154,9 @@ where
 
                 // enable btns
                 ui_strong.set_enable_content_btns(true);
+
+                // log done displaying
+                tracing::info!("Displayed static resource.");
             }) {
                 util::slint_event_loop_panic(err);
             };

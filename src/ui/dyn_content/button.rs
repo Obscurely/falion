@@ -75,6 +75,9 @@ where
 
                                             // set dynamic content
                                             ui.set_dyn_content(content.into());
+
+                                            // log action
+                                            tracing::info!("Successfully displayed previous item in resource result.")
                                         }) {
                                             util::slint_event_loop_panic(err);
                                         };
@@ -169,6 +172,9 @@ where
 
                                                     // unwrap is fine since it there is always at least one element
                                                     ui.set_dyn_content(content.into());
+                                                    
+                                                    // log action
+                                                    tracing::info!("Successfully displayed next item in resource result.")
                                                 })
                                             {
                                                 util::slint_event_loop_panic(err);
