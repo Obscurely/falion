@@ -7,6 +7,7 @@ use slint::Weak;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
+#[tracing::instrument(skip_all)]
 pub fn get_back_content_fn<E, F>(
     ui: Weak<MainWindow>,
     results: Arc<Mutex<Option<ResultsDynType<E, F>>>>,
@@ -103,6 +104,7 @@ where
     }
 }
 
+#[tracing::instrument(skip_all)]
 pub fn get_next_content_fn<E, F>(
     ui: Weak<MainWindow>,
     results: Arc<Mutex<Option<ResultsDynType<E, F>>>>,

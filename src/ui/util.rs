@@ -1,5 +1,6 @@
 use slint::Weak;
 
+#[tracing::instrument(skip_all)]
 pub fn get_ui<T>(ui: Weak<T>) -> T
 where
     T: slint::ComponentHandle,
@@ -14,6 +15,7 @@ where
     }
 }
 
+#[tracing::instrument(skip_all)]
 pub fn slint_event_loop_panic(err: slint::EventLoopError) {
     tracing::error!("Failed to invoke slint from event loop. Error {}", err);
     // if we can't invoke slint from the event loop it's probably right to panic as

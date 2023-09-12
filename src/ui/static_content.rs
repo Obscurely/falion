@@ -8,6 +8,7 @@ use slint::Weak;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
+#[tracing::instrument(skip_all)]
 pub fn setup_content_display<E, F>(
     ui: Weak<MainWindow>,
     results: Arc<Mutex<Option<ResultsStaticType<E, F>>>>,
@@ -44,6 +45,7 @@ pub fn setup_content_display<E, F>(
     }
 }
 
+#[tracing::instrument(skip_all)]
 fn get_resource_enter_fn<E, F>(
     ui: Weak<MainWindow>,
     results: Arc<Mutex<Option<ResultsStaticType<E, F>>>>,

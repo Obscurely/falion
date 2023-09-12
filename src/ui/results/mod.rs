@@ -17,6 +17,7 @@ pub enum ResultType {
     DdgSearch,
 }
 
+#[tracing::instrument(skip_all)]
 pub fn reset_results(ui: Weak<MainWindow>) {
     if let Err(err) = slint::invoke_from_event_loop(move || {
         let ui = util::get_ui(ui);
@@ -56,6 +57,7 @@ pub fn reset_results(ui: Weak<MainWindow>) {
     };
 }
 
+#[tracing::instrument(skip_all)]
 pub fn setup_results_btns<T, E>(
     ui: Weak<MainWindow>,
     results: Arc<Mutex<Option<Results<T, E>>>>,

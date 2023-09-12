@@ -6,6 +6,7 @@ use slint::Weak;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
+#[tracing::instrument(skip_all)]
 pub fn display_first_result<T, E>(
     ui: Weak<MainWindow>,
     results: &Results<T, E>,
@@ -103,6 +104,7 @@ pub fn display_first_result<T, E>(
     }
 }
 
+#[tracing::instrument(skip_all)]
 pub fn redisplay_result<T, E>(
     ui: Weak<MainWindow>,
     results: Arc<Mutex<Option<Results<T, E>>>>,
