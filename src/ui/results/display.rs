@@ -17,37 +17,37 @@ pub fn display_first_result<T, E>(
         // unwrap is fine here since it would have been an error if there were no
         // results, so there is at least one
         Ok(results) => {
-            let res = results.get_index(0).unwrap().0.to_string();
+            let res = slint::SharedString::from(results.get_index(0).unwrap().0);
             if let Err(err) = slint::invoke_from_event_loop(move || {
                 let ui = util::get_ui(ui);
 
                 match results_type {
                     ResultType::StackOverflow => {
-                        ui.set_sof_result(res.into());
+                        ui.set_sof_result(res);
                         ui.set_is_sof(true);
                         ui.set_is_sof_back(true);
                         ui.set_is_sof_next(true);
                     }
                     ResultType::StackExchange => {
-                        ui.set_se_result(res.into());
+                        ui.set_se_result(res);
                         ui.set_is_se(true);
                         ui.set_is_se_back(true);
                         ui.set_is_se_next(true);
                     }
                     ResultType::GithubGist => {
-                        ui.set_gg_result(res.into());
+                        ui.set_gg_result(res);
                         ui.set_is_gg(true);
                         ui.set_is_gg_back(true);
                         ui.set_is_gg_next(true);
                     }
                     ResultType::GeeksForGeeks => {
-                        ui.set_gfg_result(res.into());
+                        ui.set_gfg_result(res);
                         ui.set_is_gfg(true);
                         ui.set_is_gfg_back(true);
                         ui.set_is_gfg_next(true);
                     }
                     ResultType::DdgSearch => {
-                        ui.set_ddg_result(res.into());
+                        ui.set_ddg_result(res);
                         ui.set_is_ddg(true);
                         ui.set_is_ddg_back(true);
                         ui.set_is_ddg_next(true);
@@ -58,7 +58,7 @@ pub fn display_first_result<T, E>(
             };
         }
         Err(err) => {
-            let err = err.to_string();
+            let err = slint::SharedString::from(err.to_string());
             match results_type {
                 ResultType::StackOverflow => {
                     tracing::warn!("There were no results for StackOverflow. Error {}", err);
@@ -81,19 +81,19 @@ pub fn display_first_result<T, E>(
 
                 match results_type {
                     ResultType::StackOverflow => {
-                        ui.set_sof_result(err.into());
+                        ui.set_sof_result(err);
                     }
                     ResultType::StackExchange => {
-                        ui.set_sof_result(err.into());
+                        ui.set_sof_result(err);
                     }
                     ResultType::GithubGist => {
-                        ui.set_sof_result(err.into());
+                        ui.set_sof_result(err);
                     }
                     ResultType::GeeksForGeeks => {
-                        ui.set_sof_result(err.into());
+                        ui.set_sof_result(err);
                     }
                     ResultType::DdgSearch => {
-                        ui.set_sof_result(err.into());
+                        ui.set_sof_result(err);
                     }
                 }
             }) {
@@ -113,25 +113,25 @@ pub fn redisplay_result<T, E>(
 {
     if let Some(Ok(results)) = results.blocking_lock().as_ref() {
         if let Some(res) = results.get_index(*index.blocking_lock()) {
-            let res = res.0.to_string();
+            let res = slint::SharedString::from(res.0);
             if let Err(err) = slint::invoke_from_event_loop(move || {
                 let ui = util::get_ui(ui);
 
                 match results_type {
                     ResultType::StackOverflow => {
-                        ui.set_sof_result(res.into());
+                        ui.set_sof_result(res);
                     }
                     ResultType::StackExchange => {
-                        ui.set_se_result(res.into());
+                        ui.set_se_result(res);
                     }
                     ResultType::GithubGist => {
-                        ui.set_gg_result(res.into());
+                        ui.set_gg_result(res);
                     }
                     ResultType::GeeksForGeeks => {
-                        ui.set_gfg_result(res.into());
+                        ui.set_gfg_result(res);
                     }
                     ResultType::DdgSearch => {
-                        ui.set_ddg_result(res.into());
+                        ui.set_ddg_result(res);
                     }
                 }
             }) {
