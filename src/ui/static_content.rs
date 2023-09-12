@@ -76,6 +76,7 @@ where
             let index_lock = locked.1;
             let mut results_awaited_lock = locked.2;
 
+            // try get the content
             let content = match results_lock.as_mut() {
                 Some(results) => match results {
                     Ok(results) => match results.get_index_mut(*index_lock) {

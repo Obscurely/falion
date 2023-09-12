@@ -9,7 +9,7 @@ where
         Some(ui) => ui,
         None => {
             tracing::error!("Failed to get ui thread behind weak pointer.");
-            // it the pointer to the UI is invalid probably the program is not working anymore.
+            // if the pointer to the UI is invalid probably the program is not working anymore.
             panic!("Failed to get pointer to ui.");
         }
     }

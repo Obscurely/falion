@@ -22,6 +22,8 @@ pub fn display_first_result<T, E>(
             if let Err(err) = slint::invoke_from_event_loop(move || {
                 let ui = util::get_ui(ui);
 
+                // display the result based on the results type
+                // set the text, enable button, and the cycle buttons
                 match results_type {
                     ResultType::StackOverflow => {
                         ui.set_sof_result(res);
@@ -60,6 +62,7 @@ pub fn display_first_result<T, E>(
         }
         Err(err) => {
             let err = slint::SharedString::from(err.to_string());
+            // error depending on the results type
             match results_type {
                 ResultType::StackOverflow => {
                     tracing::warn!("There were no results for StackOverflow. Error {}", err);
@@ -80,6 +83,7 @@ pub fn display_first_result<T, E>(
             if let Err(err) = slint::invoke_from_event_loop(move || {
                 let ui = util::get_ui(ui);
 
+                // error depending on the results type
                 match results_type {
                     ResultType::StackOverflow => {
                         ui.set_sof_result(err);
@@ -119,6 +123,7 @@ pub fn redisplay_result<T, E>(
             if let Err(err) = slint::invoke_from_event_loop(move || {
                 let ui = util::get_ui(ui);
 
+                // redisplay results based on their type
                 match results_type {
                     ResultType::StackOverflow => {
                         ui.set_sof_result(res);

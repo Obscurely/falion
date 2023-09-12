@@ -131,6 +131,7 @@ pub fn setup_results_btns<T, E>(
         }
     };
 
+    // seput events based on the results type and their respective callbacks
     match results_type {
         ResultType::StackOverflow => {
             ui_deref.on_sof_back_enter(back_event);

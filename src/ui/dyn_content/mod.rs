@@ -24,7 +24,7 @@ pub fn setup_content_display<E, F>(
 {
     let ui_strong = util::get_ui(ui.clone());
 
-    // disaple buttons
+    // disable buttons
     ui_strong.set_enable_content_btns(false);
 
     // setup enter content
