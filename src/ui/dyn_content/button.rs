@@ -17,7 +17,7 @@ pub fn get_back_content_fn<E, F>(
 ) -> impl Fn()
 where
     E: std::fmt::Display + std::marker::Send + 'static,
-    F: std::marker::Send + 'static,
+    F: std::fmt::Display + std::marker::Send + 'static,
 {
     move || {
         // clone necessary ARCs
@@ -29,7 +29,12 @@ where
         let ui = ui.clone();
 
         tokio::spawn(async move {
-            let locked = futures::join!(index_clone.lock(), content_index_clone.lock(), results_clone.lock(), results_awaited_clone.lock());
+            let locked = futures::join!(
+                index_clone.lock(),
+                content_index_clone.lock(),
+                results_clone.lock(),
+                results_awaited_clone.lock()
+            );
             let index_lock = locked.0;
             let mut content_index_lock = locked.1;
             // return if the index is already on 0
@@ -39,7 +44,7 @@ where
                 *content_index_lock = content_index_lock.saturating_sub(1);
             }
             let results_lock = locked.2;
-            let results_awaited_lock = locked.3; 
+            let results_awaited_lock = locked.3;
 
             match results_lock.as_ref() {
                 Some(results) => match results {
@@ -73,16 +78,26 @@ where
                                             util::slint_event_loop_panic(err);
                                         };
                                     }
-                                    None => return,
+                                    None => {
+                                        tracing::warn!("User tried getting content at a non existent index. Programming error.");
+                                    }
                                 }
                             }
-                            None => return,
+                            None => {
+                                tracing::warn!("User tried accessing a result at a non existen index which shouldn't have happened and it's a programming error if it does");
+                            }
                         },
-                        None => return,
+                        None => {
+                            tracing::warn!("User is on the view content screen, but the result they try to go through is not awaited. Programming error.");
+                        }
                     },
-                    Err(err) => return,
+                    Err(err) => {
+                        tracing::warn!("The results are an error and the user should have not been able to interact with them. Err: {}", err.to_string());
+                    }
                 },
-                None => return,
+                None => {
+                    tracing::warn!("There are no results for a selected resource, but the user still got to the view content screen. This is a programming error");
+                }
             }
         });
     }
@@ -98,7 +113,7 @@ pub fn get_next_content_fn<E, F>(
 ) -> impl Fn()
 where
     E: std::fmt::Display + std::marker::Send + 'static,
-    F: std::marker::Send + 'static,
+    F: std::fmt::Display + std::marker::Send + 'static,
 {
     move || {
         // clone necessary ARCs
@@ -110,7 +125,12 @@ where
         let ui = ui.clone();
 
         tokio::spawn(async move {
-            let locked = futures::join!(index_clone.lock(), content_index_clone.lock(), results_clone.lock(), results_awaited_clone.lock());
+            let locked = futures::join!(
+                index_clone.lock(),
+                content_index_clone.lock(),
+                results_clone.lock(),
+                results_awaited_clone.lock()
+            );
             let index_lock = locked.0;
             let mut content_index_lock = locked.1;
             let results_lock = locked.2;
@@ -152,17 +172,27 @@ where
                                                 util::slint_event_loop_panic(err);
                                             };
                                         }
-                                        None => return,
+                                        None => {
+                                            tracing::warn!("User tried getting content at a non existent index. Programming error.");
+                                        }
                                     }
                                 }
                             }
-                            None => return,
+                            None => {
+                                tracing::warn!("User tried accessing a result at a non existen index which shouldn't have happened and it's a programming error if it does");
+                            }
                         },
-                        None => return,
+                        None => {
+                            tracing::warn!("User is on the view content screen, but the result they try to go through is not awaited. Programming error.");
+                        }
                     },
-                    Err(err) => return,
+                    Err(err) => {
+                        tracing::warn!("The results are an error and the user should have not been able to interact with them. Err: {}", err.to_string());
+                    }
                 },
-                None => return,
+                None => {
+                    tracing::warn!("There are no results for a selected resource, but the user still got to the view content screen. This is a programming error");
+                }
             }
         });
     }

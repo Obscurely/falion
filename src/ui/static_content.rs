@@ -16,7 +16,7 @@ pub fn setup_content_display<E, F>(
     results_type: ResultType,
 ) where
     E: std::fmt::Display + std::marker::Send + 'static,
-    F: std::marker::Send + 'static,
+    F: std::fmt::Display + std::marker::Send + 'static,
 {
     let ui_strong = util::get_ui(ui.clone());
 
@@ -37,7 +37,10 @@ pub fn setup_content_display<E, F>(
             Arc::clone(&results_awaited),
             Arc::clone(&index),
         )),
-        _ => return,
+        _ => {
+            tracing::error!("Results type used on a function that doesn't support it.");
+            panic!("Results type used on function that doesn't support it. This is a programming error.");
+        }
     }
 }
 
@@ -49,7 +52,7 @@ fn get_resource_enter_fn<E, F>(
 ) -> impl Fn()
 where
     E: std::fmt::Display + std::marker::Send + 'static,
-    F: std::marker::Send + 'static,
+    F: std::fmt::Display + std::marker::Send + 'static,
 {
     move || {
         // clone necessary ARCs
@@ -114,11 +117,20 @@ where
                                 }
                             }
                         }
-                        None => return,
+                        None => {
+                            tracing::warn!("User tried accessing a result at a non existen index which shouldn't have happened and it's a programming error if it does");
+                            return;
+                        }
                     },
-                    Err(err) => return,
+                    Err(err) => {
+                        tracing::warn!("The results are an error and the user should have not been able to interact with them. Err: {}", err.to_string());
+                        return;
+                    }
                 },
-                None => return,
+                None => {
+                    tracing::warn!("The results are non existen, yet the user still managed to try and access them.");
+                    return;
+                }
             };
 
             // set the first element
