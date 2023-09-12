@@ -7,6 +7,22 @@ use slint::Weak;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
+/// The function that's called when the content back button is hit.
+///
+/// # Arguments
+///
+/// * `ui` - weak pointer to the slint ui
+/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// ui function.
+/// * `results_awaited` - ARC to the Mutex of the awaited results variable, from the main ui
+/// function.
+/// * `index` - ARC to the Mutex of the current results index for this particular resource
+/// * `content_index` - the index of the item that should be displayed from the result
+/// * `results_type` - the kind of result this is. Ex: StackOverflow.
+///
+/// # Panics
+///
+/// If slint couldn't be invoked from the event loop.
 #[tracing::instrument(skip_all)]
 pub fn get_back_content_fn<E, F>(
     ui: Weak<MainWindow>,
@@ -107,6 +123,22 @@ where
     }
 }
 
+/// The function that's called when the content next button is hit.
+///
+/// # Arguments
+///
+/// * `ui` - weak pointer to the slint ui
+/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// ui function.
+/// * `results_awaited` - ARC to the Mutex of the awaited results variable, from the main ui
+/// function.
+/// * `index` - ARC to the Mutex of the current results index for this particular resource
+/// * `content_index` - the index of the item that should be displayed from the result
+/// * `results_type` - the kind of result this is. Ex: StackOverflow.
+///
+/// # Panics
+///
+/// If slint couldn't be invoked from the event loop.
 #[tracing::instrument(skip_all)]
 pub fn get_next_content_fn<E, F>(
     ui: Weak<MainWindow>,

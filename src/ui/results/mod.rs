@@ -8,6 +8,7 @@ use slint::Weak;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
+/// Possible results type, pretty self explanatory
 #[derive(Clone, Copy, PartialEq)]
 pub enum ResultType {
     StackOverflow,
@@ -17,6 +18,15 @@ pub enum ResultType {
     DdgSearch,
 }
 
+/// Reset the results ui elements. Disabling the buttons and removing any button text.
+///
+/// # Arguments
+///
+/// * `ui` - weak pointer to the slint ui (.as_weak())
+///
+/// # Panics
+///
+/// If the slint can't be invoked from the event loop.
 #[tracing::instrument(skip_all)]
 pub fn reset_results(ui: Weak<MainWindow>) {
     if let Err(err) = slint::invoke_from_event_loop(move || {
@@ -57,6 +67,20 @@ pub fn reset_results(ui: Weak<MainWindow>) {
     };
 }
 
+/// Setup the buttons for the results: cycle through them and the results itself
+///
+/// # Arguments
+///
+/// * `ui` - weak pointer to the slint ui
+/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// ui function.
+/// function.
+/// * `index` - ARC to the Mutex of the current results index for this particular resource
+/// * `results_type` - the kind of result this is. Ex: StackOverflow.
+///
+/// # Panics
+///
+/// If it can't invoke the slint event loop.
 #[tracing::instrument(skip_all)]
 pub fn setup_results_btns<T, E>(
     ui: Weak<MainWindow>,

@@ -38,6 +38,7 @@ type Results<T, E> = Result<IndexMap<String, T>, E>;
 type ResultsStaticType<E, F> = Result<IndexMap<String, JoinHandle<Result<String, E>>>, F>;
 type ResultsDynType<E, F> = Result<IndexMap<String, JoinHandle<Result<Vec<String>, E>>>, F>;
 
+/// The main ui function that executes the window and sets it up.
 #[tracing::instrument(skip_all)]
 pub fn ui() {
     tracing::info!("User chose the GUI.");

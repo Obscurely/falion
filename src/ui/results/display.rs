@@ -6,6 +6,18 @@ use slint::Weak;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
+/// Display the first resould for the provided resource
+///
+/// # Arguments
+///
+/// * `ui` - weak pointer to the slint ui
+/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// ui function.
+/// * `results_type` - the kind of result this is. Ex: StackOverflow.
+///
+/// # Panics
+///
+/// If it can't invoke the slint event loop.
 #[tracing::instrument(skip_all)]
 pub fn display_first_result<T, E>(
     ui: Weak<MainWindow>,
@@ -108,6 +120,20 @@ pub fn display_first_result<T, E>(
     }
 }
 
+/// Redisplay the result for the provide resource
+///
+/// # Arguments
+///
+/// * `ui` - weak pointer to the slint ui
+/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// ui function.
+/// function.
+/// * `index` - ARC to the Mutex of the current results index for this particular resource
+/// * `results_type` - the kind of result this is. Ex: StackOverflow.
+///
+/// # Panics
+///
+/// If it can't invoke the slint event loop.
 #[tracing::instrument(skip_all)]
 pub fn redisplay_result<T, E>(
     ui: Weak<MainWindow>,

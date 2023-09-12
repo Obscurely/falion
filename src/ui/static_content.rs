@@ -8,6 +8,21 @@ use slint::Weak;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
+/// Sets up the callbacks in the ui for when a user clicks to see the content of a result.
+///
+/// # Arguments
+///
+/// * `ui` - weak pointer to the slint ui
+/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// ui function.
+/// * `results_awaited` - ARC to the Mutex of the awaited results variable, from the main ui
+/// function.
+/// * `index` - ARC to the Mutex of the current results index for this particular resource
+/// * `results_type` - the kind of result this is. Ex: StackOverflow.
+///
+/// # Panics
+///
+/// It the results type is not made for this function
 #[tracing::instrument(skip_all)]
 pub fn setup_content_display<E, F>(
     ui: Weak<MainWindow>,
@@ -45,6 +60,20 @@ pub fn setup_content_display<E, F>(
     }
 }
 
+/// The callback function for viewing the resource.
+///
+/// # Arguments
+///
+/// * `ui` - weak pointer to the slint ui
+/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// ui function.
+/// * `results_awaited` - ARC to the Mutex of the awaited results variable, from the main ui
+/// function.
+/// * `index` - ARC to the Mutex of the current results index for this particular resource
+///
+/// # Panics
+///
+/// If slint couldn't be invoked from the event loop.
 #[tracing::instrument(skip_all)]
 fn get_resource_enter_fn<E, F>(
     ui: Weak<MainWindow>,
