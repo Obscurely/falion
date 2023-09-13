@@ -63,7 +63,9 @@ pub async fn cli() {
         Ok(query) => query,
         Err(_) => {
             tracing::error!("Can't continue, user provided a query shorter than 5 characters");
-            eprintln!("Provided query is shorter than 5 characters. Do --help for more information");
+            eprintln!(
+                "Provided query is shorter than 5 characters. Do --help for more information"
+            );
             return;
         }
     };
