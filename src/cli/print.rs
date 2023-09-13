@@ -151,7 +151,7 @@ pub fn print_dyn_content(
             // go to next content
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('n'),
-                modifiers: event::KeyModifiers::CONTROL,
+                modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
                 if current_index < max_index {
@@ -160,15 +160,15 @@ pub fn print_dyn_content(
             }
             // go to previous content
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('b'),
-                modifiers: event::KeyModifiers::CONTROL,
+                code: event::KeyCode::Char('N'),
+                modifiers: event::KeyModifiers::SHIFT,
                 ..
             }) => {
                 current_index = current_index.saturating_sub(1);
             }
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('q'),
-                modifiers: event::KeyModifiers::CONTROL,
+                modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
                 return false;
@@ -242,7 +242,7 @@ pub fn print_static_content(stdout: &mut std::io::Stdout, content: &str) -> bool
             // return to main menu
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('q'),
-                modifiers: event::KeyModifiers::CONTROL,
+                modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
                 return false;

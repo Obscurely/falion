@@ -496,7 +496,7 @@ pub async fn cli() {
             // move every resource to it's next element in the list, if any more
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('n'),
-                modifiers: event::KeyModifiers::CONTROL,
+                modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
                 // move all resources to the next element
@@ -548,8 +548,8 @@ pub async fn cli() {
             }
             // move to the previous element in the list of every resource, if any more
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('b'),
-                modifiers: event::KeyModifiers::CONTROL,
+                code: event::KeyCode::Char('N'),
+                modifiers: event::KeyModifiers::SHIFT,
                 ..
             }) => {
                 // move all the resources to the previous element
