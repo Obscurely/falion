@@ -195,8 +195,8 @@ where
 
                                             // set content
                                             let content = content.to_owned();
-                                            if let Err(err) =
-                                                slint::invoke_from_event_loop(move || {
+                                            if let Err(err) = slint::invoke_from_event_loop(
+                                                move || {
                                                     let ui = util::get_ui(ui_clone);
 
                                                     // set content tag
@@ -204,11 +204,11 @@ where
 
                                                     // unwrap is fine since it there is always at least one element
                                                     ui.set_dyn_content(content.into());
-                                                    
+
                                                     // log action
                                                     tracing::info!("Successfully displayed next item in resource result.")
-                                                })
-                                            {
+                                                },
+                                            ) {
                                                 util::slint_event_loop_panic(err);
                                             };
                                         }

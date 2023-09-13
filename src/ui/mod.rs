@@ -147,7 +147,7 @@ pub fn ui() {
             tracing::info!("Getting results for search query {}", &text);
 
             // reset results
-            results::reset_results(ui_thread.clone()); 
+            results::reset_results(ui_thread.clone());
 
             // disable search
             helper::disable_search(ui_thread.clone());
@@ -229,7 +229,7 @@ pub fn ui() {
                     index::reset_result_index(geeksforgeeks_index_clone),
                     index::reset_result_index(ddg_search_index_clone),
                 );
- 
+
                 // update results with the new ones
                 stackoverflow_results_clone_lock.replace(res.0);
                 stackexchange_results_clone_lock.replace(res.1);
@@ -273,7 +273,7 @@ pub fn ui() {
 
                 // enable back search
                 helper::enable_search(ui_thread.clone());
-                
+
                 // log that we displayed the results successfully
                 tracing::info!("Displayed the results successfully!");
             });
