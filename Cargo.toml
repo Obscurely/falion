@@ -31,9 +31,9 @@ section = "CHANGEME_MANUAL"
 [profile.release]
 strip = true      # Automatically strip symbols from the binary.
 opt-level = 3     # Optimize for speed.
-lto = true        # instructs the linker to optimize at the link stage
+lto = true        # instructs the linker to optimize at the link stage.
 codegen-units = 1 # Default is 16, the higher the faster compile time, but it may produce slower code.
-panic = "unwind"  # Since all of the errors are  handled manually (should be), aborting and removing the panic code is nothing, but an improvement.
+panic = "unwind"
 
 #═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
