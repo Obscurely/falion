@@ -181,6 +181,8 @@ If you've got any questions please give the [FAQ](#faq) a check.
 - [Nix File](#nix-file)
 - [Deb File](#deb-file)
 
+**⚠️ Dependencies:** openssl, most likely already installed.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 #### Portable Bin
