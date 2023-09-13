@@ -1,6 +1,6 @@
 pub mod display;
-pub mod index;
 pub mod helper;
+pub mod index;
 use super::util;
 use super::MainWindow;
 use super::Results;

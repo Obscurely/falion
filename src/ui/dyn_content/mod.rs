@@ -72,7 +72,7 @@ pub fn setup_content_display<E, F>(
         _ => {
             tracing::error!("Results type used on a function that doesn't support it.");
             panic!("Results type used on function that doesn't support it. This is a programming error.");
-        },
+        }
     }
 }
 
@@ -174,17 +174,17 @@ where
                         None => {
                             tracing::warn!("User tried accessing a result at a non existen index which shouldn't have happened and it's a programming error if it does");
                             return;
-                        },
+                        }
                     },
                     Err(err) => {
                         tracing::warn!("The results are an error and the user should have not been able to interact with them. Err: {}", err.to_string());
                         return;
-                    },
+                    }
                 },
                 None => {
                     tracing::warn!("The results are non existen, yet the user still managed to try and access them.");
                     return;
-                },
+                }
             };
 
             // set the first element

@@ -36,7 +36,7 @@ pub fn try_up_index<T, E>(results: Arc<Mutex<Option<Results<T, E>>>>, index: Arc
 }
 
 /// Try substract one from a usize, in this case an index, untill it reaches 0
-/// 
+///
 /// # Arguments
 ///
 /// * `index` - ARC to Mutex of a usize variable

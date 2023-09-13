@@ -9,7 +9,7 @@ use slint::Weak;
 /// * `ui` - weak pointer to the slint ui
 ///
 /// # Panics
-/// 
+///
 /// If it can't invoke the slint event loop.
 #[tracing::instrument(skip_all)]
 pub fn disable_search(ui: Weak<MainWindow>) {
@@ -29,7 +29,7 @@ pub fn disable_search(ui: Weak<MainWindow>) {
 /// * `ui` - weak pointer to the slint ui
 ///
 /// # Panics
-/// 
+///
 /// If it can't invoke the slint event loop.
 #[tracing::instrument(skip_all)]
 pub fn enable_search(ui: Weak<MainWindow>) {

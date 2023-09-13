@@ -9,12 +9,12 @@ use super::search::github_gist::GithubGistError;
 use super::search::stackexchange::SeError;
 use super::search::stackoverflow::SofError;
 use indexmap::IndexMap;
+use results::display;
+use results::helper;
+use results::index;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
-use results::index;
-use results::helper;
-use results::display;
 
 slint::include_modules!();
 

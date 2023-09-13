@@ -1,7 +1,7 @@
 use super::util;
 use super::MainWindow;
-use super::Results;
 use super::ResultType;
+use super::Results;
 use slint::Weak;
 use std::sync::Arc;
 use tokio::sync::Mutex;
