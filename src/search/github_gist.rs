@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use super::ddg;
 use super::util;
 use futures::StreamExt;
@@ -78,7 +77,6 @@ impl GithubGist {
     ///
     /// let github_gist = github_gist::GithubGist::with_client(reqwest::Client::new());
     /// ```
-    #[allow(dead_code)]
     pub fn with_client(client: reqwest::Client) -> Self {
         Self {
             client: client.clone(),

@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use super::{ddg, util};
 use indexmap::IndexMap;
 use thiserror::Error;
@@ -74,7 +73,6 @@ impl StackOverflow {
     ///
     /// let sof = stackoverflow::StackOverflow::with_client(reqwest::Client::new());
     /// ```
-    #[allow(dead_code)]
     pub fn with_client(client: reqwest::Client) -> Self {
         Self {
             client: client.clone(),

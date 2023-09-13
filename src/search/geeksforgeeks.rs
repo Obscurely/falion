@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use super::ddg;
 use super::util;
 use indexmap::IndexMap;
@@ -7,7 +6,6 @@ use thiserror::Error;
 const CONTENT_SEP_FIRST: &str = "<div class=text>";
 const CONTENT_SEP_FINAL: &str = "<div class=article-bottom";
 const GEEKSFORGEEKS_SITE: &str = "www.geeksforgeeks.org";
-const GEEKSFORGEEKS_PAGE_URL: &str = "https://www.geeksforgeeks.org/";
 const GEEKSFORGEEKS_INVALID: [&str; 7] = [
     "https://www.geeksforgeeks.org/tag/",
     "https://www.geeksforgeeks.org/category/",
@@ -80,7 +78,6 @@ impl GeeksForGeeks {
     ///
     /// let se = geeksforgeeks::GeeksForGeeks::with_client(reqwest::Client::new());
     /// ```
-    #[allow(dead_code)]
     pub fn with_client(client: reqwest::Client) -> Self {
         Self {
             client: client.clone(),

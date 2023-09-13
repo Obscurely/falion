@@ -13,18 +13,6 @@ use crossterm::style;
 use crossterm::style::Stylize;
 use indexmap::IndexMap;
 use std::io::Write;
-use tokio::task::JoinHandle;
-
-type StackOverflowResults =
-    Result<IndexMap<String, JoinHandle<Result<Vec<String>, SofError>>>, SofError>;
-type StackExchangeResults =
-    Result<IndexMap<String, JoinHandle<Result<Vec<String>, SeError>>>, SeError>;
-type GithubGistResults =
-    Result<IndexMap<String, JoinHandle<Result<Vec<String>, GithubGistError>>>, GithubGistError>;
-type GeeksForGeeksResults =
-    Result<IndexMap<String, JoinHandle<Result<String, GfgError>>>, GfgError>;
-type DdgSearchResults =
-    Result<IndexMap<String, JoinHandle<Result<String, DdgSearchError>>>, DdgSearchError>;
 
 /// Command line options, cli setup done with clap.
 ///

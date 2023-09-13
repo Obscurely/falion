@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use super::ddg;
 use super::util;
 use indexmap::IndexMap;
@@ -59,7 +58,6 @@ impl DdgSearch {
     ///
     /// let ddg_search = ddg_search::DdgSearch::with_client(reqwest::Client::new());
     /// ```
-    #[allow(dead_code)]
     pub fn with_client(client: reqwest::Client) -> Self {
         Self {
             client: client.clone(),
