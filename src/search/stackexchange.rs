@@ -1,5 +1,4 @@
 use super::{ddg, util};
-use indexmap::IndexMap;
 use thiserror::Error;
 
 const QUESTION_SEP: &str = "<div class=\"s-prose js-post-body\" itemprop=\"text\">";
@@ -225,7 +224,7 @@ impl StackExchange {
     /// Search for stackexchange results using duckduckgo and a provided query. This function will
     /// go through ALL of those results and crate a future for each one which will start getting
     /// the content asynchronously for ALL of them. Each of this Futures is associated with the
-    /// title of the question and returned inside an IndexMap for preserved order.
+    /// title of the question and returned inside a Vec for preserved order.
     ///
     /// PLEASE READ: While setting a limit is optional, doing 100 requests to StackExchange at once
     /// will probably get you rate limited.
@@ -269,7 +268,7 @@ impl StackExchange {
         &self,
         query: &str,
         limit: Option<usize>,
-    ) -> Result<IndexMap<String, tokio::task::JoinHandle<SeQuestion>>, SeError> {
+    ) -> Result<Vec<(String, tokio::task::JoinHandle<SeQuestion>)>, SeError> {
         tracing::info!("Get multiple Stackexchange questions and their content for search query: {} with a results limit of: {:#?}", &query, &limit);
         // get the links from duckduckgo
         let links = match self
@@ -287,26 +286,26 @@ impl StackExchange {
             Err(err) => return Err(SeError::DdgError(err)),
         };
 
-        // create a new IndexMap
-        let mut questions_content = IndexMap::with_capacity(links.len());
+        // create a new Vec
+        let mut questions_content = Vec::with_capacity(links.len());
 
         // start looping through the links associating the question title and the joinhandle for
         // the future the scrapes the content of the question by inserting them togheter in the
-        // IndexMap
+        // Vec inside a tuple
         for link in links {
             // unwrap is safe here since ddg does all the checks
             let name = link.split('/').last().unwrap().replace('-', " ");
             // insert question content
             let client = self.client.clone();
-            questions_content.insert(
+            questions_content.push((
                 name,
                 tokio::task::spawn(async move {
                     Self::with_client(client).get_question_content(&link).await
-                }),
+                })),
             );
         }
 
-        // return the IndexMap
+        // return the Vec
         Ok(questions_content)
     }
 }

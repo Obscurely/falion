@@ -1,11 +1,10 @@
 use crossterm::event;
 use crossterm::style;
 use crossterm::style::Stylize;
-use indexmap::IndexMap;
 use std::io::Write;
 use tokio::task::JoinHandle;
 
-type ResultsType<T, S> = IndexMap<String, JoinHandle<Result<T, S>>>;
+type ResultsType<T, S> = Vec<(String, JoinHandle<Result<T, S>>)>;
 
 /// Print the given print followed by the title of the given index result.
 ///
@@ -27,7 +26,7 @@ pub fn print_resource<T, S>(
     match resource_results {
         Ok(results) => {
             // get the current result
-            let current_result = match results.get_index(resource_index) {
+            let current_result = match results.get(resource_index) {
                 Some(res) => res,
                 None => {
                     // this should never happen
@@ -40,7 +39,7 @@ pub fn print_resource<T, S>(
             if let Err(error) = crossterm::queue!(
                 stdout,
                 style::PrintStyledContent(
-                    (resource_print.to_string() + current_result.0).stylize()
+                    (resource_print.to_string() + &current_result.0).stylize()
                 ),
                 style::Print("\n\r")
             ) {

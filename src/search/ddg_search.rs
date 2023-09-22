@@ -1,6 +1,5 @@
 use super::ddg;
 use super::util;
-use indexmap::IndexMap;
 use thiserror::Error;
 
 type DdgPage = Result<String, DdgSearchError>;
@@ -148,7 +147,7 @@ impl DdgSearch {
     /// Search for results using duckduckgo and a provided query. This function will
     /// go through ALL of those results and crate a future for each one which will start getting
     /// the content asynchronously for ALL of them. Each of this Futures is associated with the
-    /// title of the page and returned inside an IndexMap for preserved order.
+    /// title of the page and returned inside a Vec for preserved order.
     ///
     /// PLEASE READ: While setting a limit is optional, doing multiple requests to possibly the
     /// same site at once will probably get you rate limited.
@@ -192,7 +191,7 @@ impl DdgSearch {
         &self,
         query: &str,
         limit: Option<usize>,
-    ) -> Result<IndexMap<String, tokio::task::JoinHandle<DdgPage>>, DdgSearchError> {
+    ) -> Result<Vec<(String, tokio::task::JoinHandle<DdgPage>)>, DdgSearchError> {
         tracing::info!("Get multiple pages and their content for search query: {} with a results limit of: {:#?}", &query, &limit);
         // get the links from duckduckgo
         let links = match self
@@ -204,12 +203,12 @@ impl DdgSearch {
             Err(err) => return Err(DdgSearchError::DdgError(err)),
         };
 
-        // create a new IndexMap
-        let mut pages_content = IndexMap::with_capacity(links.len());
+        // create a new Vec
+        let mut pages_content = Vec::with_capacity(links.len());
 
         // start looping through the links associating the page title and the joinhandle for
         // the future the scrapes the content of the page by inserting them togheter in the
-        // IndexMap
+        // Vec inside a tuple
         for link in links {
             // unwrap is safe here since ddg does all the checks
             let mut name = String::from("");
@@ -228,15 +227,15 @@ impl DdgSearch {
             full_name.push_str(&name);
             // insert page content
             let client = self.client.clone();
-            pages_content.insert(
+            pages_content.push((
                 full_name,
                 tokio::task::spawn(async move {
                     Self::with_client(client).get_page_content(&link).await
-                }),
+                })),
             );
         }
 
-        // return the IndexMap
+        // return the Vec
         Ok(pages_content)
     }
 }

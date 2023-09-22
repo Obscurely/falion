@@ -11,7 +11,7 @@ use clap::Parser;
 use crossterm::event;
 use crossterm::style;
 use crossterm::style::Stylize;
-use indexmap::IndexMap;
+use hashbrown::HashMap;
 use std::io::Write;
 
 /// Command line options, cli setup done with clap.
@@ -82,11 +82,11 @@ pub async fn cli() {
     let ddg_search = search::ddg_search::DdgSearch::with_client(client.clone());
 
     // Get results
-    let stackoverflow_results = stackoverflow.get_multiple_questions_content(&query, Some(10));
-    let stackexchange_results = stackexchange.get_multiple_questions_content(&query, Some(10));
-    let github_gist_results = github_gist.get_multiple_gists_content(&query, Some(10));
-    let geeksforgeeks_results = geeksforgeeks.get_multiple_pages_content(&query, Some(10));
-    let ddg_search_results = ddg_search.get_multiple_pages_content(&query, Some(10));
+    let stackoverflow_results = stackoverflow.get_multiple_questions_content(&query, Some(5));
+    let stackexchange_results = stackexchange.get_multiple_questions_content(&query, Some(5));
+    let github_gist_results = github_gist.get_multiple_gists_content(&query, Some(5));
+    let geeksforgeeks_results = geeksforgeeks.get_multiple_pages_content(&query, Some(5));
+    let ddg_search_results = ddg_search.get_multiple_pages_content(&query, Some(5));
 
     // await all results at the same time
     let results_awaited = futures::join!(
@@ -110,15 +110,15 @@ pub async fn cli() {
     };
 
     // create vars
-    let mut stackoverflow_results_awaited: IndexMap<String, Vec<String>> = IndexMap::new();
+    let mut stackoverflow_results_awaited: HashMap<String, Vec<String>> = HashMap::with_capacity(5);
     let mut stackoverflow_index = 0;
-    let mut stackexchange_results_awaited: IndexMap<String, Vec<String>> = IndexMap::new();
+    let mut stackexchange_results_awaited: HashMap<String, Vec<String>> = HashMap::with_capacity(5);
     let mut stackexchange_index = 0;
-    let mut github_gist_results_awaited: IndexMap<String, Vec<String>> = IndexMap::new();
+    let mut github_gist_results_awaited: HashMap<String, Vec<String>> = HashMap::with_capacity(5);
     let mut github_gist_index = 0;
-    let mut geeksforgeeks_results_awaited: IndexMap<String, String> = IndexMap::new();
+    let mut geeksforgeeks_results_awaited: HashMap<String, String> = HashMap::with_capacity(5);
     let mut geeksforgeeks_index = 0;
-    let mut ddg_search_results_awaited: IndexMap<String, String> = IndexMap::new();
+    let mut ddg_search_results_awaited: HashMap<String, String> = HashMap::with_capacity(5);
     let mut ddg_search_index = 0;
     // actual cli
     // reusable prints

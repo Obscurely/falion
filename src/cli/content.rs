@@ -1,8 +1,8 @@
-use indexmap::IndexMap;
+use hashbrown::HashMap;
 use tokio::task::JoinHandle;
 
-type ResultsStaticType<E> = IndexMap<String, JoinHandle<Result<String, E>>>;
-type ResultsDynType<E> = IndexMap<String, JoinHandle<Result<Vec<String>, E>>>;
+type ResultsStaticType<E> = Vec<(String, JoinHandle<Result<String, E>>)>;
+type ResultsDynType<E> = Vec<(String, JoinHandle<Result<Vec<String>, E>>)>;
 
 /// Get dynamic type content (in form of a vector). Either await it if it wasn't already, it it was
 /// get it from the awaited list.
@@ -15,7 +15,7 @@ type ResultsDynType<E> = IndexMap<String, JoinHandle<Result<Vec<String>, E>>>;
 #[tracing::instrument(skip_all)]
 pub async fn get_dyn_result_content<'a, E>(
     results_ref: &'a mut Result<ResultsDynType<E>, E>,
-    results_awaited_ref: &'a mut IndexMap<String, Vec<String>>,
+    results_awaited_ref: &'a mut HashMap<String, Vec<String>>,
     results_index: usize,
 ) -> Option<&'a Vec<String>>
 where
@@ -23,14 +23,15 @@ where
 {
     match results_ref {
         Ok(res) => {
-            if let Some(unawaited_res) = res.get_index_mut(results_index) {
-                if results_awaited_ref.contains_key(unawaited_res.0) {
-                    match results_awaited_ref.get(unawaited_res.0) {
+            if let Some(unawaited_res) = res.get_mut(results_index) {
+                let (title, handle) = unawaited_res;
+                if results_awaited_ref.contains_key(title) {
+                    match results_awaited_ref.get(title) {
                         Some(res) => Some(res),
                         None => None,
                     }
                 } else {
-                    let awaited = match unawaited_res.1.await {
+                    let awaited = match handle.await {
                         Ok(handled) => match handled {
                             Ok(content) => content,
                             Err(error) => {
@@ -48,10 +49,10 @@ where
                     };
 
                     // save already awaited
-                    results_awaited_ref.insert(unawaited_res.0.to_owned(), awaited);
+                    results_awaited_ref.insert(title.to_owned(), awaited);
 
                     // unwrap is safe since we just inserted this element
-                    results_awaited_ref.get(unawaited_res.0)
+                    results_awaited_ref.get(title)
                 }
             } else {
                 None
@@ -78,7 +79,7 @@ where
 #[tracing::instrument(skip_all)]
 pub async fn get_static_result_content<'a, E>(
     results_ref: &'a mut Result<ResultsStaticType<E>, E>,
-    results_awaited_ref: &'a mut IndexMap<String, String>,
+    results_awaited_ref: &'a mut HashMap<String, String>,
     results_index: usize,
 ) -> Option<&'a String>
 where
@@ -86,14 +87,15 @@ where
 {
     match results_ref {
         Ok(res) => {
-            if let Some(unawaited_res) = res.get_index_mut(results_index) {
-                if results_awaited_ref.contains_key(unawaited_res.0) {
-                    match results_awaited_ref.get(unawaited_res.0) {
+            if let Some(unawaited_res) = res.get_mut(results_index) {
+                let (title, handle) = unawaited_res;
+                if results_awaited_ref.contains_key(title) {
+                    match results_awaited_ref.get(title) {
                         Some(res) => Some(res),
                         None => None,
                     }
                 } else {
-                    let awaited = match unawaited_res.1.await {
+                    let awaited = match handle.await {
                         Ok(handled) => match handled {
                             Ok(content) => content,
                             Err(error) => {
@@ -111,10 +113,10 @@ where
                     };
 
                     // save already awaited
-                    results_awaited_ref.insert(unawaited_res.0.to_owned(), awaited);
+                    results_awaited_ref.insert(title.to_owned(), awaited);
 
                     // unwrap is safe since we just inserted this element
-                    results_awaited_ref.get(unawaited_res.0)
+                    results_awaited_ref.get(title)
                 }
             } else {
                 None

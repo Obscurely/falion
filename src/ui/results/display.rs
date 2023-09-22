@@ -30,7 +30,8 @@ pub fn display_first_result<T, E>(
         // unwrap is fine here since it would have been an error if there were no
         // results, so there is at least one
         Ok(results) => {
-            let res = slint::SharedString::from(results.get_index(0).unwrap().0);
+            let (title, _) = results.get(0).unwrap();
+            let res = slint::SharedString::from(title);
             if let Err(err) = slint::invoke_from_event_loop(move || {
                 let ui = util::get_ui(ui);
 
@@ -144,8 +145,9 @@ pub fn redisplay_result<T, E>(
     E: std::fmt::Display,
 {
     if let Some(Ok(results)) = results.blocking_lock().as_ref() {
-        if let Some(res) = results.get_index(*index.blocking_lock()) {
-            let res = slint::SharedString::from(res.0);
+        if let Some(res) = results.get(*index.blocking_lock()) {
+            let (title, _) = res;
+            let res = slint::SharedString::from(title);
             if let Err(err) = slint::invoke_from_event_loop(move || {
                 let ui = util::get_ui(ui);
 

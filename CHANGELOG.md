@@ -27,6 +27,8 @@
   able to debug eventual errors. I tried to keep it simple.
 - Added code documenation.
 - Added tests.
+- Added a GUI made with slint that is used when not running the program from the
+  cli.
 
 ### Changed
 
@@ -58,6 +60,8 @@
   Note: it works almost the same, this is just the backend.
 - Made code way more maintainable.
 - Actual cli code is in it's own module.
+- Replaced IndexMap everywhere with either a vector of tuples or dashmap in ui
+  and hashbrown in cli for improved performance.
 
 ### Deprecated
 

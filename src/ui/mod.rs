@@ -8,7 +8,7 @@ use super::search::geeksforgeeks::GfgError;
 use super::search::github_gist::GithubGistError;
 use super::search::stackexchange::SeError;
 use super::search::stackoverflow::SofError;
-use indexmap::IndexMap;
+use dashmap::DashMap;
 use results::display;
 use results::helper;
 use results::index;
@@ -23,20 +23,20 @@ const DYN_CONTENT_VIEW: i32 = 1;
 const STATIC_CONTENT_VIEW: i32 = 2;
 
 type StackOverflowResults =
-    Option<Result<IndexMap<String, JoinHandle<Result<Vec<String>, SofError>>>, SofError>>;
+    Option<Result<Vec<(String, JoinHandle<Result<Vec<String>, SofError>>)>, SofError>>;
 type StackExchangeResults =
-    Option<Result<IndexMap<String, JoinHandle<Result<Vec<String>, SeError>>>, SeError>>;
+    Option<Result<Vec<(String, JoinHandle<Result<Vec<String>, SeError>>)>, SeError>>;
 type GithubGistResults = Option<
-    Result<IndexMap<String, JoinHandle<Result<Vec<String>, GithubGistError>>>, GithubGistError>,
+    Result<Vec<(String, JoinHandle<Result<Vec<String>, GithubGistError>>)>, GithubGistError>,
 >;
 type GeeksForGeeksResults =
-    Option<Result<IndexMap<String, JoinHandle<Result<String, GfgError>>>, GfgError>>;
+    Option<Result<Vec<(String, JoinHandle<Result<String, GfgError>>)>, GfgError>>;
 type DdgSearchResults =
-    Option<Result<IndexMap<String, JoinHandle<Result<String, DdgSearchError>>>, DdgSearchError>>;
+    Option<Result<Vec<(String, JoinHandle<Result<String, DdgSearchError>>)>, DdgSearchError>>;
 
-type Results<T, E> = Result<IndexMap<String, T>, E>;
-type ResultsStaticType<E, F> = Result<IndexMap<String, JoinHandle<Result<String, E>>>, F>;
-type ResultsDynType<E, F> = Result<IndexMap<String, JoinHandle<Result<Vec<String>, E>>>, F>;
+type Results<T, E> = Result<Vec<(String, T)>, E>;
+type ResultsStaticType<E, F> = Result<Vec<(String, JoinHandle<Result<String, E>>)>, F>;
+type ResultsDynType<E, F> = Result<Vec<(String, JoinHandle<Result<Vec<String>, E>>)>, F>;
 
 /// The main ui function that executes the window and sets it up.
 #[tracing::instrument(skip_all)]
@@ -74,16 +74,16 @@ pub fn ui() {
 
     // make variables to store awaite results
     // create vars
-    let stackoverflow_results_awaited: Arc<Mutex<IndexMap<String, Vec<String>>>> =
-        Arc::new(Mutex::new(IndexMap::new()));
-    let stackexchange_results_awaited: Arc<Mutex<IndexMap<String, Vec<String>>>> =
-        Arc::new(Mutex::new(IndexMap::new()));
-    let github_gist_results_awaited: Arc<Mutex<IndexMap<String, Vec<String>>>> =
-        Arc::new(Mutex::new(IndexMap::new()));
-    let geeksforgeeks_results_awaited: Arc<Mutex<IndexMap<String, String>>> =
-        Arc::new(Mutex::new(IndexMap::new()));
-    let ddg_search_results_awaited: Arc<Mutex<IndexMap<String, String>>> =
-        Arc::new(Mutex::new(IndexMap::new()));
+    let stackoverflow_results_awaited: Arc<DashMap<String, Vec<String>>> =
+        Arc::new(DashMap::with_capacity(5));
+    let stackexchange_results_awaited: Arc<DashMap<String, Vec<String>>> =
+        Arc::new(DashMap::with_capacity(5));
+    let github_gist_results_awaited: Arc<DashMap<String, Vec<String>>> =
+        Arc::new(DashMap::with_capacity(5));
+    let geeksforgeeks_results_awaited: Arc<DashMap<String, String>> =
+        Arc::new(DashMap::with_capacity(5));
+    let ddg_search_results_awaited: Arc<DashMap<String, String>> =
+        Arc::new(DashMap::with_capacity(5));
 
     // make variables to store the current index
     let stackoverflow_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
@@ -181,11 +181,11 @@ pub fn ui() {
             // spawn task to get the results and show in a different thread.
             tokio::spawn(async move {
                 // get result
-                let so_res = stackoverflow_clone.get_multiple_questions_content(&text, Some(10));
-                let se_res = stackexchange_clone.get_multiple_questions_content(&text, Some(10));
-                let gg_res = github_gist_clone.get_multiple_gists_content(&text, Some(10));
-                let gfg_res = geeksforgeeks_clone.get_multiple_pages_content(&text, Some(10));
-                let ddg_res = ddg_search_clone.get_multiple_pages_content(&text, Some(10));
+                let so_res = stackoverflow_clone.get_multiple_questions_content(&text, Some(5));
+                let se_res = stackexchange_clone.get_multiple_questions_content(&text, Some(5));
+                let gg_res = github_gist_clone.get_multiple_gists_content(&text, Some(5));
+                let gfg_res = geeksforgeeks_clone.get_multiple_pages_content(&text, Some(5));
+                let ddg_res = ddg_search_clone.get_multiple_pages_content(&text, Some(5));
 
                 // await all results at the same time
                 let res = futures::join!(so_res, se_res, gg_res, gfg_res, ddg_res);
@@ -198,28 +198,20 @@ pub fn ui() {
                     geeksforgeeks_results_clone.lock(),
                     ddg_search_results_clone.lock(),
                 );
-
+                
+                // take out the locks
                 let mut stackoverflow_results_clone_lock = locked.0;
                 let mut stackexchange_results_clone_lock = locked.1;
                 let mut github_gist_results_clone_lock = locked.2;
                 let mut geeksforgeeks_results_clone_lock = locked.3;
                 let mut ddg_search_results_clone_lock = locked.4;
 
-                // get the locks for results awaited too, in order to reset them
-                let mut locked = futures::join!(
-                    stackoverflow_results_awaited_clone.lock(),
-                    stackexchange_results_awaited_clone.lock(),
-                    github_gist_results_awaited_clone.lock(),
-                    geeksforgeeks_results_awaited_clone.lock(),
-                    ddg_search_results_awaited_clone.lock(),
-                );
-
                 // clear awaited results
-                *locked.0 = IndexMap::new();
-                *locked.1 = IndexMap::new();
-                *locked.2 = IndexMap::new();
-                *locked.3 = IndexMap::new();
-                *locked.4 = IndexMap::new();
+                stackoverflow_results_awaited_clone.clear();
+                stackexchange_results_awaited_clone.clear();
+                github_gist_results_awaited_clone.clear();
+                geeksforgeeks_results_awaited_clone.clear();
+                ddg_search_results_awaited_clone.clear();
 
                 // resest index to 0
                 futures::join!(

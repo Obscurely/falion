@@ -2,7 +2,7 @@ use super::super::results::ResultType;
 use super::util;
 use super::MainWindow;
 use super::ResultsDynType;
-use indexmap::IndexMap;
+use dashmap::DashMap;
 use slint::Weak;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -27,7 +27,7 @@ use tokio::sync::Mutex;
 pub fn get_back_content_fn<E, F>(
     ui: Weak<MainWindow>,
     results: Arc<Mutex<Option<ResultsDynType<E, F>>>>,
-    results_awaited: Arc<Mutex<IndexMap<String, Vec<String>>>>,
+    results_awaited: Arc<DashMap<String, Vec<String>>>,
     index: Arc<Mutex<usize>>,
     content_index: Arc<Mutex<usize>>,
     results_type: ResultType,
@@ -50,7 +50,6 @@ where
                 index_clone.lock(),
                 content_index_clone.lock(),
                 results_clone.lock(),
-                results_awaited_clone.lock()
             );
             let index_lock = locked.0;
             let mut content_index_lock = locked.1;
@@ -61,12 +60,11 @@ where
                 *content_index_lock = content_index_lock.saturating_sub(1);
             }
             let results_lock = locked.2;
-            let results_awaited_lock = locked.3;
 
             match results_lock.as_ref() {
                 Some(results) => match results {
-                    Ok(results) => match results.get_index(*index_lock) {
-                        Some(result) => match results_awaited_lock.get(result.0) {
+                    Ok(results) => match results.get(*index_lock) {
+                        Some(result) => match results_awaited_clone.get(&result.0) {
                             Some(result) => {
                                 match result.get(*content_index_lock) {
                                     Some(content) => {
@@ -143,7 +141,7 @@ where
 pub fn get_next_content_fn<E, F>(
     ui: Weak<MainWindow>,
     results: Arc<Mutex<Option<ResultsDynType<E, F>>>>,
-    results_awaited: Arc<Mutex<IndexMap<String, Vec<String>>>>,
+    results_awaited: Arc<DashMap<String, Vec<String>>>,
     index: Arc<Mutex<usize>>,
     content_index: Arc<Mutex<usize>>,
     results_type: ResultType,
@@ -166,17 +164,15 @@ where
                 index_clone.lock(),
                 content_index_clone.lock(),
                 results_clone.lock(),
-                results_awaited_clone.lock()
             );
             let index_lock = locked.0;
             let mut content_index_lock = locked.1;
             let results_lock = locked.2;
-            let results_awaited_lock = locked.3;
 
             match results_lock.as_ref() {
                 Some(results) => match results {
-                    Ok(results) => match results.get_index(*index_lock) {
-                        Some(result) => match results_awaited_lock.get(result.0) {
+                    Ok(results) => match results.get(*index_lock) {
+                        Some(result) => match results_awaited_clone.get(&result.0) {
                             Some(result) => {
                                 if *content_index_lock < result.len() - 1 {
                                     *content_index_lock += 1;

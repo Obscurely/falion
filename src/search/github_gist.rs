@@ -1,7 +1,6 @@
 use super::ddg;
 use super::util;
 use futures::StreamExt;
-use indexmap::IndexMap;
 use rayon::prelude::*;
 use thiserror::Error;
 
@@ -300,7 +299,7 @@ impl GithubGist {
     /// Search for results using duckduckgo and a provided query on GitHub gists. This function will
     /// go through ALL of those results and crate a future for each one which will start getting
     /// the content asynchronously for ALL of them. Each of this Futures is associated with the
-    /// title of the page and returned inside an IndexMap for preserved order.
+    /// title of the page and returned inside a Vec for preserved order.
     ///
     /// PLEASE READ: While setting a limit is optional, doing 100 requests to GitHub at once will
     /// probably get you rate limited.
@@ -344,7 +343,7 @@ impl GithubGist {
         &self,
         query: &str,
         limit: Option<usize>,
-    ) -> Result<IndexMap<String, tokio::task::JoinHandle<GistContent>>, GithubGistError> {
+    ) -> Result<Vec<(String, tokio::task::JoinHandle<GistContent>)>, GithubGistError> {
         tracing::info!("Get multiple GitHub gists and their content for search query: {} with a results limit of: {:#?}", &query, &limit);
         // get the links from duckduckgo
         let links = match self
@@ -356,12 +355,12 @@ impl GithubGist {
             Err(err) => return Err(GithubGistError::DdgError(err)),
         };
 
-        // create a new IndexMap
-        let mut gists_content = IndexMap::with_capacity(links.len());
+        // create a new Vec
+        let mut gists_content = Vec::with_capacity(links.len());
 
         // start looping through the links associating the page title and the joinhandle for
         // the future the scrapes the content of the page by inserting them togheter in the
-        // IndexMap
+        // Vec inside a tuple
         for link in links {
             // unwrap is safe here since ddg & GithubGist do all the checks
             let name = match link.split_once(GIST_URL) {
@@ -378,15 +377,15 @@ impl GithubGist {
             full_name.push_str(&id);
             // insert page content
             let client = self.client.clone();
-            gists_content.insert(
+            gists_content.push((
                 full_name,
                 tokio::task::spawn(async move {
                     Self::with_client(client).get_gist_content(&link).await
-                }),
+                })),
             );
         }
 
-        // return the IndexMap
+        // return the Vec
         Ok(gists_content)
     }
 }
