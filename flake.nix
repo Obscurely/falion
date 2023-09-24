@@ -8,7 +8,6 @@
   };
 
   outputs = {
-    self,
     nixpkgs,
     rust-overlay,
     flake-utils,
@@ -42,7 +41,6 @@
               cmake
               git
               gcc
-              pkg-config
               python311
               python311Packages.pillow # this is for python repo script
               openssl
@@ -62,7 +60,6 @@
               expat
               freetype
               freetype.dev
-              pkgconfig
             ];
 
             shellHook = ''
