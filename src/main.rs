@@ -11,7 +11,6 @@ async fn main() {
     if stdout().is_terminal() {
         cli::cli().await;
     } else {
-        util::setup_logs(true);
         ui::ui();
     }
 }

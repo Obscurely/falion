@@ -34,6 +34,10 @@ pub struct Cli {
     /// Disable logs
     #[arg(short, long)]
     pub disable_logs: bool,
+
+    /// Run the ui from the cli
+    #[arg(short, long)]
+    pub ui: bool,
 }
 
 /// The main cli function for falion. Show results and lets you scroll through them.
@@ -61,13 +65,20 @@ pub async fn cli() {
     // setup cli and get query
     let query = match util::setup_cli() {
         Ok(query) => query,
-        Err(_) => {
-            tracing::error!("Can't continue, user provided a query shorter than 5 characters");
-            eprintln!(
-                "Provided query is shorter than 5 characters. Do --help for more information"
-            );
-            return;
-        }
+        Err(err) => match err.kind() {
+            std::io::ErrorKind::Other => {
+                tracing::info!("User chose to run the gui from the cli.");
+                return;
+            }
+            std::io::ErrorKind::NotFound => {
+                tracing::error!("Can't continue, user provided a query shorter than 5 characters");
+                eprintln!(
+                    "Provided query is shorter than 5 characters. Do --help for more information"
+                );
+                return;
+            }
+            _ => return,
+        },
     };
 
     // debug log the query

@@ -41,6 +41,9 @@ type ResultsDynType<E, F> = Result<Vec<(String, JoinHandle<Result<Vec<String>, E
 /// The main ui function that executes the window and sets it up.
 #[tracing::instrument(skip_all)]
 pub fn ui() {
+    // firt setup logs
+    crate::util::setup_logs(true);
+    // continue
     tracing::info!("User chose the GUI.");
     // main window
     let main_window = match MainWindow::new() {

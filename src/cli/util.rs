@@ -70,6 +70,15 @@ pub fn setup_cli() -> Result<String, std::io::Error> {
     // initiate cli
     let cli = super::Cli::parse();
 
+    // first check for ui
+    if cli.ui {
+        crate::ui::ui();
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "User chose to run gui from cli",
+        ));
+    }
+
     // get values
     let query = cli.query.join(" ");
     let verbose = cli.verbose;
