@@ -231,8 +231,8 @@ impl DdgSearch {
                 full_name,
                 tokio::task::spawn(async move {
                     Self::with_client(client).get_page_content(&link).await
-                })),
-            );
+                }),
+            ));
         }
 
         // return the Vec

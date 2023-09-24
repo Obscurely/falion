@@ -96,10 +96,7 @@ where
         // actual logic
         tokio::spawn(async move {
             // get locks
-            let locked = futures::join!(
-                results_clone.write(),
-                index_clone.read(),
-            );
+            let locked = futures::join!(results_clone.write(), index_clone.read(),);
             let mut results_lock = locked.0;
             let index_lock = locked.1;
 
