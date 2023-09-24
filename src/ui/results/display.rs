@@ -4,14 +4,14 @@ use super::ResultType;
 use super::Results;
 use slint::Weak;
 use std::sync::Arc;
-use tokio::sync::Mutex;
+use tokio::sync::RwLock;
 
 /// Display the first resould for the provided resource
 ///
 /// # Arguments
 ///
 /// * `ui` - weak pointer to the slint ui
-/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// * `results` - ARC to the RwLock encapsulation of the Option for the results variable, from the main
 /// ui function.
 /// * `results_type` - the kind of result this is. Ex: StackOverflow.
 ///
@@ -126,10 +126,10 @@ pub fn display_first_result<T, E>(
 /// # Arguments
 ///
 /// * `ui` - weak pointer to the slint ui
-/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// * `results` - ARC to the RwLock encapsulation of the Option for the results variable, from the main
 /// ui function.
 /// function.
-/// * `index` - ARC to the Mutex of the current results index for this particular resource
+/// * `index` - ARC to the RwLock of the current results index for this particular resource
 /// * `results_type` - the kind of result this is. Ex: StackOverflow.
 ///
 /// # Panics
@@ -138,14 +138,14 @@ pub fn display_first_result<T, E>(
 #[tracing::instrument(skip_all)]
 pub fn redisplay_result<T, E>(
     ui: Weak<MainWindow>,
-    results: Arc<Mutex<Option<Results<T, E>>>>,
-    index: Arc<Mutex<usize>>,
+    results: Arc<RwLock<Option<Results<T, E>>>>,
+    index: Arc<RwLock<usize>>,
     results_type: ResultType,
 ) where
     E: std::fmt::Display,
 {
-    if let Some(Ok(results)) = results.blocking_lock().as_ref() {
-        if let Some(res) = results.get(*index.blocking_lock()) {
+    if let Some(Ok(results)) = results.blocking_read().as_ref() {
+        if let Some(res) = results.get(*index.blocking_read()) {
             let (title, _) = res;
             let res = slint::SharedString::from(title);
             if let Err(err) = slint::invoke_from_event_loop(move || {

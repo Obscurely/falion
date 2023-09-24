@@ -5,18 +5,18 @@ use super::ResultsDynType;
 use dashmap::DashMap;
 use slint::Weak;
 use std::sync::Arc;
-use tokio::sync::Mutex;
+use tokio::sync::RwLock;
 
 /// The function that's called when the content back button is hit.
 ///
 /// # Arguments
 ///
 /// * `ui` - weak pointer to the slint ui
-/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// * `results` - ARC to the RwLock encapsulation of the Option for the results variable, from the main
 /// ui function.
-/// * `results_awaited` - ARC to the Mutex of the awaited results variable, from the main ui
+/// * `results_awaited` - ARC to the RwLock of the awaited results variable, from the main ui
 /// function.
-/// * `index` - ARC to the Mutex of the current results index for this particular resource
+/// * `index` - ARC to the RwLock of the current results index for this particular resource
 /// * `content_index` - the index of the item that should be displayed from the result
 /// * `results_type` - the kind of result this is. Ex: StackOverflow.
 ///
@@ -26,15 +26,15 @@ use tokio::sync::Mutex;
 #[tracing::instrument(skip_all)]
 pub fn get_back_content_fn<E, F>(
     ui: Weak<MainWindow>,
-    results: Arc<Mutex<Option<ResultsDynType<E, F>>>>,
+    results: Arc<RwLock<Option<ResultsDynType<E, F>>>>,
     results_awaited: Arc<DashMap<String, Vec<String>>>,
-    index: Arc<Mutex<usize>>,
-    content_index: Arc<Mutex<usize>>,
+    index: Arc<RwLock<usize>>,
+    content_index: Arc<RwLock<usize>>,
     results_type: ResultType,
 ) -> impl Fn()
 where
     E: std::fmt::Display + std::marker::Send + 'static,
-    F: std::fmt::Display + std::marker::Send + 'static,
+    F: std::fmt::Display + std::marker::Send + std::marker::Sync + 'static,
 {
     move || {
         // clone necessary ARCs
@@ -47,9 +47,9 @@ where
 
         tokio::spawn(async move {
             let locked = futures::join!(
-                index_clone.lock(),
-                content_index_clone.lock(),
-                results_clone.lock(),
+                index_clone.read(),
+                content_index_clone.write(),
+                results_clone.read(),
             );
             let index_lock = locked.0;
             let mut content_index_lock = locked.1;
@@ -126,11 +126,11 @@ where
 /// # Arguments
 ///
 /// * `ui` - weak pointer to the slint ui
-/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// * `results` - ARC to the RwLock encapsulation of the Option for the results variable, from the main
 /// ui function.
-/// * `results_awaited` - ARC to the Mutex of the awaited results variable, from the main ui
+/// * `results_awaited` - ARC to the RwLock of the awaited results variable, from the main ui
 /// function.
-/// * `index` - ARC to the Mutex of the current results index for this particular resource
+/// * `index` - ARC to the RwLock of the current results index for this particular resource
 /// * `content_index` - the index of the item that should be displayed from the result
 /// * `results_type` - the kind of result this is. Ex: StackOverflow.
 ///
@@ -140,15 +140,15 @@ where
 #[tracing::instrument(skip_all)]
 pub fn get_next_content_fn<E, F>(
     ui: Weak<MainWindow>,
-    results: Arc<Mutex<Option<ResultsDynType<E, F>>>>,
+    results: Arc<RwLock<Option<ResultsDynType<E, F>>>>,
     results_awaited: Arc<DashMap<String, Vec<String>>>,
-    index: Arc<Mutex<usize>>,
-    content_index: Arc<Mutex<usize>>,
+    index: Arc<RwLock<usize>>,
+    content_index: Arc<RwLock<usize>>,
     results_type: ResultType,
 ) -> impl Fn()
 where
     E: std::fmt::Display + std::marker::Send + 'static,
-    F: std::fmt::Display + std::marker::Send + 'static,
+    F: std::fmt::Display + std::marker::Send + std::marker::Sync + 'static,
 {
     move || {
         // clone necessary ARCs
@@ -161,9 +161,9 @@ where
 
         tokio::spawn(async move {
             let locked = futures::join!(
-                index_clone.lock(),
-                content_index_clone.lock(),
-                results_clone.lock(),
+                index_clone.read(),
+                content_index_clone.write(),
+                results_clone.read(),
             );
             let index_lock = locked.0;
             let mut content_index_lock = locked.1;

@@ -6,7 +6,7 @@ use super::MainWindow;
 use super::Results;
 use slint::Weak;
 use std::sync::Arc;
-use tokio::sync::Mutex;
+use tokio::sync::RwLock;
 
 /// Possible results type, pretty self explanatory
 #[derive(Clone, Copy, PartialEq)]
@@ -72,10 +72,10 @@ pub fn reset_results(ui: Weak<MainWindow>) {
 /// # Arguments
 ///
 /// * `ui` - weak pointer to the slint ui
-/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// * `results` - ARC to the RwLock encapsulation of the Option for the results variable, from the main
 /// ui function.
 /// function.
-/// * `index` - ARC to the Mutex of the current results index for this particular resource
+/// * `index` - ARC to the RwLock of the current results index for this particular resource
 /// * `results_type` - the kind of result this is. Ex: StackOverflow.
 ///
 /// # Panics
@@ -84,12 +84,12 @@ pub fn reset_results(ui: Weak<MainWindow>) {
 #[tracing::instrument(skip_all)]
 pub fn setup_results_btns<T, E>(
     ui: Weak<MainWindow>,
-    results: Arc<Mutex<Option<Results<T, E>>>>,
-    index: Arc<Mutex<usize>>,
+    results: Arc<RwLock<Option<Results<T, E>>>>,
+    index: Arc<RwLock<usize>>,
     results_type: ResultType,
 ) where
-    E: std::fmt::Display + std::marker::Send + 'static,
-    T: 'static + std::marker::Send,
+    E: std::fmt::Display + std::marker::Send + std::marker::Sync + 'static,
+    T: std::marker::Send + std::marker::Sync + 'static,
 {
     let ui_deref = util::get_ui(ui.clone());
     let ui_clone = ui.clone();

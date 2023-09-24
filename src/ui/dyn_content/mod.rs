@@ -8,7 +8,7 @@ use super::DYN_CONTENT_VIEW;
 use dashmap::DashMap;
 use slint::Weak;
 use std::sync::Arc;
-use tokio::sync::Mutex;
+use tokio::sync::RwLock;
 
 /// Setup the button on which the result is printed which when is pressed brings you the view
 /// content screen.
@@ -16,11 +16,11 @@ use tokio::sync::Mutex;
 /// # Arguments
 ///
 /// * `ui` - weak pointer to the slint ui
-/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// * `results` - ARC to the RwLock encapsulation of the Option for the results variable, from the main
 /// ui function.
-/// * `results_awaited` - ARC to the Mutex of the awaited results variable, from the main ui
+/// * `results_awaited` - ARC to the RwLock of the awaited results variable, from the main ui
 /// function.
-/// * `index` - ARC to the Mutex of the current results index for this particular resource
+/// * `index` - ARC to the RwLock of the current results index for this particular resource
 /// * `results_type` - the kind of result this is. Ex: StackOverflow.
 ///
 /// # Panics
@@ -29,14 +29,14 @@ use tokio::sync::Mutex;
 #[tracing::instrument(skip_all)]
 pub fn setup_content_display<E, F>(
     ui: Weak<MainWindow>,
-    results: Arc<Mutex<Option<ResultsDynType<E, F>>>>,
+    results: Arc<RwLock<Option<ResultsDynType<E, F>>>>,
     results_awaited: Arc<DashMap<String, Vec<String>>>,
-    index: Arc<Mutex<usize>>,
-    content_index: Arc<Mutex<usize>>,
+    index: Arc<RwLock<usize>>,
+    content_index: Arc<RwLock<usize>>,
     results_type: ResultType,
 ) where
     E: std::fmt::Display + std::marker::Send + 'static,
-    F: std::fmt::Display + std::marker::Send + 'static,
+    F: std::fmt::Display + std::marker::Send + std::marker::Sync + 'static,
 {
     let ui_strong = util::get_ui(ui.clone());
 
@@ -81,11 +81,11 @@ pub fn setup_content_display<E, F>(
 /// # Arguments
 ///
 /// * `ui` - weak pointer to the slint ui
-/// * `results` - ARC to the Mutex encapsulation of the Option for the results variable, from the main
+/// * `results` - ARC to the RwLock encapsulation of the Option for the results variable, from the main
 /// ui function.
-/// * `results_awaited` - ARC to the Mutex of the awaited results variable, from the main ui
+/// * `results_awaited` - ARC to the RwLock of the awaited results variable, from the main ui
 /// function.
-/// * `index` - ARC to the Mutex of the current results index for this particular resource
+/// * `index` - ARC to the RwLock of the current results index for this particular resource
 /// * `content_index` - the index of the item that should be displayed from the result
 /// * `results_type` - the kind of result this is. Ex: StackOverflow.
 ///
@@ -95,15 +95,15 @@ pub fn setup_content_display<E, F>(
 #[tracing::instrument(skip_all)]
 fn get_resource_enter_fn<E, F>(
     ui: Weak<MainWindow>,
-    results: Arc<Mutex<Option<ResultsDynType<E, F>>>>,
+    results: Arc<RwLock<Option<ResultsDynType<E, F>>>>,
     results_awaited: Arc<DashMap<String, Vec<String>>>,
-    index: Arc<Mutex<usize>>,
-    content_index: Arc<Mutex<usize>>,
+    index: Arc<RwLock<usize>>,
+    content_index: Arc<RwLock<usize>>,
     results_type: ResultType,
 ) -> impl Fn()
 where
     E: std::fmt::Display + std::marker::Send + 'static,
-    F: std::fmt::Display + std::marker::Send + 'static,
+    F: std::fmt::Display + std::marker::Send + std::marker::Sync + 'static,
 {
     move || {
         // clone necessary ARCs
@@ -120,8 +120,8 @@ where
             results::index::reset_result_index(Arc::clone(&content_index_clone)).await;
             // get locks
             let locked = futures::join!(
-                results_clone.lock(),
-                index_clone.lock(),
+                results_clone.write(),
+                index_clone.read(),
             );
             let mut results_lock = locked.0;
             let index_lock = locked.1;

@@ -13,7 +13,7 @@ use results::display;
 use results::helper;
 use results::index;
 use std::sync::Arc;
-use tokio::sync::Mutex;
+use tokio::sync::RwLock;
 use tokio::task::JoinHandle;
 
 slint::include_modules!();
@@ -66,11 +66,11 @@ pub fn ui() {
     let ddg_search = Arc::new(search::ddg_search::DdgSearch::with_client(client.clone()));
 
     // make variables to store results
-    let stackoverflow_results: Arc<Mutex<StackOverflowResults>> = Arc::new(Mutex::new(None));
-    let stackexchange_results: Arc<Mutex<StackExchangeResults>> = Arc::new(Mutex::new(None));
-    let github_gist_results: Arc<Mutex<GithubGistResults>> = Arc::new(Mutex::new(None));
-    let geeksforgeeks_results: Arc<Mutex<GeeksForGeeksResults>> = Arc::new(Mutex::new(None));
-    let ddg_search_results: Arc<Mutex<DdgSearchResults>> = Arc::new(Mutex::new(None));
+    let stackoverflow_results: Arc<RwLock<StackOverflowResults>> = Arc::new(RwLock::new(None));
+    let stackexchange_results: Arc<RwLock<StackExchangeResults>> = Arc::new(RwLock::new(None));
+    let github_gist_results: Arc<RwLock<GithubGistResults>> = Arc::new(RwLock::new(None));
+    let geeksforgeeks_results: Arc<RwLock<GeeksForGeeksResults>> = Arc::new(RwLock::new(None));
+    let ddg_search_results: Arc<RwLock<DdgSearchResults>> = Arc::new(RwLock::new(None));
 
     // make variables to store awaite results
     // create vars
@@ -86,16 +86,16 @@ pub fn ui() {
         Arc::new(DashMap::with_capacity(5));
 
     // make variables to store the current index
-    let stackoverflow_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
-    let stackexchange_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
-    let github_gist_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
-    let geeksforgeeks_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
-    let ddg_search_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+    let stackoverflow_index: Arc<RwLock<usize>> = Arc::new(RwLock::new(0));
+    let stackexchange_index: Arc<RwLock<usize>> = Arc::new(RwLock::new(0));
+    let github_gist_index: Arc<RwLock<usize>> = Arc::new(RwLock::new(0));
+    let geeksforgeeks_index: Arc<RwLock<usize>> = Arc::new(RwLock::new(0));
+    let ddg_search_index: Arc<RwLock<usize>> = Arc::new(RwLock::new(0));
 
     // make variables to store the current content index
-    let stackoverflow_content_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
-    let stackexchange_content_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
-    let github_gist_content_index: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+    let stackoverflow_content_index: Arc<RwLock<usize>> = Arc::new(RwLock::new(0));
+    let stackexchange_content_index: Arc<RwLock<usize>> = Arc::new(RwLock::new(0));
+    let github_gist_content_index: Arc<RwLock<usize>> = Arc::new(RwLock::new(0));
 
     // Event for when a search enter is hit
     main_window.on_query_enter({
@@ -192,11 +192,11 @@ pub fn ui() {
 
                 // lock the mutex for the results in oder to update them
                 let locked = futures::join!(
-                    stackoverflow_results_clone.lock(),
-                    stackexchange_results_clone.lock(),
-                    github_gist_results_clone.lock(),
-                    geeksforgeeks_results_clone.lock(),
-                    ddg_search_results_clone.lock(),
+                    stackoverflow_results_clone.write(),
+                    stackexchange_results_clone.write(),
+                    github_gist_results_clone.write(),
+                    geeksforgeeks_results_clone.write(),
+                    ddg_search_results_clone.write(),
                 );
                 
                 // take out the locks
