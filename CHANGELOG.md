@@ -6,9 +6,60 @@
 
 ### Breaking Changes
 
+None
+
+### Added
+
+None
+
+### Changed
+
+None
+
+### Deprecated
+
+None
+
+### Removed
+
+None
+
+### Fixed
+
+None
+
+### Security
+
+None
+
+## v1.0.0-stable
+
+### Highlights
+
+- Whole project rewritten, now with more than year more of experience, learning
+  and building with rust. The cli part of the project provides almost the same
+  experience, except for the keybinds which are more VIM like now.
+- Heavy, heavy performance improvements across the board.
+- Added a GUI that is automatically launched when not running from the cli.
+- Program is actually fully cross-platform now.
+- Many more checks in place preventing bad results, errors and other ux
+  problems. Also results are much better now.
+- Client is configured to mimic a browser and a limit of five results per
+  resource is set in order to prevent any sort of rate limiting in normal use.
+- Added unit tests, fuzzers and tested the program under many conditions to make
+  sure it works as intended.
+- Bumped crates and rust version to the latest.
+- Fixed security issues.
+- Better repository structure, thanks to
+  [my rust template](https://github.com/Obscurely/RustTemplate).
+- Code is much more maintainable with added code documentation, more idiomatic
+  design and logging for easier debugging.
+
+### Breaking Changes
+
 - End user experience is as close as to the original as possible, but the whole
-  application has been re-written entirely.
-- The whole structure of this repository has changed since I re-written it using
+  application has been rewritten entirely.
+- The whole structure of this repository has changed since I rewritten it using
   [my rust template](https://github.com/Obscurely/RustTemplate).
 
 ### Added
@@ -32,7 +83,7 @@
 
 ### Changed
 
-- Bumped rust version to 1.70.0
+- Bumped rust version to 1.72.1
 - Bumped all the crates to the latest version.
 - Instead of the many different functions that handled the duckduckgo searches
   now there is one with half the code, way faster and more robust.
@@ -62,14 +113,6 @@
 - Actual cli code is in it's own module.
 - Replaced IndexMap everywhere with either a vector of tuples or dashmap in ui
   and hashbrown in cli for improved performance.
-
-### Deprecated
-
-None
-
-### Removed
-
-None
 
 ### Fixed
 
