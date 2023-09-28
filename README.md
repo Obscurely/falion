@@ -105,41 +105,44 @@ If you've got any questions please give the [FAQ](#faq) a check.
 ### 💡 Features
 
 - [x] Scrapes programming resources
-    - [x] **StackOverflow** - No need to say anything
-    - [x] **StackExchange**- index of different forums
-    - [x] **Github Gists** - for code snippets and guides
-    - [x] **GeeksForGeeks** - has various good programming resources
-    - [x] **DuckDuckGo** - just so you don't need to leave the program you also have html versions of the basic results
+  - [x] **StackOverflow** - No need to say anything
+  - [x] **StackExchange**- index of different forums
+  - [x] **Github Gists** - for code snippets and guides
+  - [x] **GeeksForGeeks** - has various good programming resources
+  - [x] **DuckDuckGo** - just so you don't need to leave the program you also
+        have html versions of the basic results
 - [x] **Privacy** focused
-    - [x] DuckDuckGo used for results
-    - [x] HTTPs only requests
-    - [x] Only fetches HTML, no unnecessary tracking
+  - [x] DuckDuckGo used for results
+  - [x] HTTPs only requests
+  - [x] Only fetches HTML, no unnecessary tracking
 - [x] Incredibly **fast** and **efficient**
-    - [x] Results are retrieved **asynchronously**
-    - [x] Resources are scraped in **parallel**
-    - [x] Instantly view a page, by the time **results appear the content is already loaded**
-    - [x] **Takes about 1 second to 1 and a half to get the results (& content). 5 results each resource**
-    - [x] Leverages rust's performance
-    - [x] Many **optimizations** done
+  - [x] Results are retrieved **asynchronously**
+  - [x] Resources are scraped in **parallel**
+  - [x] Instantly view a page, by the time **results appear the content is
+        already loaded**
+  - [x] **Takes about 1 second to 1 and a half to get the results (& content). 5
+        results each resource**
+  - [x] Leverages rust's performance
+  - [x] Many **optimizations** done
 - [x] CLI interface
-    - [x] **Fast** and render optimized interface
-    - [x] **VIM** like key binds (almost)
-    - [x] **Simple** and **intuitive**
+  - [x] **Fast** and render optimized interface
+  - [x] **VIM** like key binds (almost)
+  - [x] **Simple** and **intuitive**
 - [x] GUI interface
-    - [x] **Ligthweight** interface
-    - [x] **Simple**
-    - [x] **Responsive**
+  - [x] **Ligthweight** interface
+  - [x] **Simple**
+  - [x] **Responsive**
 - [x] Cross-platform
-    - [x] **Linux**
-    - [x] **MacOS**
-    - [x] **Windows**
-- [x] **Doesn't get you rate limited**, *under normal use*
+  - [x] **Linux**
+  - [x] **MacOS**
+  - [x] **Windows**
+- [x] **Doesn't get you rate limited**, _under normal use_
 - [x] Project can also **be used as a crate**
 - [ ] Results are **cached** for up to 7 days
 - [ ] **Web UI**
 - [ ] **Custom resources** support
 - [ ] **Configurable**
-    - [ ] Config file editable from the program
+  - [ ] Config file editable from the program
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
