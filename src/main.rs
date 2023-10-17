@@ -5,8 +5,6 @@ mod ui;
 mod util;
 
 #[cfg(windows)]
-use std::ptr;
-#[cfg(windows)]
 use winapi::um::processthreadsapi::GetStartupInfoW;
 
 #[cfg(windows)]
@@ -18,7 +16,7 @@ fn is_launched_from_terminal() -> bool {
         // Check if the STARTF_USESHOWWINDOW flag is set
         if si.dwFlags & winapi::um::winbase::STARTF_USESHOWWINDOW != 0 {
             // If it's set, it may be launched from a terminal
-            return si.wShowWindow == winapi::um::winuser::SW_SHOW;
+            return si.wShowWindow == winapi::um::winuser::SW_SHOW as u16;
         }
     }
     
