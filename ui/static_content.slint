@@ -11,9 +11,6 @@ export component StaticContent inherits Window {
     in property <bool> enable-btns: false;
 
     VerticalBox {
-        min-width: 750px;
-        min-height: 500px;
-
         HorizontalBox { 
             back-btn := Button {
                 text: " Back";
@@ -27,7 +24,6 @@ export component StaticContent inherits Window {
                 text: root.content-tag;
                 font-size: 28px;
                 min-width: 260px;
-                max-width: 260px;
                 color: yellow;
             }
         }
