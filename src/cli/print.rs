@@ -150,6 +150,7 @@ pub fn print_dyn_content(
             // go to next content
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('n'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -160,6 +161,7 @@ pub fn print_dyn_content(
             // go to previous content
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('N'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::SHIFT,
                 ..
             }) => {
@@ -167,6 +169,7 @@ pub fn print_dyn_content(
             }
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('q'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -174,6 +177,7 @@ pub fn print_dyn_content(
             }
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('c'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::CONTROL,
                 ..
             }) => {
@@ -241,6 +245,7 @@ pub fn print_static_content(stdout: &mut std::io::Stdout, content: &str) -> bool
             // return to main menu
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('q'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -249,6 +254,7 @@ pub fn print_static_content(stdout: &mut std::io::Stdout, content: &str) -> bool
             // quit app
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('c'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::CONTROL,
                 ..
             }) => {

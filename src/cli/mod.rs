@@ -213,6 +213,7 @@ pub async fn cli() {
             // enter the menu for first resource
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('1'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -244,6 +245,7 @@ pub async fn cli() {
             // go to next element in the first resource (using ! because of terminal limitations)
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('!'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -261,6 +263,7 @@ pub async fn cli() {
             // go to the previous element in the first resource (using alt instead of ctrl because of terminal limitations)
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('1'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::ALT,
                 ..
             }) => {
@@ -271,6 +274,7 @@ pub async fn cli() {
             // enter the menu of the second resource
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('2'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -303,6 +307,7 @@ pub async fn cli() {
             // go to the next element in the second resource list
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('@'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -320,6 +325,7 @@ pub async fn cli() {
             // go to previous element in the second resource list
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('2'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::ALT,
                 ..
             }) => {
@@ -330,6 +336,7 @@ pub async fn cli() {
             // enter the menu for the third resource
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('3'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -362,6 +369,7 @@ pub async fn cli() {
             // go to the next element in the third resource list
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('#'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -379,6 +387,7 @@ pub async fn cli() {
             // go to the previous element in the third resource list
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('3'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::ALT,
                 ..
             }) => {
@@ -389,6 +398,7 @@ pub async fn cli() {
             // enter the forth resource menu
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('4'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -421,6 +431,7 @@ pub async fn cli() {
             // go to the next element in the forth resource list
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('$'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -438,6 +449,7 @@ pub async fn cli() {
             // go to the previous element in the forth resource list
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('4'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::ALT,
                 ..
             }) => {
@@ -448,6 +460,7 @@ pub async fn cli() {
             // enter the fifth resource menu
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('5'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -480,6 +493,7 @@ pub async fn cli() {
             // go to the next element in the fifth resource list
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('%'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -497,6 +511,7 @@ pub async fn cli() {
             // go to the previous element in the fifth resource list
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('5'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::ALT,
                 ..
             }) => {
@@ -507,6 +522,7 @@ pub async fn cli() {
             // move every resource to it's next element in the list, if any more
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('n'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
             }) => {
@@ -560,6 +576,7 @@ pub async fn cli() {
             // move to the previous element in the list of every resource, if any more
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('N'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::SHIFT,
                 ..
             }) => {
@@ -574,6 +591,7 @@ pub async fn cli() {
             // clear the terminal and exit the program
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('c'),
+                kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::CONTROL,
                 ..
             }) => {
