@@ -4,13 +4,44 @@ mod search;
 mod ui;
 mod util;
 
+#[cfg(windows)]
+use std::ptr;
+#[cfg(windows)]
+use winapi::um::processthreadsapi::GetStartupInfoW;
+
+#[cfg(windows)]
+fn is_launched_from_terminal() -> bool {
+    unsafe {
+        let mut si = std::mem::zeroed();
+        GetStartupInfoW(&mut si);
+        
+        // Check if the STARTF_USESHOWWINDOW flag is set
+        if si.dwFlags & winapi::um::winbase::STARTF_USESHOWWINDOW != 0 {
+            // If it's set, it may be launched from a terminal
+            return si.wShowWindow == winapi::um::winuser::SW_SHOW;
+        }
+    }
+    
+    // If the flag is not set, it's likely not launched from a terminal
+    false
+}
+
 /// Main Falion execution
 #[tokio::main]
 async fn main() {
-    // if falion is run from a terminal run the cli, if not run the ui.
-    if stdout().is_terminal() {
-        cli::cli().await;
+    if cfg!(windows) {
+        #[cfg(windows)]
+        if is_launched_from_terminal() {
+            cli::cli().await;
+        } else {
+            ui::ui();
+        }
+        
     } else {
-        ui::ui();
+        if stdout().is_terminal() {
+            cli::cli().await;
+        } else {
+            ui::ui();
+        }
     }
 }
