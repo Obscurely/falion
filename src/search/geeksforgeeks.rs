@@ -2,8 +2,8 @@ use super::ddg;
 use super::util;
 use thiserror::Error;
 
-const CONTENT_SEP_FIRST: &str = "<div class=text>";
-const CONTENT_SEP_FINAL: &str = "<div class=article-bottom";
+const CONTENT_SEP_FIRST: &str = "<div class=\"text\">";
+const CONTENT_SEP_FINAL: &str = "<div class=\"article-bottom";
 const GEEKSFORGEEKS_SITE: &str = "www.geeksforgeeks.org";
 const GEEKSFORGEEKS_INVALID: [&str; 7] = [
     "https://www.geeksforgeeks.org/tag/",
