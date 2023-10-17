@@ -201,7 +201,7 @@ pub fn ui() {
                     geeksforgeeks_results_clone.write(),
                     ddg_search_results_clone.write(),
                 );
-
+                
                 // take out the locks
                 let mut stackoverflow_results_clone_lock = locked.0;
                 let mut stackexchange_results_clone_lock = locked.1;

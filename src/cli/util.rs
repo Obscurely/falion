@@ -21,7 +21,7 @@ pub fn clean(stdout: &mut std::io::Stdout) {
     if let Err(error) = crossterm::queue!(stdout, crossterm::cursor::Show) {
         tracing::warn!("Failed to show back cursor. Error: {}", error);
     }
-    if let Err(error) = crossterm::queue!(stdout, terminal::Clear(terminal::ClearType::All)) {
+    if let Err(error) = crossterm::queue!(stdout, terminal::Clear(terminal::ClearType::Purge)) {
         tracing::warn!("Failed to clear terminal. Error: {}", error);
     }
     if let Err(error) = crossterm::queue!(stdout, terminal::ScrollUp(u16::MAX)) {
@@ -44,7 +44,7 @@ pub fn clean(stdout: &mut std::io::Stdout) {
 /// functions for ideal performance and queue commands to it.
 #[tracing::instrument(skip_all)]
 pub fn clear_terminal(stdout: &mut std::io::Stdout) {
-    if let Err(error) = crossterm::queue!(stdout, terminal::Clear(terminal::ClearType::All)) {
+    if let Err(error) = crossterm::queue!(stdout, terminal::Clear(terminal::ClearType::Purge)) {
         tracing::warn!("Failed to clear terminal. Error: {}", error);
     }
     if let Err(error) = crossterm::queue!(stdout, terminal::ScrollUp(u16::MAX)) {
