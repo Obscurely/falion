@@ -108,7 +108,7 @@ pub fn is_parent_explorer() -> Option<bool> {
         .args(["process", "get", "ParentProcessId"])
         .output()
         .ok()?;
-    
+
     // Parse the output to extract the parent process ID
     let output_str = String::from_utf8_lossy(&output.stdout);
     let mut parent_id = output_str.trim().lines().rev();
@@ -118,7 +118,13 @@ pub fn is_parent_explorer() -> Option<bool> {
     let parent_id = parent_id.next()?.trim();
 
     let output = Command::new("wmic")
-        .args(["process", "where", format!("processId={}", parent_id).as_str(), "get", "name"])
+        .args([
+            "process",
+            "where",
+            format!("processId={}", parent_id).as_str(),
+            "get",
+            "name",
+        ])
         .output()
         .ok()?;
 
@@ -138,9 +144,11 @@ pub fn is_parent_explorer() -> Option<bool> {
 #[cfg(windows)]
 pub fn hide_console_window() {
     use std::ptr;
-    let window = unsafe {kernel32::GetConsoleWindow()};
+    let window = unsafe { kernel32::GetConsoleWindow() };
     // https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548%28v=vs.85%29.aspx
-    if window != ptr::null_mut() {unsafe {user32::ShowWindow (window, winapi::um::winuser::SW_HIDE)};}
+    if window != ptr::null_mut() {
+        unsafe { user32::ShowWindow(window, winapi::um::winuser::SW_HIDE) };
+    }
 }
 
 #[cfg(not(windows))]
