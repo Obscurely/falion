@@ -98,3 +98,50 @@ pub fn setup_logs(verbose: bool) {
             .init();
     }
 }
+
+/// Check if the parent process in explorer.exe on windows.
+#[cfg(windows)]
+pub fn is_parent_explorer() -> Option<bool> {
+    use std::process::Command;
+    // Use the "wmic" command to retrieve the parent process IDs
+    let output = Command::new("wmic")
+        .args(["process", "get", "ParentProcessId"])
+        .output()
+        .ok()?;
+    
+    // Parse the output to extract the parent process ID
+    let output_str = String::from_utf8_lossy(&output.stdout);
+    let mut parent_id = output_str.trim().lines().rev();
+    // the third process from the back in the list is the actual parent process
+    parent_id.next();
+    parent_id.next();
+    let parent_id = parent_id.next()?.trim();
+
+    let output = Command::new("wmic")
+        .args(["process", "where", format!("processId={}", parent_id).as_str(), "get", "name"])
+        .output()
+        .ok()?;
+
+    if String::from_utf8_lossy(&output.stdout).contains("explorer.exe") {
+        Some(true)
+    } else {
+        Some(false)
+    }
+}
+
+/// Returns None since we don't need to get the parent process on linux
+#[cfg(not(windows))]
+pub fn is_parent_explorer() -> Option<bool> {
+    None
+}
+
+#[cfg(windows)]
+pub fn hide_console_window() {
+    use std::ptr;
+    let window = unsafe {kernel32::GetConsoleWindow()};
+    // https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548%28v=vs.85%29.aspx
+    if window != ptr::null_mut() {unsafe {user32::ShowWindow (window, winapi::SW_HIDE)};}
+}
+
+#[cfg(not(windows))]
+pub fn hide_console_window() {}
