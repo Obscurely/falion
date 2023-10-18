@@ -140,7 +140,7 @@ pub fn hide_console_window() {
     use std::ptr;
     let window = unsafe {kernel32::GetConsoleWindow()};
     // https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548%28v=vs.85%29.aspx
-    if window != ptr::null_mut() {unsafe {user32::ShowWindow (window, winapi::SW_HIDE)};}
+    if window != ptr::null_mut() {unsafe {user32::ShowWindow (window, winapi::um::winuser::SW_HIDE)};}
 }
 
 #[cfg(not(windows))]
