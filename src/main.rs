@@ -15,7 +15,9 @@ fn is_parent_explorer() -> Option<bool> {
     
     // Parse the output to extract the parent process ID
     let output_str = String::from_utf8_lossy(&output.stdout);
-    let parent_id: &str = output_str.trim().lines().last()?;
+    let mut parent_id = output_str.trim().lines().rev();
+    parent_id.next();
+    let parent_id = parent_id.next()?;
 
     let output = Command::new("wmic")
         .args(["process", "where", format!("processId={}", parent_id).as_str(), "get", "name"])
