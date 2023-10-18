@@ -17,7 +17,10 @@ fn is_parent_explorer() -> Option<bool> {
     let output_str = String::from_utf8_lossy(&output.stdout);
     let mut parent_id = output_str.trim().lines().rev();
     parent_id.next();
-    let parent_id = parent_id.next()?;
+    parent_id.next();
+    let parent_id = parent_id.next()?.trim();
+
+    dbg!(parent_id);
 
     let output = Command::new("wmic")
         .args(["process", "where", format!("processId={}", parent_id).as_str(), "get", "name"])
