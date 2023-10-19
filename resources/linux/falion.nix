@@ -38,7 +38,7 @@ appimageTools.wrapType2 rec {
 
   meta = {
     homepage = "https://github.com/Obscurely/falion";
-    description = "CHANGEME_DESC";
+    description = "An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI. ";
     license = lib.licenses.mit;
     platforms = lib.platforms.linux;
   };

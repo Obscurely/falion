@@ -15,7 +15,7 @@
 <h1 align="center"></h1>
 
 <p align="center">
-    CHANGEME_DESC
+    An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI. 
     <p>
         <a href="https://github.com/Obscurely/falion/wiki"><strong>Explore the docs »</strong></a>
         <br />

@@ -5,7 +5,7 @@ version = "1.0.0"
 edition = "2021"
 rust-version = "1.72.1"                                                     # Minimum rust version
 resolver = "2"
-description = "CHANGEME_DESC"
+description = "An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI. "
 documentation = "https://github.com/Obscurely/falion/blob/master/README.md"
 repository = "https://github.com/Obscurely/falion"
 homepage = "https://github.com/Obscurely/falion"
@@ -22,7 +22,7 @@ maintainer = "Obscurely <adrian.obscurely@protonmail.com>"
 copyright = "2023, 2023 <adrian.obscurely@protonmail.com>"
 license-file = ["LICENSE", "0"]
 extended-description = """\
-CHANGEME_DESC""""
+An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI. """"
 depends = "$auto"
 section = "CHANGEME_MANUAL"
 
