@@ -215,13 +215,39 @@ If you've got any questions please give the [FAQ](#faq) a check.
 
 ### 🍔 Built with
 
-- [Rust 1.69.0](https://www.rust-lang.org/)
+- [Rust 1.72.1](https://www.rust-lang.org/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 #### The stock libraries and these awesome third-party ones
 
-- CHANGEME_MANUAL
+- [chrono](https://lib.rs/crates/chrono) for the names of the log file
+- [clap](https://lib.rs/crates/clap) for cli arguments
+- [crossterm](https://lib.rs/crates/crossterm) is at at the heart of the cli
+- [dashmap](https://lib.rs/crates/dashmap) is a concurent hashmap
+- [dirs](https://lib.rs/crates/dirs) for getting where to store log files
+- [futures](https://lib.rs/crates/futures) for parallel execution
+- [hashbrown](https://lib.rs/crates/hashbrown) is the std hashmap, but with a
+  much faster hash
+- [html2text](https://lib.rs/crates/html2text) for making html readable as text
+- [rand](https://lib.rs/crates/fastrand) for generating a random user agent
+- [rayon](https://lib.rs/crates/rayon) for parallel iterators
+- [reqwest](https://lib.rs/crates/reqwest) for making web requests
+- [slint](https://lib.rs/crates/slint) for the GUI
+- [slint-build](https://lib.rs/crates/slint-build) for building the gui files
+- [thiserror](https://lib.rs/crates/thiserror) for making error handling better
+- [tokio](https://lib.rs/crates/tokio) is an asynchronous runtime
+- [tracing](https://lib.rs/crates/tracing) for getting logs
+- [tracing-subscriber](https://lib.rs/crates/tracing-subscriber) for parsing and
+  storing the logs
+- [url](https://lib.rs/crates/url) for parsing urls to test if they are valid
+- [urlencoding](https://lib.rs/crates/urlencoding) for encoding search queries
+- [user32-sys](https://lib.rs/crates/user32-sys),
+  [winapi](https://lib.rs/crates/winapi) and
+  [kernel32-sys](https://lib.rs/crates/kernel32-sys) for checking where the
+  program was run from and hiding the terminal window on windows
+- [embed-resource](https://lib.rs/crates/embed-resource) for embeding the icon
+  in the executable on build on windows
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
