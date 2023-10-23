@@ -19,4 +19,4 @@ section.
    python3 scripts/repo.py udesc
    ```
 
-   This will replace the An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI.  tag in every file.
+   This will replace the placeholder for the description everywhere.

@@ -15,7 +15,7 @@
 <h1 align="center"></h1>
 
 <p align="center">
-    An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI. 
+    An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI.
     <p>
         <a href="https://github.com/Obscurely/falion/wiki"><strong>Explore the docs »</strong></a>
         <br />
@@ -36,6 +36,8 @@
     <li>
       <a href="# -about-the-project">About The Project</a>
       <ul>
+        <li><a href="#key-highlights">Key Highlights</a></li>
+        <li><a href="#supported-resources">Supported Resources</a></li>
         <li><a href="#-features">💡 Features</a></li>
         <li><a href="#-video-showcase">🎥 Video showcase</a></li>
         <li><a href="#-built-with">🍔 Built with</a></li>
@@ -96,7 +98,66 @@
 
 ## 🪽 About The Project
 
-CHANGEME_MANUAL
+**Falion** is creative open-source tool created in **Rust** with the aim of
+improving programming **resource scraping**. It prioritizes **privacy**,
+**speed**, and **efficiency**, targeting sources like **StackOverflow**,
+**GitHub Gists**, and more.
+
+The project aims to solve the challenges of accessing information **quickly**
+and **privately** in the programming world, using **DuckDuckGo** for **secure**,
+**private** search results. **HTTPS-only** connections & **no JavaScript**,
+**plain HTML**.
+
+**Falion** is **lightning-fast** and **efficient**, with **asynchronous** result
+retrieval and **parallel** scraping. It takes **only about 1-1.5 seconds** to
+obtain five results from each resource. **Meaning, by the time you see the
+results everything is already loaded and ready to be accessed**.
+
+It offers user-centric interfaces, including a **Command Line Interface (CLI)**
+with VIM-like key bindings and a **Graphical User Interface (GUI)**.
+
+**Cross-platform** support ensures that it runs on **Linux**, **MacOS**, and
+**Windows**.
+
+It can be used as a standalone tool or integrated into Rust projects **as a
+crate**, enhancing development capabilities.
+
+---
+
+**Key Highlights**
+
+**Privacy First:** It utilizes DuckDuckGo for results, stick to HTTPS-only
+connections, and keep it tracker-free.
+
+**Blazing Speed:** Thanks to asynchronous result retrieval and parallel
+scraping, you get your answers in a snap.
+
+**User-Centric Interfaces:** Choose between a VIM-like CLI or a lightweight GUI
+for your preferred experience.
+
+**Cross-Platform:** Works seamlessly on Linux, MacOS, and Windows.
+
+**No Rate Limitations:** Scraping without interruptions under normal use.
+
+**Versatile:** Use it as a stand-alone tool or integrate it as a crate into your
+Rust projects.
+
+---
+
+**Supported Resources**
+
+These are generic resources that work for most popular languages. In the future
+there will be more added + custom resources support.
+
+- [StackOverflow](https://stackoverflow.com/) is a programming Q&A website.
+- [StackExchange](https://stackexchange.com/) is a network of community-driven
+  Q&A websites.
+- [GitHub Gists](https://gist.github.com/) are a platform for sharing and
+  collaborating on code snippets.
+- [GeeksForGeeks](https://www.geeksforgeeks.org/) is an online learning platform
+  for computer science and programming.
+- [DuckDuckGo Results](https://duckduckgo.com/) are just your normal results
+  rendered as text, not as nice as the above, as a last resort.
 
 If you've got any questions please give the [FAQ](#faq) a check.
 
