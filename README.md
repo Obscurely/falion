@@ -147,7 +147,8 @@ Rust projects.
 **Supported Resources**
 
 These are generic resources that work for most popular languages. In the future
-there will be more added + custom resources support.
+there will be more added + custom resources support. Also
+[request resources here](https://github.com/Obscurely/falion/discussions/15).
 
 - [StackOverflow](https://stackoverflow.com/) is a programming Q&A website.
 - [StackExchange](https://stackexchange.com/) is a network of community-driven
@@ -609,7 +610,7 @@ CHANGEME_MANUAL
 ## 🗾 Road Map
 
 The roadmap (kanban board) is located up top in the projects tab or at
-[this link](https://github.com/users/Obscurely/projects/CHANGEME_MANUAL).
+[this link](https://github.com/users/Obscurely/projects/4).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -632,10 +633,7 @@ it and that's it. Also be kind and respectful.
 
 ## ❓FAQ
 
-CHANGEME_MANUAL
-
-1. Question 1
-   - Answer 1
+The [FAQ is here](FAQ.md).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
