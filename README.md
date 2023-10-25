@@ -599,11 +599,46 @@ go.**
 
 ### Basics
 
-CHANGEME_MANUAL
+#### CLI key binds
+
+**Note: where '..' is used it means from that to that like '1..5' would mean
+from 1 to 5.**
+
+**Main menu:**<br /> **[1..5]** = Access that resource.<br /> **SHIFT + [1..5]**
+= Go to the next element in the list of that resource.<br /> **ALT + [1..5]** =
+Go to the previous element in the list of that resource.<br /> **n** = Move to
+the next element in the list of every resource.<br /> **SHIFT + n** = Move back
+to the previous element in the list of every resource.<br /> **CTRL + c** =
+Clear terminal and exit.<br />
+
+**Sub menus for the resources:**<br /> **n** = Move to the next element in the
+content list (like questions & answers).<br /> **SHIFT + n** = Move back to the
+previous element in the content list.<br /> **CTRL + q** = Go back to the main
+menu.<br /> **CTRL + c** = Clear terminal and exit.<br />
+
+#### How to use GUI
+
+1. Write your query in the search box and press enter or click the button
+   besides it.
+1. Browse through the resources
+   1. The arrows besides the resources are for moving one element forwards or
+      backwards individually.
+   1. The arrows at the bottom are for moving one elment forwards or backwards
+      all the resources.
+1. Click on a button containing the title to move into the result view for that
+   result.
+1. If it's a dynamic result use the arrows to move, if not just scroll through.
+1. In the upper left corner there is a back button to take you back to the main
+   menu.
 
 ### Advanced
 
-CHANGEME_MANUAL
+There are few cli options you might wanna know
+
+1. `--verbose` to make logging verbose
+1. `--disable-logs` to disable writting log files
+1. `--ui` to run the ui from the cli
+1. `--help` to display the help message
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
