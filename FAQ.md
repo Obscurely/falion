@@ -2,7 +2,8 @@
 
 1. What are the system requirements to run Falion on my computer?
 
-Falion has minimal system requirements and should work even on a raspberry pi.
+   Falion has minimal system requirements and should work even on a raspberry
+   pi.
 
 1. Can I use Falion to search for resources in multiple programming languages?
 
