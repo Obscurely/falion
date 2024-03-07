@@ -17,6 +17,13 @@ pub fn setup_logs(verbose: bool) {
                 eprintln!("Failed to create cache dir. Error: {}", error);
                 return;
             }
+
+            // put the logs in Temp folder from local appdata on windows
+            #[cfg(windows)]
+            {
+                path.push("Temp");
+            }
+
             path
         }
         None => {
