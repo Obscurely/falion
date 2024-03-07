@@ -12,17 +12,17 @@ pub fn setup_logs(verbose: bool) {
     // get/create cache dir
     let cache_dir = match dirs::cache_dir() {
         Some(mut path) => {
-            path.push("falion");
-            if let Err(error) = fs::create_dir_all(&path) {
-                eprintln!("Failed to create cache dir. Error: {}", error);
-                return;
-            }
-
             // put the logs in Temp folder from local appdata on windows
             #[cfg(windows)]
             {
                 path.push("Temp");
             }
+
+            path.push("falion");
+            if let Err(error) = fs::create_dir_all(&path) {
+                eprintln!("Failed to create cache dir. Error: {}", error);
+                return;
+            } 
 
             path
         }
