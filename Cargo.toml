@@ -3,7 +3,7 @@ name = "falion"
 authors = ["Obscurely <adrian.obscurely@protonmail.com"]
 version = "1.0.0"
 edition = "2021"
-rust-version = "1.72.1"                                        # Minimum rust version
+rust-version = "1.76.0"                                        # Minimum rust version
 resolver = "2"
 description = "An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI. "
 documentation = "https://github.com/Obscurely/falion/blob/master/README.md"
@@ -19,7 +19,7 @@ build = "build.rs"
 
 [package.metadata.deb]
 maintainer = "Obscurely <adrian.obscurely@protonmail.com>"
-copyright = "2023, 2023 <adrian.obscurely@protonmail.com>"
+copyright = "2024, 2024 <adrian.obscurely@protonmail.com>"
 license-file = ["LICENSE", "0"]
 extended-description = """\
 An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI. """"
@@ -38,38 +38,38 @@ panic = "unwind"
 #═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [build-dependencies]
-slint-build = "1.2.0"
+slint-build = "1.4.1"
 
 #═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [target.'cfg(windows)'.build-dependencies]
-embed-resource = "2.3.0"
+embed-resource = "2.4.2"
 
 #═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [dependencies]
-chrono = { version = "0.4.28", default-features = false, features = ["clock"] }
-clap = { version = "4.4.2", features = ["derive"] }
+chrono = { version = "0.4.35", default-features = false, features = ["clock"] }
+clap = { version = "4.5.2", features = ["derive"] }
 crossterm = "0.27.0"
-dashmap = "5.5.3"
+dashmap = "5.4.0"
 dirs = "5.0.1"
-futures = "0.3.28"
-hashbrown = "0.14.0"
-html2text = "0.6.0"
+futures = "0.3.30"
+hashbrown = "0.14.3"
+html2text = "0.12.4"
 rand = "0.8.5"
-rayon = "1.7.0"
-reqwest = { version = "0.11.20", features = [
+rayon = "1.9.0"
+reqwest = { version = "0.11.25", features = [
   "json",
   "gzip",
   "brotli",
   "deflate",
 ] }
-slint = "1.2.0"
-thiserror = "1.0.48"
-tokio = { version = "1.32.0", features = ["full"] }
-tracing = "0.1.37"
-tracing-subscriber = "0.3.17"
-url = "2.4.1"
+slint = "1.4.1"
+thiserror = "1.0.57"
+tokio = { version = "1.36.0", features = ["full"] }
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
+url = "2.5.0"
 urlencoding = "2.1.3"
 
 #═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════

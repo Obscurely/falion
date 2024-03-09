@@ -83,7 +83,7 @@ None
 
 ### Changed
 
-- Bumped rust version to 1.72.1
+- Bumped rust version to 1.76.0
 - Bumped all the crates to the latest version.
 - Instead of the many different functions that handled the duckduckgo searches
   now there is one with half the code, way faster and more robust.
