@@ -30,7 +30,7 @@ pub fn display_first_result<T, E>(
         // unwrap is fine here since it would have been an error if there were no
         // results, so there is at least one
         Ok(results) => {
-            let (title, _) = results.get(0).unwrap();
+            let (title, _) = results.first().unwrap();
             let res = slint::SharedString::from(title);
             if let Err(err) = slint::invoke_from_event_loop(move || {
                 let ui = util::get_ui(ui);
