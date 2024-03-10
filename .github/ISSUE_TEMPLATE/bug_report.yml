@@ -43,6 +43,17 @@ body:
     validations:
       required: true
   - type: textarea
+    id: log
+    attributes:
+      label: Log file
+      description: |
+        The log file from the session on which the issue happened. Available at:
+        On windows: C:\users\yourname\AppData\Temp\falion\the_file.log
+        On macOS: $HOME/Library/Caches/falion/the_file.log
+        On Linux: $HOME/.cache/falion/the_file.log
+    validations:
+      required: true
+  - type: textarea
     id: context
     attributes:
       label: Additional context
