@@ -8,9 +8,9 @@ body:
     attributes:
       value: |
         ## First of all
-        1. Please search for [existing issues](https://github.com/CHANGEME_USER/CHANGEME_NAME/issues?q=is%3Aissue) about this problem first.
-        2. Make sure `rustc` and all relevant CHANGEME_NAME packages are up to date.
-        3. Make sure it's an issue with CHANGEME_NAME and not something else you are using.
+        1. Please search for [existing issues](https://github.com/Obscurely/falion/issues?q=is%3Aissue) about this problem first.
+        2. Make sure `rustc` and all relevant falion packages are up to date.
+        3. Make sure it's an issue with falion and not something else you are using.
         4. Remember to follow the community guidelines and be friendly.
   - type: textarea
     id: description
