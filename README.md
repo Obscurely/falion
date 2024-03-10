@@ -114,7 +114,8 @@ obtain five results from each resource. **Meaning, by the time you see the
 results everything is already loaded and ready to be accessed**.
 
 It offers user-centric interfaces, including a **Command Line Interface (CLI)**
-with VIM-like key bindings and a **Graphical User Interface (GUI)**.
+with VIM-like key bindings (where applicable) and a **Graphical User Interface
+(GUI)**.
 
 **Cross-platform** support ensures that it runs on **Linux**, **MacOS**, and
 **Windows**.
@@ -132,8 +133,8 @@ connections, and keep it tracker-free.
 **Blazing Speed:** Thanks to asynchronous result retrieval and parallel
 scraping, you get your answers in a snap.
 
-**User-Centric Interfaces:** Choose between a VIM-like CLI or a lightweight GUI
-for your preferred experience.
+**User-Centric Interfaces:** Choose between a VIM-like (where applicable) CLI or
+a lightweight GUI for your preferred experience.
 
 **Cross-Platform:** Works seamlessly on Linux, MacOS, and Windows.
 
@@ -188,7 +189,7 @@ If you've got any questions please give the [FAQ](#faq) a check.
   - [x] Many **optimizations** done
 - [x] CLI interface
   - [x] **Fast** and render optimized interface
-  - [x] **VIM** like key binds (almost)
+  - [x] **VIM** like key binds (where applicable)
   - [x] **Simple** and **intuitive**
 - [x] GUI interface
   - [x] **Ligthweight** interface
@@ -613,7 +614,7 @@ Clear terminal and exit.<br />
 
 **Sub menus for the resources:**<br /> **n** = Move to the next element in the
 content list (like questions & answers).<br /> **SHIFT + n** = Move back to the
-previous element in the content list.<br /> **CTRL + q** = Go back to the main
+previous element in the content list.<br /> **q** = Go back to the main
 menu.<br /> **CTRL + c** = Clear terminal and exit.<br />
 
 #### How to use GUI
@@ -668,7 +669,44 @@ it and that's it. Also be kind and respectful.
 
 ## ❓FAQ
 
-The [FAQ is here](FAQ.md).
+1. **Does Falion support scraping of non-English content on supported resources
+   like StackOverflow or GitHub Gists?**
+
+   No. For one DuckDuckGO struggles with anything, but english and second I have
+   configured the client to only accept english because most of the programming
+   related stuff is in english.
+
+1. **Can I contribute and if so, what's the process?**
+
+   First refer to [Contributing](#-contributing). Second as long as you write
+   good, clean, fast, documented/commented code and it helps with the project I
+   will be more than happy to accept your pull request.
+
+1. **What privacy measures does Falion take when scraping content from
+   resources?**
+
+   It uses DuckDuckGO for search results, queries the least number of urls
+   possible and only html pages with no added finger prints to the client. The
+   only thing to worry about is your IP address which most people can get a new
+   one with a router restart so it holds no value.
+
+1. **Is running Falion on older hardware slower than advertised?**
+
+   I have ran it in a 1 core Windows vm on my 6 years old cpu (ryzen 7 2700)
+   with turbo disabled, 2Gb of ram and the performance seemed to be about the
+   same (at most half a sec slower). As long as your total network latency is
+   low and the speed above like 100Mbits/s it's going to be mostly as
+   advertised. Regardless it will be faster than using your browser.
+
+1. **How can I report a bug or request a feature?**
+
+   Just go [here](https://github.com/Obscurely/falion/issues/new/choose).
+
+1. **What can the falion crate do for my project?**
+
+   All the methods used to get results from the programming resources or
+   duckduckgo are exposed. So if you want to get search results from any of
+   those in a highly efficient way this is the crate for you.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
