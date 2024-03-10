@@ -58,7 +58,8 @@ secret click `New repository secret`.
 
 [Create a new access token](https://github.com/settings/tokens/new), copy it and
 save it somewhere safe, you will not able to after. Create a new secret with the
-name `API_TOKEN_GITHUB` and paste the token in the secret box (second box).
+name `API_TOKEN_GITHUB` and paste the token in the secret box (second box). The
+token you create will be of type classic and have only the repo scope selected.
 
 ### AUR
 

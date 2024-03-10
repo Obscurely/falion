@@ -28,7 +28,7 @@
 
 ### Discord Server (line 7)
 
-Ideally you should have a link a server/group on something like discord on
+Ideally you should have a link a server/group on something like discord or
 matrix. Discord would be preferred since is more used.
 
 ### Email (line 12)

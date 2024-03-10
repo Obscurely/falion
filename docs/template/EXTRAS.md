@@ -27,8 +27,8 @@
 You have to setup commit signing if you want to use
 [my](https://github.com/Obscurely) [Workflow](WORKFLOW.md) and in general you
 should set this up as it proves your work is actually yours. To actually do this
-you can follow the whole _Verify commit signatures_ section on this
-[GitHub article](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification)
+you can follow the whole _GPG commit signature verification_ section on this
+[GitHub article](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification#gpg-commit-signature-verification)
 
 ## Repository Settings
 
