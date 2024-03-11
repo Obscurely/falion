@@ -14,12 +14,63 @@ use crossterm::style::Stylize;
 use hashbrown::HashMap;
 use std::io::Write;
 
+//
+// CLI Key mapping
+//
+
 // Key press event modifiers
 // On windows even though SHIFT + 1 results in ! we still need SHIFT as the modifier
+// forward results modifiers
 #[cfg(windows)]
-const FORWARD_MODIFIER: event::KeyModifiers = event::KeyModifiers::SHIFT;
+const FORWARD_RESOURCE_MODIFIER: event::KeyModifiers = event::KeyModifiers::SHIFT;
 #[cfg(not(windows))]
-const FORWARD_MODIFIER: event::KeyModifiers = event::KeyModifiers::NONE;
+const FORWARD_RESOURCE_MODIFIER: event::KeyModifiers = event::KeyModifiers::NONE;
+// backward results modifiers
+#[cfg(target_os = "macos")]
+const BACKWARD_RESOURCE_MODIFIER: event::KeyModifiers = event::KeyModifiers::NONE;
+#[cfg(not(target_os = "macos"))]
+const BACKWARD_RESOURCE_MODIFIER: event::KeyModifiers = event::KeyModifiers::ALT;
+
+// Keys for accessing the resources
+const ACCESS_RESOURCE_1_CHAR: char = '1';
+const ACCESS_RESOURCE_2_CHAR: char = '2';
+const ACCESS_RESOURCE_3_CHAR: char = '3';
+const ACCESS_RESOURCE_4_CHAR: char = '4';
+const ACCESS_RESOURCE_5_CHAR: char = '5';
+
+// Keys for moving the results forward
+const FORWARD_RESOURCE_1_CHAR: char = '!';
+const FORWARD_RESOURCE_2_CHAR: char = '@';
+const FORWARD_RESOURCE_3_CHAR: char = '#';
+const FORWARD_RESOURCE_4_CHAR: char = '$';
+const FORWARD_RESOURCE_5_CHAR: char = '%';
+
+// Keys for moving results back because on macos using alt with numbers inputs symbols
+// first resource
+#[cfg(target_os = "macos")]
+const BACKWARD_RESOURCE_1_CHAR: char = '¡';
+#[cfg(not(target_os = "macos"))]
+const BACKWARD_RESOURCE_1_CHAR: char = '1';
+// first resource
+#[cfg(target_os = "macos")]
+const BACKWARD_RESOURCE_2_CHAR: char = '™';
+#[cfg(not(target_os = "macos"))]
+const BACKWARD_RESOURCE_2_CHAR: char = '2';
+// first resource
+#[cfg(target_os = "macos")]
+const BACKWARD_RESOURCE_3_CHAR: char = '£';
+#[cfg(not(target_os = "macos"))]
+const BACKWARD_RESOURCE_3_CHAR: char = '3';
+// first resource
+#[cfg(target_os = "macos")]
+const BACKWARD_RESOURCE_4_CHAR: char = '¢';
+#[cfg(not(target_os = "macos"))]
+const BACKWARD_RESOURCE_4_CHAR: char = '4';
+// first resource
+#[cfg(target_os = "macos")]
+const BACKWARD_RESOURCE_5_CHAR: char = '∞';
+#[cfg(not(target_os = "macos"))]
+const BACKWARD_RESOURCE_5_CHAR: char = '5';
 
 /// Command line options, cli setup done with clap.
 ///
@@ -219,7 +270,7 @@ pub async fn cli() {
         match event_read {
             // enter the menu for first resource
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('1'),
+                code: event::KeyCode::Char(ACCESS_RESOURCE_1_CHAR),
                 kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
@@ -251,9 +302,9 @@ pub async fn cli() {
             }
             // go to next element in the first resource (using ! because of terminal limitations)
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('!'),
+                code: event::KeyCode::Char(FORWARD_RESOURCE_1_CHAR),
                 kind: event::KeyEventKind::Press,
-                modifiers: FORWARD_MODIFIER,
+                modifiers: FORWARD_RESOURCE_MODIFIER,
                 ..
             }) => {
                 // stackoverflow next result
@@ -269,9 +320,9 @@ pub async fn cli() {
             }
             // go to the previous element in the first resource (using alt instead of ctrl because of terminal limitations)
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('1'),
+                code: event::KeyCode::Char(BACKWARD_RESOURCE_1_CHAR),
                 kind: event::KeyEventKind::Press,
-                modifiers: event::KeyModifiers::ALT,
+                modifiers: BACKWARD_RESOURCE_MODIFIER,
                 ..
             }) => {
                 // stackoverflow back results by one
@@ -280,7 +331,7 @@ pub async fn cli() {
 
             // enter the menu of the second resource
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('2'),
+                code: event::KeyCode::Char(ACCESS_RESOURCE_2_CHAR),
                 kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
@@ -313,9 +364,9 @@ pub async fn cli() {
             }
             // go to the next element in the second resource list
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('@'),
+                code: event::KeyCode::Char(FORWARD_RESOURCE_2_CHAR),
                 kind: event::KeyEventKind::Press,
-                modifiers: FORWARD_MODIFIER,
+                modifiers: FORWARD_RESOURCE_MODIFIER,
                 ..
             }) => {
                 // stackexchange next result
@@ -331,9 +382,9 @@ pub async fn cli() {
             }
             // go to previous element in the second resource list
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('2'),
+                code: event::KeyCode::Char(BACKWARD_RESOURCE_2_CHAR),
                 kind: event::KeyEventKind::Press,
-                modifiers: event::KeyModifiers::ALT,
+                modifiers: BACKWARD_RESOURCE_MODIFIER,
                 ..
             }) => {
                 // stackexchange back results by one
@@ -342,7 +393,7 @@ pub async fn cli() {
 
             // enter the menu for the third resource
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('3'),
+                code: event::KeyCode::Char(ACCESS_RESOURCE_3_CHAR),
                 kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
@@ -375,9 +426,9 @@ pub async fn cli() {
             }
             // go to the next element in the third resource list
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('#'),
+                code: event::KeyCode::Char(FORWARD_RESOURCE_3_CHAR),
                 kind: event::KeyEventKind::Press,
-                modifiers: FORWARD_MODIFIER,
+                modifiers: FORWARD_RESOURCE_MODIFIER,
                 ..
             }) => {
                 // github gist next result
@@ -393,9 +444,9 @@ pub async fn cli() {
             }
             // go to the previous element in the third resource list
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('3'),
+                code: event::KeyCode::Char(BACKWARD_RESOURCE_3_CHAR),
                 kind: event::KeyEventKind::Press,
-                modifiers: event::KeyModifiers::ALT,
+                modifiers: BACKWARD_RESOURCE_MODIFIER,
                 ..
             }) => {
                 // github gist back results by one
@@ -404,7 +455,7 @@ pub async fn cli() {
 
             // enter the forth resource menu
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('4'),
+                code: event::KeyCode::Char(ACCESS_RESOURCE_4_CHAR),
                 kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
@@ -437,9 +488,9 @@ pub async fn cli() {
             }
             // go to the next element in the forth resource list
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('$'),
+                code: event::KeyCode::Char(FORWARD_RESOURCE_4_CHAR),
                 kind: event::KeyEventKind::Press,
-                modifiers: FORWARD_MODIFIER,
+                modifiers: FORWARD_RESOURCE_MODIFIER,
                 ..
             }) => {
                 // geeksforgeeks next result
@@ -455,9 +506,9 @@ pub async fn cli() {
             }
             // go to the previous element in the forth resource list
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('4'),
+                code: event::KeyCode::Char(BACKWARD_RESOURCE_4_CHAR),
                 kind: event::KeyEventKind::Press,
-                modifiers: event::KeyModifiers::ALT,
+                modifiers: BACKWARD_RESOURCE_MODIFIER,
                 ..
             }) => {
                 // geeksforgeeks back results by one
@@ -466,7 +517,7 @@ pub async fn cli() {
 
             // enter the fifth resource menu
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('5'),
+                code: event::KeyCode::Char(ACCESS_RESOURCE_5_CHAR),
                 kind: event::KeyEventKind::Press,
                 modifiers: event::KeyModifiers::NONE,
                 ..
@@ -499,9 +550,9 @@ pub async fn cli() {
             }
             // go to the next element in the fifth resource list
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('%'),
+                code: event::KeyCode::Char(FORWARD_RESOURCE_5_CHAR),
                 kind: event::KeyEventKind::Press,
-                modifiers: FORWARD_MODIFIER,
+                modifiers: FORWARD_RESOURCE_MODIFIER,
                 ..
             }) => {
                 // ddg search next result
@@ -517,9 +568,9 @@ pub async fn cli() {
             }
             // go to the previous element in the fifth resource list
             event::Event::Key(event::KeyEvent {
-                code: event::KeyCode::Char('5'),
+                code: event::KeyCode::Char(BACKWARD_RESOURCE_5_CHAR),
                 kind: event::KeyEventKind::Press,
-                modifiers: event::KeyModifiers::ALT,
+                modifiers: BACKWARD_RESOURCE_MODIFIER,
                 ..
             }) => {
                 // ddg search back results by one
