@@ -14,6 +14,13 @@ use crossterm::style::Stylize;
 use hashbrown::HashMap;
 use std::io::Write;
 
+// Key press event modifiers
+// On windows even though SHIFT + 1 results in ! we still need SHIFT as the modifier
+#[cfg(windows)]
+const FORWARD_MODIFIER: event::KeyModifiers = event::KeyModifiers::SHIFT;
+#[cfg(not(windows))]
+const FORWARD_MODIFIER: event::KeyModifiers = event::KeyModifiers::NONE;
+
 /// Command line options, cli setup done with clap.
 ///
 /// # Options
@@ -246,7 +253,7 @@ pub async fn cli() {
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('!'),
                 kind: event::KeyEventKind::Press,
-                modifiers: event::KeyModifiers::NONE,
+                modifiers: FORWARD_MODIFIER,
                 ..
             }) => {
                 // stackoverflow next result
@@ -308,7 +315,7 @@ pub async fn cli() {
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('@'),
                 kind: event::KeyEventKind::Press,
-                modifiers: event::KeyModifiers::NONE,
+                modifiers: FORWARD_MODIFIER,
                 ..
             }) => {
                 // stackexchange next result
@@ -370,7 +377,7 @@ pub async fn cli() {
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('#'),
                 kind: event::KeyEventKind::Press,
-                modifiers: event::KeyModifiers::NONE,
+                modifiers: FORWARD_MODIFIER,
                 ..
             }) => {
                 // github gist next result
@@ -432,7 +439,7 @@ pub async fn cli() {
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('$'),
                 kind: event::KeyEventKind::Press,
-                modifiers: event::KeyModifiers::NONE,
+                modifiers: FORWARD_MODIFIER,
                 ..
             }) => {
                 // geeksforgeeks next result
@@ -494,7 +501,7 @@ pub async fn cli() {
             event::Event::Key(event::KeyEvent {
                 code: event::KeyCode::Char('%'),
                 kind: event::KeyEventKind::Press,
-                modifiers: event::KeyModifiers::NONE,
+                modifiers: FORWARD_MODIFIER,
                 ..
             }) => {
                 // ddg search next result
