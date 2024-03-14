@@ -149,7 +149,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - name: Dependencies
         run: |
-          sudo apt-get install libxcb-shape0-dev libxcb-xfixes0-dev libxkbcommon-dev libfontconfig-dev pkg-config -y
+          sudo apt-get install -y libxcb-shape0-dev libxcb-xfixes0-dev libxkbcommon-dev libfontconfig-dev pkg-config
           cargo install cargo-deb
       - name: Prepare
         run: |
