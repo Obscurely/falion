@@ -641,6 +641,7 @@ There are few cli options you might wanna know
 1. `--disable-logs` to disable writting log files
 1. `--ui` to run the ui from the cli
 1. `--help` to display the help message
+1. `--keybinds` to display the keybinds list for the cli
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
