@@ -212,7 +212,11 @@ If you've got any questions please give the [FAQ](#faq) a check.
 
 ### 🎥 Video showcase
 
-[Showcase](CHANGEME_MANUAL) <!-- Showcase video uploaded to github -->
+[Showcase](
+
+https://github.com/Obscurely/falion/assets/59087558/53dbb49d-1442-41c8-ad5d-ec0ba000bdb9
+
+) <!-- Showcase video uploaded to github -->
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
