@@ -220,7 +220,7 @@ If you've got any questions please give the [FAQ](#faq) a check.
 
 ### 🍔 Built with
 
-- [Rust 1.72.1](https://www.rust-lang.org/)
+- [Rust 1.76.0](https://www.rust-lang.org/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
