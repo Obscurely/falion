@@ -22,7 +22,7 @@ pub fn setup_logs(verbose: bool) {
             if let Err(error) = fs::create_dir_all(&path) {
                 eprintln!("Failed to create cache dir. Error: {}", error);
                 return;
-            } 
+            }
 
             path
         }
