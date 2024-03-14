@@ -187,6 +187,7 @@ If you've got any questions please give the [FAQ](#faq) a check.
         results each resource**
   - [x] Leverages rust's performance
   - [x] Many **optimizations** done
+  - [x] Ligthweight on resources (GUI and CLI)
 - [x] CLI interface
   - [x] **Fast** and render optimized interface
   - [x] **VIM** like key binds (where applicable)
