@@ -31,6 +31,9 @@ target/
 # Folder config file
 [Dd]esktop.ini
 
+# Where I keep the video showcase project and files for syncthing to push them to my home server
+showcase/
+
 # Python
 .mypy_cache/
 scripts/.mypy_cache/
