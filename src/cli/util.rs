@@ -79,6 +79,15 @@ pub fn setup_cli() -> Result<String, std::io::Error> {
         ));
     }
 
+    // next check if for keybinds
+    if cli.keybinds {
+        print_keybindings();
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "User chose to print the keybinds list",
+        ));
+    }
+
     // get values
     let query = cli.query.join(" ");
     let verbose = cli.verbose;
@@ -104,4 +113,27 @@ pub fn setup_cli() -> Result<String, std::io::Error> {
     }
 
     Ok(query)
+}
+
+/// Simple println statement to print the keybinds for the cli
+pub fn print_keybindings() {
+    let keybinds_list = r#"
+Keybinds list for falion.
+Note: where you see ".." it means from that to that i.e "1..5" would mean from 1 to 5.
+   
+Main menu:
+[1..5] = Access that resource.
+SHIFT + [1..5] = Go to the next element in the list of that resource.
+ALT + [1..5] = Go to the previous element in the list of that resource.
+n = Move to the next element in the list of every resource.
+SHIFT + n = Move back to the previous element in the list of every resource.
+CTRL + c = Clear terminal and exit.
+
+Sub menus for the resources:
+n = Move to the next element in the content list (like questions & answers).
+SHIFT + n = Move back to the previous element in the content list.
+q = Go back to the main menu.
+CTRL + c = Clear terminal and exit.
+    "#;
+    println!("{keybinds_list}");
 }

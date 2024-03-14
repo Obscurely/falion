@@ -96,6 +96,10 @@ pub struct Cli {
     /// Run the ui from the cli
     #[arg(short, long)]
     pub ui: bool,
+
+    /// Print the keybinds list
+    #[arg(short, long)]
+    pub keybinds: bool,
 }
 
 /// The main cli function for falion. Show results and lets you scroll through them.
