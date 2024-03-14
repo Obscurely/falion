@@ -1,122 +1,105 @@
-use colored::Colorize;
-use crossterm::terminal;
-use html2text;
-use urlencoding;
+use rand::distributions::DistString;
+use reqwest::header;
 
-pub struct Util {}
+/// Create a new reqwest client using a randomly generated user-agent.
+/// This is useful so you don't get limited by some websites like duckduckgo.
+///
+/// # Examples
+///
+/// ```
+/// use falion::search::util;
+///
+/// let client = util::client_with_special_settings();
+/// ```
+pub fn client_with_special_settings() -> reqwest::Client {
+    let mut rng = rand::thread_rng();
 
-impl Util {
-    pub fn get_url_compatible_string(text: String) -> String {
-        let comp_string = urlencoding::encode(&text).to_string();
+    // specific headers to avoid rate limiting
+    let mut headers = header::HeaderMap::new();
+    headers.insert(
+        "X-Forwarded-Host",
+        header::HeaderValue::from_static("duckduckgo.com"),
+    );
+    headers.insert(
+        "Origin",
+        header::HeaderValue::from_static("https://duckduckgo.com"),
+    );
+    headers.insert(
+        "Accept",
+        header::HeaderValue::from_static(
+            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        ),
+    );
+    headers.insert(
+        "Accept-Language",
+        header::HeaderValue::from_static("en-US,en;q=0.5"),
+    );
+    headers.insert(
+        "Accept-Encoding",
+        header::HeaderValue::from_static("gzip, deflate, br"),
+    );
+    headers.insert("DNT", header::HeaderValue::from_static("1"));
+    headers.insert(
+        "Upgrade-Insecure-Requests",
+        header::HeaderValue::from_static("1"),
+    );
 
-        comp_string
+    let mut ua = String::with_capacity(27);
+    ua.push_str("Mozilla/5.0");
+    ua.push_str(&rand::distributions::Alphanumeric.sample_string(&mut rng, 16));
+
+    reqwest::ClientBuilder::new()
+        .user_agent(ua)
+        .default_headers(headers)
+        .brotli(true)
+        .gzip(true)
+        .deflate(true)
+        .https_only(true)
+        .build()
+        .unwrap()
+}
+
+/// Converts html got from the web into readeable text inside a terminal.
+///
+/// # Arguments
+///
+/// * `html` - The html to convert.
+/// * `term_width` - The width of your terminal in order to properly display.
+///
+/// # Examples
+///
+/// ```
+/// use falion::search::util;
+///
+/// let text = "<p>Hello World!</p>";
+/// assert_eq!(util::html_to_text(text, 50), "Hello World!\n");
+/// ```
+pub fn html_to_text(html: &str, term_width: usize) -> String {
+    let mut text = html2text::from_read(html.as_bytes(), term_width);
+
+    // remove any chunks of more than 2 new lines
+    while text.contains("\n\n\n") {
+        text = text.replace("\n\n\n", "\n\n");
     }
 
-    pub fn beautify_text_in_html(text: &str, term_width: usize) -> String {
-        html2text::from_read(text.as_bytes(), term_width)
+    // return text
+    text
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_html_to_text() {
+        let text = "<p>Hello World!</p>";
+        assert_eq!(html_to_text(text, 50), "Hello World!\n");
     }
 
-    pub fn clear_terminal(out: &mut std::io::Stdout, enable_warnings: bool) {
-        match crossterm::execute!(out, terminal::Clear(terminal::ClearType::All)) {
-            Ok(_) => (),
-            Err(error) => {
-                if enable_warnings {
-                    eprintln!("{} {}", "[522][Warning] There was an error clearing the terminal, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
-                }
-            }
-        }
-        match crossterm::execute!(out, terminal::ScrollUp(u16::MAX)) {
-            Ok(_) => (),
-            Err(error) => {
-                if enable_warnings {
-                    eprintln!("{} {}", "[523][Warning] There was an error scrolling up the terminal, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
-                }
-            }
-        }
-        match crossterm::execute!(out, crossterm::cursor::MoveTo(0, 0)) {
-            Ok(_) => (),
-            Err(error) => {
-                if enable_warnings {
-                    eprintln!("{} {}", "[524][Warning] There was an error moving the cursor of the terminal, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
-                }
-            }
-        }
-    }
+    #[tokio::test]
+    async fn test_create_client() {
+        let client = client_with_special_settings();
 
-    // pub fn move_cursor_beginning(out: &mut std::io::Stdout, enable_warnings: bool) {
-    //     match crossterm::execute!(out, crossterm::cursor::MoveTo(0, 0)) {
-    //         Ok(_) => (),
-    //         Err(error) => {
-    //             if enable_warnings {
-    //                 eprintln!("{} {}", "[525][Warning] There was an error moving the cursor of the terminal, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
-    //             }
-    //         }
-    //     }
-    // }
-
-    // pub fn move_cursor_down(out: &mut std::io::Stdout, enable_warnings: bool) {
-    //     match crossterm::execute!(out, terminal::ScrollDown(1)) {
-    //         Ok(_) => (),
-    //         Err(error) => {
-    //             if enable_warnings {
-    //                 eprintln!("{} {}", "[526][Warning] There was an error moving the cursor down, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
-    //             }
-    //         }
-    //     }
-    // }
-
-    // pub fn move_cursor_up(out: &mut std::io::Stdout, enable_warnings: bool) {
-    //     match crossterm::execute!(out, terminal::ScrollUp(1)) {
-    //         Ok(_) => (),
-    //         Err(error) => {
-    //             if enable_warnings {
-    //                 eprintln!("{} {}", "[527][Warning] There was an error moving the cursor up, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
-    //             }
-    //         }
-    //     }
-    // }
-
-    // pub fn move_cursor_down_5(out: &mut std::io::Stdout, enable_warnings: bool) {
-    //     match crossterm::execute!(out, terminal::ScrollDown(5)) {
-    //         Ok(_) => (),
-    //         Err(error) => {
-    //             if enable_warnings {
-    //                 eprintln!("{} {}", "[528][Warning] There was an error moving the cursor down 5 lines, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
-    //             }
-    //         }
-    //     }
-    // }
-
-    // pub fn move_cursor_up_5(out: &mut std::io::Stdout, enable_warnings: bool) {
-    //     match crossterm::execute!(out, terminal::ScrollUp(5)) {
-    //         Ok(_) => (),
-    //         Err(error) => {
-    //             if enable_warnings {
-    //                 eprintln!("{} {}", "[529][Warning] There was an error moving the cursor up 5 lines, program may not work as expected! the given error is:".yellow(), format!("{}", error).red());
-    //             }
-    //         }
-    //     }
-    // }
-
-    pub fn disable_terminal_raw_mode(enable_warnings: bool) {
-        match terminal::disable_raw_mode() {
-            Ok(_) => (),
-            Err(error) => {
-                if enable_warnings {
-                    eprintln!("{} {}", "[530][Warning] There was an error disabling terminal raw mode, program may not run as expected! the given error is:".yellow(), format!("{}", error).red());
-                }
-            }
-        }
-    }
-
-    pub fn enable_terminal_raw_mode(enable_warnings: bool) {
-        match terminal::enable_raw_mode() {
-            Ok(_) => (),
-            Err(error) => {
-                if enable_warnings {
-                    eprintln!("{} {}", "[531][Warning] There was an error enabling raw mode, program may not run as expected! the given error is:".yellow(), format!("{}", error).red());
-                }
-            }
-        }
+        client.get("https://google.com").send().await.unwrap();
     }
 }

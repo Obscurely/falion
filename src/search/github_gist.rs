@@ -1,142 +1,446 @@
-use crate::search::duckduckgo::DuckDuckGo;
-use colored::Colorize;
-use indexmap::IndexMap;
-use regex::Regex;
-use reqwest;
-use std::collections::HashMap;
+use super::ddg;
+use super::util;
+use futures::StreamExt;
+use rayon::prelude::*;
+use thiserror::Error;
 
-pub struct GithubGist {}
+const GIST_URL: &str = "https://gist.github.com/";
+const GIST_URI: &str = "https://gist.github.com";
+const GIST_SITE: &str = "gist.github.com";
+const GIST_RAW_URL_SPLIT: &str = "<a href=\"/{GIST_LOCATION}/raw/";
+const GIST_RAW_URL: &str = "https://gist.github.com/{GIST_LOCATION}/raw/{FILE_URL}";
+
+type GistContent = Result<Vec<String>, GithubGistError>;
+
+/// These are the errors the functions associated with GithubGist will return.
+///
+/// * `NotGist` - The given url does not correspond to a GitHub gist.
+/// * `InvalidRequest` - Reqwest returned an error when processing the request. This can be
+/// due to rate limiting, bad internet etc.
+/// * `InvalidResponseBody` - The response content you got back is corrupted, usually bad
+/// internet.
+/// * `InvalidPageContent` - Usually this means the content returned by the website is
+/// corrupted because it did return 200 OK.
+/// * `NoGistFileGot` - This means the gist might contain files, but the function couldn't get any
+/// of them.
+/// * `ErrorCode` - The website returned an error code
+/// * `DdgError` - error with getting results from DuckDuckGO. (ddg::DdgError)
+#[derive(Error, Debug)]
+pub enum GithubGistError {
+    #[error("The given page: {0} is not a valid Github Gist page this function can scrape.")]
+    NotGist(String),
+    #[error("Failed to make a request with the provided query/url: {0}")]
+    InvalidRequest(reqwest::Error),
+    #[error("A request has been successfully made, but there was an error getting the response body: {0}")]
+    InvalidReponseBody(reqwest::Error),
+    #[error("Couldn't format the content of the page even though the content was successfully retrieved with 200 OK.")]
+    InvalidPageContent,
+    #[error("None of the gist's files could be retrieved.")]
+    NoGistFileGot,
+    #[error("The request was successful, but the response wasn't 200 OK, it was: {0}")]
+    ErrorCode(reqwest::StatusCode),
+    #[error("There was an error retrieving search results from duckduckgo: {0}")]
+    DdgError(ddg::DdgError),
+}
+
+/// Scrape pages returned by ddg
+#[derive(std::fmt::Debug)]
+pub struct GithubGist {
+    client: reqwest::Client,
+    ddg: ddg::Ddg,
+}
 
 impl GithubGist {
-    async fn get_links(search: &str, enable_warnings: bool) -> HashMap<String, String> {
-        let service_url = "gist.github.com";
-        DuckDuckGo::get_links_formatted(service_url, search, enable_warnings).await
+    /// Create a new GithubGist instance with a custom client that generates UA (user-agent in
+    /// order to avoid getting rate limited by DuckDuckGO).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use falion::search::github_gist;
+    ///
+    /// let github_gist = github_gist::GithubGist::new();
+    /// ```
+    pub fn new() -> Self {
+        Self {
+            client: util::client_with_special_settings(),
+            ddg: ddg::Ddg::new(),
+        }
     }
 
-    async fn get_gist_content(gist_url: String, enable_warnings: bool) -> Vec<String> {
-        let gist_page_content = match reqwest::get(&gist_url).await {
-            Ok(page) => match page.text().await {
-                Ok(content) => content,
-                Err(error) => {
-                    if enable_warnings {
-                        eprintln!("{} {}", "[510][Warning] There was an error reading the received request from gist.github.com, the given error is:".yellow(), format!("{}", error).red());
-                    }
-                    return vec![String::from(
-                        "Nothing in here, there was an error retrieving content!",
-                    )];
-                }
-            },
-            Err(error) => {
-                if enable_warnings {
-                    eprintln!(
-                    "{} {}", "[511][Warning] There was an error receiving the content of a gist page, the given error is:".yellow(), format!("{}", error).red()
+    /// Create a new GithubGist instance with a provided client.
+    /// Note: DuckDuckGO will limit your requests if you don't provide a user-agent.
+    ///
+    /// ```
+    /// use falion::search::github_gist;
+    ///
+    /// let github_gist = github_gist::GithubGist::with_client(reqwest::Client::new());
+    /// ```
+    pub fn with_client(client: reqwest::Client) -> Self {
+        Self {
+            client: client.clone(),
+            ddg: ddg::Ddg::with_client(client),
+        }
+    }
+
+    /// Get the contents of a gist inside a String.
+    /// Note: the content returned could be partial. Meaning if the gist has multiple files and one
+    /// or multiple of them can't be read, but at if least one has been it will return only the
+    /// one/ones that have been successfully read.
+    ///
+    /// # Arguments
+    ///
+    /// * `gist_url` - The absolute url to the page.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use falion::search::ddg;
+    /// use falion::search::github_gist;
+    ///
+    /// # async fn run() -> Result<(), github_gist::GithubGistError> {
+    /// let ddg = ddg::Ddg::new();
+    /// let github_gist = github_gist::GithubGist::new();
+    /// let link = &ddg.get_links("Rust basics", Some("gist.github.com"), None, None, Some(1)).await.unwrap()[0];
+    ///
+    /// let gist_content = github_gist.get_gist_content(&link).await.unwrap();
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// returns github_gist::GithubGistError;
+    ///
+    /// * `NotGist` - The given url does not correspond to a GitHub gist.
+    /// * `InvalidRequest` - Reqwest returned an error when processing the request. This can be
+    /// due to rate limiting, bad internet etc.
+    /// * `InvalidResponseBody` - The response content you got back is corrupted, usually bad
+    /// internet.
+    /// * `InvalidPageContent` - Usually this means the content returned by the website is
+    /// corrupted because it did return 200 OK.
+    /// * `NoGistFileGot` - This means the gist might contain files, but the function couldn't get any
+    /// of them.
+    /// * `ErrorCode` - The website returned an error code
+    #[tracing::instrument(skip_all)]
+    pub async fn get_gist_content(&self, gist_url: &str) -> GistContent {
+        tracing::info!(
+            "Get the content for the following github gist: {}",
+            &gist_url
+        );
+        match gist_url.split_once(GIST_URL) {
+            Some(split) => {
+                if !split.0.is_empty() {
+                    tracing::error!(
+                        "The given url is not a github gist url (second split). Url: {}",
+                        &gist_url
                     );
+                    return Err(GithubGistError::NotGist(gist_url.to_string()));
                 }
-                return vec![String::from(
-                    "Nothing in here, there was an error retrieving content!",
-                )];
+            }
+            None => {
+                tracing::error!(
+                    "The given url is not a github gist url (first split). Url: {}",
+                    &gist_url
+                );
+                return Err(GithubGistError::NotGist(gist_url.to_string()));
+            }
+        }
+
+        if gist_url == GIST_URI {
+            tracing::error!(
+                "The given url is the main page for github gist. Url: {}",
+                &gist_url
+            );
+            return Err(GithubGistError::NotGist(gist_url.to_string()));
+        }
+
+        // get gist
+        let response_body = match self.client.get(gist_url).send().await {
+            Ok(res) => {
+                if res.status() != reqwest::StatusCode::OK {
+                    tracing::error!(
+                        "Get request to {} return status code: {}",
+                        &gist_url,
+                        &res.status()
+                    );
+                    return Err(GithubGistError::ErrorCode(res.status()));
+                }
+
+                match res.text().await {
+                    Ok(body) => body,
+                    Err(err) => {
+                        tracing::error!(
+                            "The response body recieved from {} is invalid. Error: {}",
+                            &gist_url,
+                            &err
+                        );
+                        return Err(GithubGistError::InvalidReponseBody(err));
+                    }
+                }
+            }
+            Err(err) => {
+                tracing::error!(
+                    "Failed to make a get request to {}. Error: {}",
+                    &gist_url,
+                    &err
+                );
+                return Err(GithubGistError::InvalidRequest(err));
             }
         };
 
-        // using unwrap here is ok since the pattern is already pre tested.
-        let relative_gist_path = gist_url.replace("https://gist.github.com/", "\"/");
-        let re = Regex::new((relative_gist_path + "/raw/.*?\"").as_ref()).unwrap();
+        // get raw gist urls
+        // unwrap here is safe since we already checked if the url containst the const GIST_URL
+        let gist_location = gist_url.split_once(GIST_URL).unwrap().1;
+        let raw_gist_sep = &GIST_RAW_URL_SPLIT.replace("{GIST_LOCATION}", gist_location);
 
-        let gist_files_urls_match = re.captures_iter(gist_page_content.as_str());
-
-        let mut gist_file_urls = vec![];
-
-        for gist_file_url in gist_files_urls_match {
-            gist_file_urls.push(
-                "https://gist.githubusercontent.com".to_string()
-                    + &gist_file_url[0].replace('"', ""),
+        // check if the gist content we got is valid
+        if !response_body.contains(raw_gist_sep) {
+            tracing::error!(
+                "The response body from {} doesn't contain any raw gist links. Response body {}",
+                &gist_url,
+                &response_body
             );
+            return Err(GithubGistError::InvalidPageContent);
         }
 
-        let mut gist_files = vec![];
-        for gist_file_url in gist_file_urls {
-            gist_files.push(tokio::task::spawn(reqwest::get(gist_file_url)));
-        }
-
-        let gist_files = futures::future::join_all(gist_files).await;
-        let mut gist_files_awaited = vec![];
-        for gist_file in gist_files {
-            gist_files_awaited.push(match gist_file {
-                Ok(value) => {
-                    match value {
-                        Ok(content) => content,
-                        Err(error) => {
-                            if enable_warnings {
-                                eprintln!("{} {}", "[512][Warning] There was an error reading the content of a gist (debug: part 2), the given error is:".yellow(), format!("{}", error).red());
-                            }
-                            return vec![String::from(
-                                "Nothing in here, there was an error retireving content!",
-                            )];
-                        }
-                    }
-                }
-                Err(error) => {
-                    if enable_warnings {
-                        eprintln!("{} {}", "[513][Warning] There was an error reading the content of a gist (debug: part 1), the given error is:".yellow(), format!("{}", error).red());
-                    }
-                    return vec![String::from(
-                        "Nothing in here, there was an error retireving content!",
-                    )];
-                }
-            });
-        }
-
-        let mut gist_files_content = vec![];
-
-        for gist_file_awaited in gist_files_awaited {
-            gist_files_content.push(tokio::task::spawn(gist_file_awaited.text()));
-        }
-        let gist_files_content = futures::future::join_all(gist_files_content).await;
-
-        let mut gist_files_content_awaited = vec![];
-        for gist_file_content in gist_files_content {
-            gist_files_content_awaited.push(match gist_file_content {
-                Ok(content) => {
-                    match content {
-                        Ok(content) => content,
-                        Err(error) => {
-                            if enable_warnings {
-                                eprintln!("{} {}", "[514][Warning] There was an error reading the content of a recieved request from gist.github.com (debug: part 2), the given error is:".yellow(), format!("{}", error).red());
-                            }
-                            return vec![String::from(
-                                "Nothing in here, there was an error retireving content!",
-                            )];
-                        }
-                    }
-                }
-                Err(error) => {
-                    if enable_warnings {
-                        eprintln!("{} {}", "[515][Warning] There was an error reading the content of a recieved request from gist.github.com (debug: part 1), the given error is:".yellow(), format!("{}", error).red());
-                    }
-                    return vec![String::from(
-                        "Nothing in here, there was an error retireving content!",
-                    )];
-                }
+        // get raw gist urls
+        let raw_gist_urls: Vec<String> = response_body
+            .split(&GIST_RAW_URL_SPLIT.replace("{GIST_LOCATION}", gist_location))
+            .skip(1)
+            .filter_map(|s| s.split_once("\" ").map(|s_split| s_split.0))
+            .map(|url| {
+                GIST_RAW_URL
+                    .replace("{GIST_LOCATION}", gist_location)
+                    .replace("{FILE_URL}", url)
             })
+            .collect();
+
+        // check if we got any urls
+        if raw_gist_urls.is_empty() {
+            tracing::error!(
+                "After filtering the raw gist urls from {} there were none left.",
+                &gist_url
+            );
+            return Err(GithubGistError::InvalidPageContent);
         }
 
-        gist_files_content_awaited
+        tracing::debug!(
+            "Request all github gist files (from {}) {:#?} parallel as a future.",
+            &gist_url,
+            &raw_gist_urls
+        );
+        // get request all gist files at the same time
+        let gist_files = futures::stream::iter(raw_gist_urls)
+            .map(|url| {
+                let client = self.client.clone();
+                tokio::spawn(async move {
+                    Ok(match client.get(&url).send().await {
+                        Ok(res) => {
+                            if res.status() != reqwest::StatusCode::OK {
+                                tracing::error!(
+                                    "Making get request to {} returned status code: {}",
+                                    &url,
+                                    &res.status()
+                                );
+                                return Err(GithubGistError::ErrorCode(res.status()));
+                            }
+
+                            match res.text().await {
+                                Ok(text) => text,
+                                Err(err) => {
+                                    tracing::error!(
+                                        "The response body recieved from {} is invalid. Error: {}",
+                                        &url,
+                                        &err
+                                    );
+                                    return Err(GithubGistError::InvalidReponseBody(err));
+                                }
+                            }
+                        }
+                        Err(err) => {
+                            tracing::error!(
+                                "Failed to make a get request to {}. Error: {}",
+                                &url,
+                                &err
+                            );
+                            return Err(GithubGistError::InvalidRequest(err));
+                        }
+                    })
+                })
+            })
+            .buffered(5)
+            .collect::<Vec<_>>()
+            .await;
+
+        // filter out the files we failed to get
+        let gist_files = gist_files
+            .into_par_iter()
+            .filter_map(|file| match file {
+                Ok(Ok(file)) => Some(file),
+                Ok(Err(_)) => None,
+                Err(_) => None,
+            })
+            .collect::<Vec<String>>();
+
+        // check if we managed to get back any file
+        if gist_files.is_empty() {
+            tracing::error!(
+                "Failed to get any of the gist files from gist: {}",
+                &gist_url
+            );
+            return Err(GithubGistError::NoGistFileGot);
+        }
+
+        // return gist files
+        Ok(gist_files)
     }
 
-    pub async fn get_name_and_content(
-        querry: &str,
-        enable_warnings: bool,
-    ) -> IndexMap<String, tokio::task::JoinHandle<Vec<String>>> {
-        let links = GithubGist::get_links(querry, enable_warnings).await;
+    /// Search for results using duckduckgo and a provided query on GitHub gists. This function will
+    /// go through ALL of those results and crate a future for each one which will start getting
+    /// the content asynchronously for ALL of them. Each of this Futures is associated with the
+    /// title of the page and returned inside a Vec for preserved order.
+    ///
+    /// PLEASE READ: While setting a limit is optional, doing 100 requests to GitHub at once will
+    /// probably get you rate limited.
+    ///
+    /// # Arguments
+    ///
+    /// * `query` - The query to search for.
+    /// * `limit` - Optional, but doing 100 requests to GitHub at once will
+    /// probably get you rate limited. A recommended value is something like 10 for enough results
+    /// and still good results.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run // don't run because it fails github code action
+    /// use falion::search::github_gist;
+    ///
+    /// # async fn run() -> Result<(), github_gist::GithubGistError> {
+    /// let github_gist = github_gist::GithubGist::new();
+    /// let gist_content = github_gist
+    ///     .get_multiple_gists_content("Rust basics", Some(1))
+    ///     .await
+    ///     .unwrap();
+    ///
+    /// for p in gist_content {
+    ///    assert!(!p.1.await.unwrap().unwrap().is_empty())
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// returns github_gist::GithubGistError;
+    ///
+    /// * `DdgError` - error with getting results from DuckDuckGO. (ddg::DdgError)
+    ///
+    /// First error is for duckduckgo, second is for the future hanle, third is for the actual
+    /// page content
+    #[tracing::instrument(skip_all)]
+    pub async fn get_multiple_gists_content(
+        &self,
+        query: &str,
+        limit: Option<usize>,
+    ) -> Result<Vec<(String, tokio::task::JoinHandle<GistContent>)>, GithubGistError> {
+        tracing::info!("Get multiple GitHub gists and their content for search query: {} with a results limit of: {:#?}", &query, &limit);
+        // get the links from duckduckgo
+        let links = match self
+            .ddg
+            .get_links(query, Some(GIST_SITE), Some(false), None, limit)
+            .await
+        {
+            Ok(res) => res,
+            Err(err) => return Err(GithubGistError::DdgError(err)),
+        };
 
-        let mut page_content = IndexMap::new();
+        // create a new Vec
+        let mut gists_content = Vec::with_capacity(links.len());
+
+        // start looping through the links associating the page title and the joinhandle for
+        // the future the scrapes the content of the page by inserting them togheter in the
+        // Vec inside a tuple
         for link in links {
-            page_content.insert(
-                link.0.replace(' ', " | "),
-                tokio::task::spawn(GithubGist::get_gist_content(link.1, enable_warnings)),
-            );
+            // unwrap is safe here since ddg & GithubGist do all the checks
+            let name = match link.split_once(GIST_URL) {
+                Some(s) => match s.1.split_once('/') {
+                    Some(s) => s.0,
+                    None => continue,
+                },
+                None => continue,
+            };
+            let id = link.split('/').last().unwrap().replace('-', " ");
+            let mut full_name = String::with_capacity(name.len() + id.len() + 3);
+            full_name.push_str(name);
+            full_name.push_str(" | ");
+            full_name.push_str(&id);
+            // insert page content
+            let client = self.client.clone();
+            gists_content.push((
+                full_name,
+                tokio::task::spawn(async move {
+                    Self::with_client(client).get_gist_content(&link).await
+                }),
+            ));
         }
 
-        page_content
+        // return the Vec
+        Ok(gists_content)
+    }
+}
+
+impl Default for GithubGist {
+    fn default() -> Self {
+        GithubGist::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::search;
+    use rand::Rng;
+    use std::thread;
+    use std::time::Duration;
+
+    #[tokio::test]
+    async fn test_get_gist() {
+        let client = search::util::client_with_special_settings();
+        let github_gist = GithubGist::with_client(client);
+
+        let link = "https://gist.github.com/noxasaxon/7bf5ebf930e281529161e51cd221cf8a";
+
+        let gist_content = github_gist.get_gist_content(link).await.unwrap();
+
+        assert!(!gist_content.is_empty())
+    }
+
+    #[ignore] // ignore to pass github code actions, it work on local machine
+    #[test]
+    fn test_get_multiple_gists_content() {
+        let test = async {
+            // random sleep time to prevent rate limiting when testing
+            thread::sleep(Duration::from_secs(rand::thread_rng().gen_range(0..5)));
+
+            // actual function
+            let client = util::client_with_special_settings();
+            let github_gist = GithubGist::with_client(client);
+
+            let gist_content = github_gist
+                .get_multiple_gists_content("Rust threading", Some(1))
+                .await
+                .unwrap();
+
+            for p in gist_content {
+                assert!(!p.1.await.unwrap().unwrap().is_empty())
+            }
+        };
+
+        tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap()
+            .block_on(test)
     }
 }

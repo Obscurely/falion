@@ -1,47 +1,99 @@
 [package]
 name = "falion"
-authors = ["Obscurely <adrian.obscurely@protonmail.com>"]
-version = "0.2.0"
+authors = ["Obscurely <adrian.obscurely@protonmail.com"]
+version = "1.0.0"
 edition = "2021"
-rust-version = "1.60"                                                                            # Minimal rust version, should work with older versions, but for compatibility this is the one I used.
-description = "A fast, asynchronous tool for getting and reading various programming resources."
-documentation = "https://github.com/Obscurely/falion"
+rust-version = "1.76.0"                                        # Minimum rust version
+resolver = "2"
+description = "An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI. "
+documentation = "https://github.com/Obscurely/falion/blob/master/README.md"
 repository = "https://github.com/Obscurely/falion"
 homepage = "https://github.com/Obscurely/falion"
-categories = ["command-line-utilities"]
-keywords = ["cli", "fast", "open-source", "asynchronous", "efficient"]
+categories = ["command-line-utilities", "web-programming"]
+keywords = ["cli", "ui", "async", "stackoverflow", "parallel"]
 readme = "README.md"
-license = "GPL-3.0-only"
+license = "MIT"
+build = "build.rs"
+
+#═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [package.metadata.deb]
 maintainer = "Obscurely <adrian.obscurely@protonmail.com>"
-copyright = "2022, 2022 <adrian.obscurely@protonmail.com>"
+copyright = "2024, 2024 <adrian.obscurely@protonmail.com>"
 license-file = ["LICENSE", "0"]
 extended-description = """\
-An open source, privacy focused tool for getting programming resources fast,
-efficient and asynchronous from the terminal. By the time you see the results
-most of the pages are fully loaded. All the searches are done through
-DuckDuckGO. For more information about the program and key binds, please read
-the README.md on github: insert link here.""""
+An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI. """"
 depends = "$auto"
-section = "utility"
+section = "Utilities"
+
+#═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [profile.release]
 strip = true      # Automatically strip symbols from the binary.
 opt-level = 3     # Optimize for speed.
-lto = true        # instructs the linker to optimize at the link stage
+lto = true        # instructs the linker to optimize at the link stage.
 codegen-units = 1 # Default is 16, the higher the faster compile time, but it may produce slower code.
-panic = "abort"   # Since this falion is highly unlikely to panic and will handle all the errors, we don't need the need the extra code for panics and we can abort straight up.
+panic = "unwind"
+
+#═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+[build-dependencies]
+slint-build = "1.4.1"
+
+#═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+[target.'cfg(windows)'.build-dependencies]
+embed-resource = "2.4.2"
+
+#═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [dependencies]
-reqwest = "0.11.10"
-tokio = { version = "1.18.5", features = ["macros", "rt-multi-thread"] }
-regex = "1.5.5"
-urlencoding = "2.1.0"
-futures = "0.3.21"
-colored = "2.0.0"
-crossterm = "0.23.2"
-html2text = "0.3.1"
-url = "2.2.2"
-indexmap = "1.8.1"
-argparse = "0.2.2"
+chrono = { version = "0.4.35", default-features = false, features = ["clock"] }
+clap = { version = "4.5.2", features = ["derive"] }
+crossterm = "0.27.0"
+dashmap = "5.4.0"
+dirs = "5.0.1"
+futures = "0.3.30"
+hashbrown = "0.14.3"
+html2text = "0.12.4"
+rand = "0.8.5"
+rayon = "1.9.0"
+reqwest = { version = "0.11.25", features = [
+  "json",
+  "gzip",
+  "brotli",
+  "deflate",
+] }
+slint = "1.4.1"
+thiserror = "1.0.57"
+tokio = { version = "1.36.0", features = ["full"] }
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
+url = "2.5.0"
+urlencoding = "2.1.3"
+
+#═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+[target.'cfg(windows)'.dependencies]
+user32-sys = "0.2.0"
+winapi = { version = "0.3.9", features = ["winuser"] }
+kernel32-sys = "0.2.2"
+
+# Great examples include:
+#   - rand (togheter with rand_hc for cryptography)
+#   - serde and serde_json
+#   - reqwest
+#   - tokio
+#   - regex
+#   - clap (fully-featured args parsing), pico-args (minimal args parsing)
+#   - chrono (date and time)
+#   - tempfile
+#   - dirs
+#   - indexmap
+#   - thiserror and anyerror (for error handling)
+#   - tracing (logging)
+#   - walkdir (recursively read a directory)
+#   - rayon (using .par_iter() it makes iters run in parallel)
+#   - slint (ui framework)
+#   - sled (high performance, written in rust, db)
+#   - itertools (for when extra iterator methods are needed)

@@ -1,0 +1,39 @@
+// Copyright © SixtyFPS GmbH <info@slint.dev>
+// SPDX-License-Identifier: MIT
+
+import { ScrollView, VerticalBox , HorizontalBox, Button } from "std-widgets.slint";
+
+export component StaticContent inherits Window {
+    callback return-enter();
+
+    in property <string> content-tag: "Page";
+    in property <string> content;
+    in property <bool> enable-btns: false;
+
+    VerticalBox {
+        HorizontalBox { 
+            back-btn := Button {
+                text: " Back";
+                max-width: 50px;
+                enabled: enable-btns;
+                clicked => {
+                    root.return-enter();
+                }
+            }
+            text-content-tag := Text {
+                text: root.content-tag;
+                font-size: 28px;
+                min-width: 260px;
+                color: yellow;
+            }
+        }
+        ScrollView {
+          VerticalBox {
+              content := Text {
+                  wrap: TextWrap.word-wrap;
+                  text: root.content;
+              }
+          }
+        }
+    }
+}

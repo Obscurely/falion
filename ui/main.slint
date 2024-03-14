@@ -1,0 +1,153 @@
+// Copyright © SixtyFPS GmbH <info@slint.dev>
+// SPDX-License-Identifier: MIT
+
+import { Results } from "./results.slint";
+import { DynContent } from "./dyn_content.slint";
+import { StaticContent } from "./static_content.slint";
+
+import "../assets/fonts/RobotoMonoNerdFont-Regular.ttf";
+
+export component MainWindow inherits Window {
+    preferred-width: 1250px;
+    preferred-height: 750px;
+    min-width: 750px;
+    min-height: 500px;
+    default-font-size: 24px;
+    default-font-family: "RobotoMono Nerd Font";
+    title: "Falion";
+    icon: @image-url("../assets/images/logo.png");
+
+    in property <int> view: 0;
+
+    callback query-enter(string);
+    callback sof-enter();
+    callback sof-back-enter();
+    callback sof-next-enter();
+    callback se-enter();
+    callback se-back-enter();
+    callback se-next-enter();
+    callback gg-enter();
+    callback gg-back-enter();
+    callback gg-next-enter();
+    callback gfg-enter();
+    callback gfg-back-enter();
+    callback gfg-next-enter();
+    callback ddg-enter();
+    callback ddg-back-enter();
+    callback ddg-next-enter();
+    callback back-enter();
+    callback next-enter();
+
+    callback dyn-back-enter();
+    callback dyn-next-enter();
+    callback content-return-enter();
+
+    in property <bool> enable_search: true;
+
+    in property <string> sof-result: " ";
+    in property <string> se-result: " ";
+    in property <string> gg-result: " ";
+    in property <string> gfg-result: " ";
+    in property <string> ddg-result: " ";
+
+    in property <bool> is-sof: false;
+    in property <bool> is-sof-back: false;
+    in property <bool> is-sof-next: false;
+
+    in property <bool> is-se: false;
+    in property <bool> is-se-back: false;
+    in property <bool> is-se-next: false;
+
+    in property <bool> is-gg: false;
+    in property <bool> is-gg-back: false;
+    in property <bool> is-gg-next: false;
+
+    in property <bool> is-gfg: false;
+    in property <bool> is-gfg-back: false;
+    in property <bool> is-gfg-next: false;
+
+    in property <bool> is-ddg: false;
+    in property <bool> is-ddg-back: false;
+    in property <bool> is-ddg-next: false;
+    
+    in property <bool> is-back: false;
+    in property <bool> is-next: false;
+
+    in property <string> error: "";
+
+    in property <string> dyn-content-tag: "";
+    in property <string> dyn-content: "";
+    in property <string> static-content-tag: "";
+    in property <string> static-content: "";
+    in property <bool> enable_content_btns: false;
+
+    VerticalLayout {
+        if (view == 0) : Results {
+            query-enter(text) => {query-enter(text);}
+            sof-enter() => {sof-enter()}
+            sof-back-enter() => {sof-back-enter();}
+            sof-next-enter() => {sof-next-enter();}
+            se-enter() => {se-enter()}
+            se-back-enter() => {se-back-enter();}
+            se-next-enter() => {se-next-enter();}
+            gg-enter() => {gg-enter()}
+            gg-back-enter() => {gg-back-enter();}
+            gg-next-enter() => {gg-next-enter();}
+            gfg-enter() => {gfg-enter()}
+            gfg-back-enter() => {gfg-back-enter();}
+            gfg-next-enter() => {gfg-next-enter();}
+            ddg-enter() => {ddg-enter()}
+            ddg-back-enter() => {ddg-back-enter();}
+            ddg-next-enter() => {ddg-next-enter();}
+            back-enter() => {back-enter();}
+            next-enter() => {next-enter();}
+
+            enable-search: enable-search;
+
+            sof-result: sof-result;
+            se-result: se-result;
+            gg-result: gg-result;
+            gfg-result: gfg-result;
+            ddg-result: ddg-result;
+
+            is-sof: is-sof;
+            is-sof-back: is-sof-back;
+            is-sof-next: is-sof-next;
+
+            is-se: is-se;
+            is-se-back: is-se-back;
+            is-se-next: is-se-next;
+
+            is-gg: is-gg;
+            is-gg-back: is-gg-back;
+            is-gg-next: is-gg-next;
+
+            is-gfg: is-gfg;
+            is-gfg-back: is-gfg-back;
+            is-gfg-next: is-gfg-next;
+
+            is-ddg: is-ddg;
+            is-ddg-back: is-ddg-back;
+            is-ddg-next: is-ddg-next;
+
+            is-back: is-back;
+            is-next: is-next;
+
+            error: error;
+        }
+        if (view == 1) : DynContent {
+            content-tag: dyn-content-tag;
+            content: dyn-content;
+            enable-btns: enable-content-btns;
+            next-enter() => {dyn-next-enter();}
+            back-enter() => {dyn-back-enter();}
+            return-enter() => {content-return-enter();}
+        }
+        if (view == 2) : StaticContent {
+            content-tag: static-content-tag;
+            content: static-content;
+            enable-btns: enable-content-btns;
+            return-enter() => {content-return-enter();}
+        }
+    }
+}

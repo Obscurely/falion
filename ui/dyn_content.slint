@@ -1,0 +1,61 @@
+// Copyright © SixtyFPS GmbH <info@slint.dev>
+// SPDX-License-Identifier: MIT
+
+import { Button, HorizontalBox, VerticalBox, ScrollView } from "std-widgets.slint";
+
+export component DynContent inherits Window {
+    callback return-enter();
+    callback next-enter();
+    callback back-enter();
+    default-font-size: 24px;
+
+    in property <string> content-tag: "Content";
+    in property <string> content;
+    in property <bool> enable_btns: false;
+
+    VerticalBox {
+        HorizontalBox {
+          back-btn := Button {
+              text: " Back";
+              max-width: 50px;
+              enabled: enable-btns;
+              clicked => {
+                  root.return-enter();
+              }
+          }
+          text-content-tag := Text {
+              text: root.content-tag;
+              font-size: 28px;
+              min-width: 260px;
+              color: yellow;
+          }
+        }
+        ScrollView {
+          VerticalBox {
+              content := Text {
+                  wrap: TextWrap.word-wrap;
+                  text: root.content;
+              }
+          }
+        }
+        HorizontalBox {
+            btn-content-back := Button {
+                text: "";
+                max-height: 30px;
+                enabled: enable-btns;
+                clicked => {
+                    root.back-enter();
+                }
+            }
+            spacing: 500px;
+            btn-content-next := Button {
+                text: "";
+                max-height: 30px;
+                enabled: enable-btns;
+                clicked => {
+                    root.next-enter();
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,263 @@
+---
+name: Release
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+*"]
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+  CARGO_TERM_COLOR: always
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create release
+        uses: "softprops/action-gh-release@v1"
+        with:
+          generate_release_notes: true
+          name: ${{ github.event.repository.name }} ${{ github.ref_name }}
+          prerelease: false
+          body: "Explicit changelog comming soon!"
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Dependencies
+        run: |
+          brew install create-dmg
+          brew install grep
+          brew install gnu-sed
+          brew install gnu-tar
+          brew install coreutils
+      - name: Prepare
+        run: |
+          VER=$(echo "${GITHUB_REF##*/}" | gsed -e 's/v//g' | gsed -e 's/-.*//g')
+          gsed -i "0,/version = \".*/s//version = \"$VER\"/" Cargo.toml
+          mkdir -p target/osx
+      - name: Build
+        run: |
+          SLINT_NO_QT=1 cargo build --release
+      - name: Copy bin
+        run: |
+          BIN_NAME=$(ggrep -o -P '(?<=name = ").*(?=")' Cargo.toml)
+          chmod +x "target/release/$BIN_NAME"
+          cp "target/release/$BIN_NAME" "target/osx/$BIN_NAME-macos"
+      - name: Dotapp
+        run: |
+          BIN_NAME=$(ggrep -o -P '(?<=name = ").*(?=")' Cargo.toml)
+          cp "target/osx/$BIN_NAME-macos" "resources/macos/${GITHUB_REPOSITORY##*/}.app/Contents/MacOS/$BIN_NAME"
+          cd resources/macos/
+          gsed -i "s/VERSION_PLACEHOLDER/${GITHUB_REF##*/}/g" "${GITHUB_REPOSITORY##*/}.app/Contents/Info.plist"
+          gtar -czf "$BIN_NAME-macos-app.tar.gz" "${GITHUB_REPOSITORY##*/}.app/"
+          cd ../../
+          cp "resources/macos/$BIN_NAME-macos-app.tar.gz" "target/osx/$BIN_NAME-macos-app.tar.gz"
+      - name: DMG installer
+        run: |
+          cd resources/macos
+          ./make-dmg.sh
+          cd ../../
+      - name: Archive for Homebrew
+        run: |
+          BIN_NAME=$(ggrep -o -P '(?<=name = ").*(?=")' Cargo.toml)
+          cp LICENSE target/osx/LICENSE
+          cp README.md target/osx/README.md
+          cd target/osx/
+          cp "$BIN_NAME-macos" "$BIN_NAME"
+          gtar -czf "$BIN_NAME-macos.tar.gz" "$BIN_NAME" LICENSE README.md
+          rm -f README.md LICENSE "$BIN_NAME"
+          cd ../../
+      - name: Homebrew
+        if: "contains(github.ref, 'stable')"
+        run: |
+          BIN_NAME=$(ggrep -o -P '(?<=name = ").*(?=")' Cargo.toml)
+          PARSED_VERSION=$(echo "${GITHUB_REF##*/}" | ggrep -o -P '(?<=v).*(?=-)')
+          cd target/osx/
+          TAR_SHA=$(gsha256sum "$BIN_NAME-macos.tar.gz" | gsed "s/  $BIN_NAME-macos.tar.gz//g")
+          cd ../../
+          gsed -i "s/VERSION_PLACEHOLDER/$PARSED_VERSION/g" "resources/macos/$BIN_NAME.rb"
+          gsed -i "s/SHA_PLACEHOLDER/$TAR_SHA/g" "resources/macos/$BIN_NAME.rb"
+          git clone "https://github.com/$GITHUB_REPOSITORY_OWNER/homebrew-tap"
+          mkdir -p homebrew-tap/Formula
+          cp "resources/macos/$BIN_NAME.rb" "homebrew-tap/Formula/$BIN_NAME.rb"
+      - name: Commit homebrew file
+        if: "contains(github.ref, 'stable')"
+        run: |
+          cd homebrew-tap/
+          git config --local user.name "$GITHUB_REPOSITORY_OWNER"
+          git config --local user.email "$GITHUB_REPOSITORY_OWNER@users.noreply.github.com"
+          git add .
+          git commit -m "update ${GITHUB_REPOSITORY##*/}"
+          git push "https://$GITHUB_REPOSITORY_OWNER:$API_TOKEN_GITHUB@github.com/$GITHUB_REPOSITORY_OWNER/homebrew-tap.git"
+          cd ../../
+      - name: Upload assets
+        uses: "softprops/action-gh-release@v1"
+        with:
+          files: |
+            target/osx/*
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Install Rust"
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          target: "x86_64-pc-windows-msvc"
+      - name: Prepare
+        shell: bash
+        run: |
+          VER=$(echo "${GITHUB_REF##*/}" | sed -e 's/v//g' | sed -e 's/-.*//g')
+          sed -i "0,/version = \".*/s//version = \"$VER\"/" Cargo.toml
+          mkdir -p target/win
+      - name: Install cargo-wix
+        shell: bash
+        run: cargo install cargo-wix
+      - name: Build
+        run: |
+          SLINT_NO_QT=1 cargo build --release
+      - name: Copy bin
+        shell: bash
+        run: |
+          BIN_NAME=$(LC_ALL=en_US.utf8 grep -o -P '(?<=name = ").*(?=")' Cargo.toml)
+          cp "target/release/$BIN_NAME.exe" "target/win/$BIN_NAME-windows.exe"
+      - name: Setup Wix
+        shell: bash
+        run: |
+          mkdir wix
+          cp "resources/windows/main.wxs" "wix/main.wxs"
+          cp "resources/windows/License.rtf" "wix/License.rtf"
+      - name: Run cargo wix
+        shell: pwsh
+        run: |
+          cargo wix --nocapture
+      - name: Copy setup
+        shell: bash
+        run: |
+          BIN_NAME=$(LC_ALL=en_US.utf8 grep -o -P '(?<=name = ").*(?=")' Cargo.toml)
+          cp target/wix/*.msi "target/win/$BIN_NAME-windows-setup.msi"
+      - name: Upload assets
+        uses: "softprops/action-gh-release@v1"
+        with:
+          files: |
+            target/win/*
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Dependencies
+        run: |
+          sudo apt-get install -y libxcb-shape0-dev libxcb-xfixes0-dev libxkbcommon-dev libfontconfig-dev pkg-config
+          cargo install cargo-deb
+      - name: Prepare
+        run: |
+          VER=$(echo "${GITHUB_REF##*/}" | sed -e 's/v//g' | sed -e 's/-.*//g')
+          sed -i "0,/version = \".*/s//version = \"$VER\"/" Cargo.toml
+          mkdir -p target/linux
+      - name: Build
+        run: |
+          SLINT_NO_QT=1 cargo build --release
+      - name: Copy bin
+        run: |
+          BIN_NAME=$(grep -o -P '(?<=name = ").*(?=")' Cargo.toml)
+          chmod +x "target/release/$BIN_NAME"
+          cp "target/release/$BIN_NAME" "target/linux/$BIN_NAME-linux"
+      - name: Deb package
+        run: |
+          cargo deb
+          BIN_NAME=$(grep -o -P '(?<=name = ").*(?=")' Cargo.toml)
+          cp target/debian/*.deb "target/linux/$BIN_NAME-linux.deb"
+      - name: AppImage
+        run: |
+          BIN_NAME=$(grep -o -P '(?<=name = ").*(?=")' Cargo.toml)
+          cp "target/release/$BIN_NAME" "resources/linux/${GITHUB_REPOSITORY##*/}.AppDir/usr/bin/$BIN_NAME"
+          cp LICENSE "resources/linux/${GITHUB_REPOSITORY##*/}.AppDir/LICENSE"
+          chmod +x "resources/linux/${GITHUB_REPOSITORY##*/}.AppDir/usr/bin/$BIN_NAME"
+          wget -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O appimagetool-x86_64.AppImage
+          chmod a+x appimagetool-x86_64.AppImage
+          ./appimagetool-x86_64.AppImage --appimage-extract
+          ARCH=x86_64 ./squashfs-root/AppRun "resources/linux/${GITHUB_REPOSITORY##*/}.AppDir/"
+          cp "${GITHUB_REPOSITORY##*/}-x86_64.AppImage" "target/linux/$BIN_NAME-linux.AppImage"
+      - name: Tar
+        run: |
+          BIN_NAME=$(grep -o -P '(?<=name = ").*(?=")' Cargo.toml)
+          cp "target/release/$BIN_NAME" "$BIN_NAME"
+          mkdir linux
+          cp -r "resources/linux/desktop" "linux/desktop"
+          tar -czf "$BIN_NAME-linux.tar.gz" "$BIN_NAME" "LICENSE" "README.md" "linux/desktop"
+          cp "$BIN_NAME-linux.tar.gz" "target/linux/$BIN_NAME-linux.tar.gz"
+      - name: Nix
+        run: |
+          BIN_NAME=$(grep -o -P '(?<=name = ").*(?=")' Cargo.toml)
+          APPIMAGE_SHA=$(sha256sum "${GITHUB_REPOSITORY##*/}-x86_64.AppImage" | sed -e "s/  ${GITHUB_REPOSITORY##*/}-x86_64.AppImage//g")
+          PKGVER=$(echo "${GITHUB_REF##*/}" | sed -e 's/v//g' | sed -e 's/-.*//g')
+          sed -i "s/VERSION_PLACEHOLDER/$PKGVER/g" "resources/linux/${GITHUB_REPOSITORY##*/}.nix"
+          sed -i "s/SHA_PLACEHOLDER/$APPIMAGE_SHA/g" "resources/linux/${GITHUB_REPOSITORY##*/}.nix"
+          cp "resources/linux/${GITHUB_REPOSITORY##*/}.nix" "target/linux/$BIN_NAME-linux.nix"
+      - name: AUR setup
+        run: |
+          BIN_NAME=$(grep -o -P '(?<=name = ").*(?=")' Cargo.toml)
+          PKGVER=$(echo "${GITHUB_REF##*/}" | sed -e 's/v//g' | sed -e 's/-.*//g')
+          PKGVER_GIT=$(git describe --tags | sed -e 's/-.*//' | sed -e 's/v//' | sed -e 's/-/./g')
+          TAR_SHA=$(sha256sum "$BIN_NAME-linux.tar.gz" | sed -e "s/  $BIN_NAME-linux.tar.gz//g")
+          sed -i "s/PKGVER-PLACEHOLDER/$PKGVER/g" resources/linux/AUR/bin/PKGBUILD
+          sed -i "s/PKGVER-PLACEHOLDER/$PKGVER_GIT/g" resources/linux/AUR/git/PKGBUILD
+          sed -i "s/PKGVER-PLACEHOLDER/$PKGVER/g" resources/linux/AUR/stable/PKGBUILD
+          sed -i "s/SHA-PLACEHOLDER/$TAR_SHA/g" resources/linux/AUR/bin/PKGBUILD
+          echo "AUR_BASE=$BIN_NAME" >> "$GITHUB_ENV"
+      - name: Publish AUR bin
+        if: "contains(github.ref, 'stable')"
+        uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
+        with:
+          pkgname: ${{ env.AUR_BASE }}-bin
+          pkgbuild: ./resources/linux/AUR/bin/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: Update AUR package
+          ssh_keyscan_types: rsa,dsa,ecdsa,ed25519
+      - name: Publish AUR git
+        uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
+        with:
+          pkgname: ${{ env.AUR_BASE }}-git
+          pkgbuild: ./resources/linux/AUR/git/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: Update AUR package
+          ssh_keyscan_types: rsa,dsa,ecdsa,ed25519
+      - name: Publish AUR stable
+        if: "contains(github.ref, 'stable')"
+        uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
+        with:
+          pkgname: ${{ env.AUR_BASE }}
+          pkgbuild: ./resources/linux/AUR/stable/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: Update AUR package
+          ssh_keyscan_types: rsa,dsa,ecdsa,ed25519
+      - name: Upload assets
+        uses: "softprops/action-gh-release@v1"
+        with:
+          files: |
+            target/linux/*
+  cratesio:
+    if: "contains(github.ref, 'stable')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Prepare
+        run: |
+          VER=$(echo "${GITHUB_REF##*/}" | sed -e 's/v//g' | sed -e 's/-.*//g')
+          sed -i "0,/version = \".*/s//version = \"$VER\"/" Cargo.toml
+          mkdir -p target/linux
+      - name: Build
+        run: cargo build --release
+      - name: Publish to crates.io
+        run: cargo publish --token "${CRATES_TOKEN}" --allow-dirty
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}

@@ -1,0 +1,16 @@
+# cargo fuzz
+target/
+corpus/
+artifacts/
+debug/
+
+# cargo lock
+Cargo.lock
+
+# rustfmt backup files
+**/*.rs.bk
+
+# system files
+*.pdb
+.DS_Store
+.cargo-ok

@@ -1,0 +1,13 @@
+---
+contact_links:
+  - name: 👨‍👨‍👦‍👦 Ask a question on github
+    url: https://github.com/Obscurely/falion/discussions/
+    about: Ask questions and discuss with other community members.
+  - name: 💬 Discord Chat
+    url: https://discord.gg/ykp5kb46TY
+    about: >
+      Ask questions and talk to other falion users and the maintainers.
+
+  - name: 📧 Email
+    url: https://mailxto.com/98oqvzjr7k
+    about: Send me an email if you wanna say more or talk privately.

@@ -1,0 +1,26 @@
+[package]
+name = "falion-fuzz"
+version = "0.0.0"
+authors = ["Automatically generated"]
+publish = false
+edition = "2018"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+tokio = "1.29.1"
+
+[dependencies.falion]
+path = ".."
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "fuzz_ddg_get_links"
+path = "fuzz_targets/fuzz_ddg_get_links.rs"
+test = false
+doc = false

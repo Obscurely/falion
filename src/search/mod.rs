@@ -1,5 +1,5 @@
-pub mod duckduckgo;
-pub mod duckduckgo_search;
+pub mod ddg;
+pub mod ddg_search;
 pub mod geeksforgeeks;
 pub mod github_gist;
 pub mod stackexchange;
