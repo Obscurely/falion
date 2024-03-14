@@ -34,7 +34,7 @@ None
 
 ## v1.0.0-stable
 
-### Highlights
+### Highlights v1.0.0
 
 - Whole project rewritten, now with more than year more of experience, learning
   and building with rust. The cli part of the project provides almost the same
@@ -55,14 +55,14 @@ None
 - Code is much more maintainable with added code documentation, more idiomatic
   design and logging for easier debugging.
 
-### Breaking Changes
+### Breaking Changes v1.0.0
 
 - End user experience is as close as to the original as possible, but the whole
   application has been rewritten entirely.
 - The whole structure of this repository has changed since I rewritten it using
   [my rust template](https://github.com/Obscurely/RustTemplate).
 
-### Added
+### Added v1.0.0
 
 - Checks in duckduckgo search with more meaningful errors making it way more
   robust.
@@ -81,7 +81,7 @@ None
 - Added a GUI made with slint that is used when not running the program from the
   cli.
 
-### Changed
+### Changed v1.0.0
 
 - Bumped rust version to 1.76.0
 - Bumped all the crates to the latest version.
@@ -89,8 +89,9 @@ None
   now there is one with half the code, way faster and more robust.
 - There is one global client that is used across all objects and threads .This
   makes the program way faster than before.
-- Regex is not used anymore since all that look back crap is slow. Switched to
-  plain splitting the content. This improves the performance by quite a bit.
+- Regular expressions are not used anymore since all that look back crap is
+  slow. Switched to plain splitting the content. This improves the performance
+  by quite a bit.
 - Rewrote ddg.rs completely. Performance improvements and way better results.
 - Rewrote stackoverflow.rs completely. Many performance improvements, using only
   one global client, many checks in place.
@@ -107,19 +108,19 @@ None
   requesting the gist files instead of concurent and simplified process.
 - Better error handling.
 - Better argument parsing using clap instead of arg_parse.
-- Rewrote the cli. More efficient, less error prone and just better in general.
+- Rewrote the cli. More efficient, less error-prone and just better in general.
   Note: it works almost the same, this is just the backend.
 - Made code way more maintainable.
 - Actual cli code is in it's own module.
 - Replaced IndexMap everywhere with either a vector of tuples or dashmap in ui
   and hashbrown in cli for improved performance.
 
-### Fixed
+### Fixed v1.0.0
 
 - Fix duckduckgo results, now they are actually good.
 - Compiling to windows & macOS doesn't fail now.
 - GeeksForGeeks pages don't contain the extra crap now.
 
-### Security
+### Security v1.0.0
 
 - Fixed a bunch of security issues that appeared over time in the last version.
