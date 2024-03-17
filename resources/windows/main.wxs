@@ -128,6 +128,16 @@
             </Directory>
         </Directory>
 
+        <!-- Create startmenu shortcut -->
+        <DirectoryRef Id="FalionProgramMenu">
+         <!-- Application shortcut -->
+         <Component Id="FalionShortcut" Guid="33685DC3-2E79-4A7B-B3A7-06D0BE4935EE">
+            <Shortcut Id="FalionShortcutFile" Name="Falion" Description="Programming Resources Scraper" Target="[TARGETDIR]falion.exe" />
+            <RemoveFolder Id="FalionProgramMenu" On="uninstall" />
+            <RegistryValue Root="HKCU" Key="Software\Microsoft\Falion" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+         </Component>
+        </DirectoryRef>
+
         <Feature
             Id='Binaries'
             Title='Application'
