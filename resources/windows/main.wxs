@@ -127,30 +127,28 @@
                 </Directory>
             </Directory>
             <Directory Id="ProgramMenuFolder" Name="Programs">
-                <Directory Id="ApplicationProgramsFolder" Name="falion">
                     <!-- Component for Start Menu Shortcut -->
-                    <Component Id="ApplicationShortcut" Guid="*">
-                        <Shortcut Id="ApplicationStartMenuShortcut"
-                                  Name="falion"
-                                  Description="Open falion"
-                                  Target="[Bin]falion.exe"
-                                  WorkingDirectory='APPLICATIONFOLDER'/>
-                        <RegistryValue
-                            Root='HKCU'
-                            Key='Software\[Manufacturer]\[ProductName]'
-                            Name='installed'
-                            Type='integer'
-                            Value='1'
-                            KeyPath='yes'/>
-                        <RemoveFolder Id='ApplicationProgramsFolder' On='uninstall'/>
-                    </Component>
-                </Directory>
+                <Component Id="ApplicationShortcut" Guid="*">
+                    <Shortcut Id="ApplicationStartMenuShortcut"
+                              Name="Falion"
+                              Description="Open falion"
+                              Target="[Bin]falion.exe"
+                              WorkingDirectory='APPLICATIONFOLDER'/>
+                    <RegistryValue
+                        Root='HKCU'
+                        Key='Software\[Manufacturer]\[ProductName]'
+                        Name='installed'
+                        Type='integer'
+                        Value='1'
+                        KeyPath='yes'/>
+                    <RemoveFolder Id='ApplicationProgramsFolder' On='uninstall'/>
+                </Component>
             </Directory>
             <Directory Id="DesktopFolder" Name="Desktop">
                 <!-- Component for Desktop Shortcut -->
                 <Component Id="DesktopShortcut" Guid="*">
                     <Shortcut Id="ApplicationDesktopShortcut"
-                              Name="falion"
+                              Name="Falion"
                               Description="Open falion"
                               Target="[Bin]falion.exe"
                               WorkingDirectory='APPLICATIONFOLDER'/>
