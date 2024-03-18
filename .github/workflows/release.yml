@@ -116,7 +116,8 @@ jobs:
         run: cargo install cargo-wix
       - name: Build
         run: |
-          SLINT_NO_QT=1 cargo build --release
+          setx "SLINT_NO_QT" "1"
+          cargo build --release
       - name: Copy bin
         shell: bash
         run: |
