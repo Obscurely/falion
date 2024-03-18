@@ -126,6 +126,42 @@
                     </Directory>
                 </Directory>
             </Directory>
+            <Directory Id="ProgramMenuFolder" Name="Programs">
+                    <!-- Component for Start Menu Shortcut -->
+                <Component Id="ApplicationShortcut" Guid="*">
+                    <Shortcut Id="ApplicationStartMenuShortcut"
+                              Name="Falion"
+                              Description="Open falion"
+                              Target="[Bin]falion.exe"
+                              WorkingDirectory='APPLICATIONFOLDER'/>
+                    <RegistryValue
+                        Root='HKCU'
+                        Key='Software\[Manufacturer]\[ProductName]'
+                        Name='installed'
+                        Type='integer'
+                        Value='1'
+                        KeyPath='yes'/>
+                    <RemoveFolder Id='ApplicationProgramsFolder' On='uninstall'/>
+                </Component>
+            </Directory>
+            <Directory Id="DesktopFolder" Name="Desktop">
+                <!-- Component for Desktop Shortcut -->
+                <Component Id="DesktopShortcut" Guid="*">
+                    <Shortcut Id="ApplicationDesktopShortcut"
+                              Name="Falion"
+                              Description="Open falion"
+                              Target="[Bin]falion.exe"
+                              WorkingDirectory='APPLICATIONFOLDER'/>
+                    <RegistryValue
+                        Root='HKCU'
+                        Key='Software\[Manufacturer]\[ProductName]\DesktopShortcut'
+                        Name='installed'
+                        Type='integer'
+                        Value='1'
+                        KeyPath='yes'/>
+                    <RemoveFolder Id='DesktopFolder' On='uninstall'/>
+                </Component>
+            </Directory>
         </Directory>
 
         <Feature
@@ -144,6 +180,10 @@
             <ComponentRef Id='License'/>
             
             <ComponentRef Id='binary0'/>
+
+            <ComponentRef Id='ApplicationShortcut'/>
+
+            <ComponentRef Id='DesktopShortcut'/>
 
             <Feature
                 Id='Environment'
