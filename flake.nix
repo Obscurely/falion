@@ -68,11 +68,7 @@
 
             RUST_BACKTRACE = 1;
             # falion specific for ui (iced)
-            LD_LIBRARY_PATH = builtins.foldl' (a: b: "${a}:${b}/lib") "${pkgs.vulkan-loader}/lib" buildInputs;
-            # which theme to build the application with
-            SLINT_STYLE = "fluent-dark";
-            # Disable qt-backend, doesn't work with the way I built it
-            SLINT_NO_QT=1;
+            LD_LIBRARY_PATH = builtins.foldl' (a: b: "${a}:${b}/lib") "${pkgs.vulkan-loader}/lib" buildInputs; 
           };
         }
     );
