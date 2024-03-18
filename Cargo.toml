@@ -49,7 +49,7 @@ embed-resource = "2.4.2"
 
 [dependencies]
 chrono = { version = "0.4.35", default-features = false, features = ["clock"] }
-clap = { version = "4.5.2", features = ["derive"] }
+clap = { version = "4.5.3", features = ["derive"] }
 crossterm = "0.27.0"
 dashmap = "5.4.0"
 dirs = "5.0.1"
@@ -58,7 +58,7 @@ hashbrown = "0.14.3"
 html2text = "0.12.4"
 rand = "0.8.5"
 rayon = "1.9.0"
-reqwest = { version = "0.11.25", features = [
+reqwest = { version = "0.11.26", features = [
   "json",
   "gzip",
   "brotli",
