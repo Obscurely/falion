@@ -32,6 +32,22 @@ None
 
 None
 
+## v1.0.1
+
+### Fixed v1.0.1
+
+- Fix builds on some platforms not being done without qt.
+- Fix arch pkg thanks to setting the backend in ./cargo/config.toml
+- Force the theme to be dark. In the future it will adapt to the system and look
+  prettier for now this is it
+- Fix homebrew pkg
+- Fix windows installer not creating desktop or start menu shortcuts
+- Fix appimage not taking CLI args and consequently fixing the nix file
+
+### Security v1.0.1
+
+- Fix multiple security issues from creates
+
 ## v1.0.0-stable
 
 ### Highlights v1.0.0
