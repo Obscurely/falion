@@ -219,27 +219,27 @@ jobs:
           ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
           commit_message: Update AUR package
           ssh_keyscan_types: rsa,dsa,ecdsa,ed25519
-      - name: Publish AUR git
-        uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
-        with:
-          pkgname: ${{ env.AUR_BASE }}-git
-          pkgbuild: ./resources/linux/AUR/git/PKGBUILD
-          commit_username: ${{ secrets.AUR_USERNAME }}
-          commit_email: ${{ secrets.AUR_EMAIL }}
-          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-          commit_message: Update AUR package
-          ssh_keyscan_types: rsa,dsa,ecdsa,ed25519
-      - name: Publish AUR stable
-        if: "contains(github.ref, 'stable')"
-        uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
-        with:
-          pkgname: ${{ env.AUR_BASE }}
-          pkgbuild: ./resources/linux/AUR/stable/PKGBUILD
-          commit_username: ${{ secrets.AUR_USERNAME }}
-          commit_email: ${{ secrets.AUR_EMAIL }}
-          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-          commit_message: Update AUR package
-          ssh_keyscan_types: rsa,dsa,ecdsa,ed25519
+      # - name: Publish AUR git
+      #   uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
+      #   with:
+      #     pkgname: ${{ env.AUR_BASE }}-git
+      #     pkgbuild: ./resources/linux/AUR/git/PKGBUILD
+      #     commit_username: ${{ secrets.AUR_USERNAME }}
+      #     commit_email: ${{ secrets.AUR_EMAIL }}
+      #     ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+      #     commit_message: Update AUR package
+      #     ssh_keyscan_types: rsa,dsa,ecdsa,ed25519
+      # - name: Publish AUR stable
+      #   if: "contains(github.ref, 'stable')"
+      #   uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
+      #   with:
+      #     pkgname: ${{ env.AUR_BASE }}
+      #     pkgbuild: ./resources/linux/AUR/stable/PKGBUILD
+      #     commit_username: ${{ secrets.AUR_USERNAME }}
+      #     commit_email: ${{ secrets.AUR_EMAIL }}
+      #     ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+      #     commit_message: Update AUR package
+      #     ssh_keyscan_types: rsa,dsa,ecdsa,ed25519
       - name: Upload assets
         uses: "softprops/action-gh-release@v2"
         with:
