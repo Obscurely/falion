@@ -344,9 +344,8 @@ If you've got any questions please give the [FAQ](#faq) a check.
 
 The PKGs are:
 
-- falion (for stable)
-- falion-bin (for precompiled)
-- falion-git (to compile from the latest source code commit)
+- falion-bin (for precompiled, it's the only one available since building in the
+  pkgbuild fails for some reason)
 
 a. if you have an AUR manager (like
 [paru](https://github.com/Morganamilo/paru/blob/master/README.md#installation)
@@ -357,7 +356,7 @@ you should)
    the following command for example.
 
    ```shell
-   paru -Sy falion
+   paru -Sy falion-bin
    ```
 
 1. Search for falion in your app launcher and launch it.
@@ -375,7 +374,7 @@ b. Manually cloning and building it from AUR
 1. Then clone the build script
 
    ```shell
-   git clone https://aur.archlinux.org/falion.git # or falion-bin & falion-git
+   git clone https://aur.archlinux.org/falion-bin.git
    ```
 
 1. Cd into the new cloned repository and run the following to build the package
