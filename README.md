@@ -15,7 +15,7 @@
 <h1 align="center"></h1>
 
 <p align="center">
-    An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI.
+    An open source, programmed in rust, privacy focused tool and crate for interacting with programming resources (like stackoverflow) fast, efficiently and asynchronously/parallel using the CLI or GUI.
     <p>
         <a href="https://github.com/Obscurely/falion/wiki"><strong>Explore the docs »</strong></a>
         <br />
@@ -99,7 +99,7 @@
 ## 🪽 About The Project
 
 **Falion** is creative open-source tool created in **Rust** with the aim of
-improving programming **resource scraping**. It prioritizes **privacy**,
+improving programming **resource interaction**. It prioritizes **privacy**,
 **speed**, and **efficiency**, targeting sources like **StackOverflow**,
 **GitHub Gists**, and more.
 
@@ -138,7 +138,7 @@ a lightweight GUI for your preferred experience.
 
 **Cross-Platform:** Works seamlessly on Linux, MacOS, and Windows.
 
-**No Rate Limitations:** Scraping without interruptions under normal use.
+**No Rate Limitations:** Browsing without interruptions under normal use.
 
 **Versatile:** Use it as a stand-alone tool or integrate it as a crate into your
 Rust projects.
@@ -167,7 +167,7 @@ If you've got any questions please give the [FAQ](#faq) a check.
 
 ### 💡 Features
 
-- [x] Scrapes programming resources
+- [x] Interact with programming resources
   - [x] **StackOverflow** - No need to say anything
   - [x] **StackExchange**- index of different forums
   - [x] **Github Gists** - for code snippets and guides

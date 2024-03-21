@@ -5,7 +5,7 @@ version = "1.0.0"
 edition = "2021"
 rust-version = "1.76.0"                                        # Minimum rust version
 resolver = "2"
-description = "An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI. "
+description = "An open source, programmed in rust, privacy focused tool and crate for interacting with programming resources (like stackoverflow) fast, efficiently and asynchronously/parallel using the CLI or GUI."
 documentation = "https://github.com/Obscurely/falion/blob/master/README.md"
 repository = "https://github.com/Obscurely/falion"
 homepage = "https://github.com/Obscurely/falion"
@@ -22,7 +22,7 @@ maintainer = "Obscurely <adrian.obscurely@protonmail.com>"
 copyright = "2024, 2024 <adrian.obscurely@protonmail.com>"
 license-file = ["LICENSE", "0"]
 extended-description = """\
-An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI. """"
+An open source, programmed in rust, privacy focused tool and crate for interacting with programming resources (like stackoverflow) fast, efficiently and asynchronously/parallel using the CLI or GUI.""""
 depends = "$auto"
 section = "Utilities"
 
