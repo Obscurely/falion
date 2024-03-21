@@ -70,7 +70,7 @@
 
         <Package Id='*'
             Keywords='Installer'
-            Description='An open source, programmed in rust, privacy focused tool for scraping programming resources (like stackoverflow) fast, efficient and asynchronous/parallel using the CLI or GUI. '
+            Description='An open source, programmed in rust, privacy focused tool and crate for interacting with programming resources (like stackoverflow) fast, efficiently and asynchronously/parallel using the CLI or GUI.'
             Manufacturer='Obscurely'
             InstallerVersion='450'
             Languages='1033'
