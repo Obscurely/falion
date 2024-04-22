@@ -48,7 +48,7 @@ embed-resource = "2.4.2"
 #═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [dependencies]
-chrono = { version = "0.4.35", default-features = false, features = ["clock"] }
+chrono = { version = "0.4.38", default-features = false, features = ["clock"] }
 clap = { version = "4.5.3", features = ["derive"] }
 crossterm = "0.27.0"
 dashmap = "5.4.0"
