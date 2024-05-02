@@ -1,9 +1,9 @@
 [package]
 name = "falion"
 authors = ["Obscurely <adrian.obscurely@protonmail.com"]
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
-rust-version = "1.76.0"                                        # Minimum rust version
+rust-version = "1.77.2"                                        # Minimum rust version
 resolver = "2"
 description = "An open source, programmed in rust, privacy focused tool and crate for interacting with programming resources (like stackoverflow) fast, efficiently and asynchronously/parallel using the CLI or GUI."
 documentation = "https://github.com/Obscurely/falion/blob/master/README.md"
@@ -48,25 +48,25 @@ embed-resource = "2.4.2"
 #═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 [dependencies]
-chrono = { version = "0.4.35", default-features = false, features = ["clock"] }
-clap = { version = "4.5.3", features = ["derive"] }
+chrono = { version = "0.4.38", default-features = false, features = ["clock"] }
+clap = { version = "4.5.4", features = ["derive"] }
 crossterm = "0.27.0"
 dashmap = "5.4.0"
 dirs = "5.0.1"
 futures = "0.3.30"
-hashbrown = "0.14.3"
+hashbrown = "0.14.5"
 html2text = "0.12.4"
 rand = "0.8.5"
-rayon = "1.9.0"
-reqwest = { version = "0.11.26", features = [
+rayon = "1.10.0"
+reqwest = { version = "0.12.4", features = [
   "json",
   "gzip",
   "brotli",
   "deflate",
 ] }
-slint = "1.4.1"
-thiserror = "1.0.58"
-tokio = { version = "1.36.0", features = ["full"] }
+slint = "1.5.1"
+thiserror = "1.0.59"
+tokio = { version = "1.37.0", features = ["full"] }
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
 url = "2.5.0"
