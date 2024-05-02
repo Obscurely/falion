@@ -210,7 +210,7 @@ jobs:
           echo "AUR_BASE=$BIN_NAME" >> "$GITHUB_ENV"
       - name: Publish AUR bin
         if: "contains(github.ref, 'stable')"
-        uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
+        uses: KSXGitHub/github-actions-deploy-aur@v2.7.1
         with:
           pkgname: ${{ env.AUR_BASE }}-bin
           pkgbuild: ./resources/linux/AUR/bin/PKGBUILD
@@ -220,7 +220,7 @@ jobs:
           commit_message: Update AUR package
           ssh_keyscan_types: rsa,dsa,ecdsa,ed25519
       # - name: Publish AUR git
-      #   uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
+      #   uses: KSXGitHub/github-actions-deploy-aur@v2.7.1
       #   with:
       #     pkgname: ${{ env.AUR_BASE }}-git
       #     pkgbuild: ./resources/linux/AUR/git/PKGBUILD
@@ -231,7 +231,7 @@ jobs:
       #     ssh_keyscan_types: rsa,dsa,ecdsa,ed25519
       # - name: Publish AUR stable
       #   if: "contains(github.ref, 'stable')"
-      #   uses: KSXGitHub/github-actions-deploy-aur@v2.7.0
+      #   uses: KSXGitHub/github-actions-deploy-aur@v2.7.1
       #   with:
       #     pkgname: ${{ env.AUR_BASE }}
       #     pkgbuild: ./resources/linux/AUR/stable/PKGBUILD
