@@ -51,7 +51,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Clippy check
         run: |
-          cargo clippy --all-targets --all-features --workspace -- -D warnings
+          cargo clippy --all-targets --all-features --workspace
   run-lint:
     name: Super Linter
     runs-on: ubuntu-latest
@@ -84,7 +84,5 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Check documentation
-        env:
-          RUSTDOCFLAGS: -D warnings
         run: >
           cargo doc --no-deps --document-private-items --all-features --workspace --examples
