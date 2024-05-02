@@ -32,6 +32,20 @@ None
 
 None
 
+## v1.0.2
+
+### Changed v1.0.2
+
+- Bump chrono to 0.4.38
+- Bump clap to 4.5.4
+- Bump hashbrown to 0.14.5
+- Bump rayon to 0.10.0
+- Bump reqwest to 0.12.4
+- Bump slint to 1.5.1
+- Bump this error to 1.0.56
+- Bump tokio to 1.37.0
+- As reult CWE-400 and CWE-770 were fixed.
+
 ## v1.0.1
 
 ### Fixed v1.0.1
