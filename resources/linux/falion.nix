@@ -3,6 +3,7 @@
 let
   version = "VERSION_PLACEHOLDER";
   name = "falion-${version}";
+  pname = "falion";
 
   plat = {
     x86_64-linux = "";
@@ -18,18 +19,17 @@ let
   };
 
   appimageContents = appimageTools.extractType2 {
-    inherit name src;
+    inherit pname version src;
   };
 in
 appimageTools.wrapType2 rec {
-  inherit name src;
+  inherit pname version src;
 
   extraInstallCommands = ''
     mkdir -p $out/share/pixmaps $out/share/licenses/falion
     cp ${appimageContents}/falion.png $out/share/pixmaps/
     cp ${appimageContents}/falion.desktop $out
     cp ${appimageContents}/LICENSE $out/share/licenses/falion/LICENSE
-    mv $out/bin/${name} $out/bin/falion
     ${desktop-file-utils}/bin/desktop-file-install --dir $out/share/applications \
       --set-key Exec --set-value $out/bin/falion \
       --set-key Comment --set-value "falion Linux" \
