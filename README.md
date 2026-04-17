@@ -606,8 +606,6 @@ This repository is based on this template [Obscurely/RustTemplate](https://githu
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/K3K3H29LV)
-
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
