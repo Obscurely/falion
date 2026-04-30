@@ -30,7 +30,6 @@ appimageTools.wrapType2 rec {
     cp ${appimageContents}/falion.png $out/share/pixmaps/
     cp ${appimageContents}/falion.desktop $out
     cp ${appimageContents}/LICENSE $out/share/licenses/falion/LICENSE
-    mv $out/bin/${name} $out/bin/falion
     ${desktop-file-utils}/bin/desktop-file-install --dir $out/share/applications \
       --set-key Exec --set-value $out/bin/falion \
       --set-key Comment --set-value "falion Linux" \
